@@ -1773,7 +1773,7 @@ function renderGames() {
 ========================================================= */
 
 let hangWord = "";
-let hangGuessed = [];
+let keyboard = [QWERTYUIOP,ASDFGHJKL,ZXCVBNM];
 let hangLives = 6;
 
 function renderHangman() {
@@ -1783,7 +1783,7 @@ function renderHangman() {
             Math.floor(Math.random()*scrambleWords.length)
         ];
 
-    hangGuessed = [];
+    keyboard = [QWERTYUIOP,ASDFGHJKL,ZXCVBNM];
     hangLives = 6;
 
     drawHangman();
@@ -1795,7 +1795,7 @@ function drawHangman() {
         hangWord
         .split("")
         .map(letter =>
-            hangGuessed.includes(letter)
+            keyboard.flat().includes(letter)
                 ? letter
                 : "_"
         )
@@ -1870,12 +1870,16 @@ function hangGuess() {
 
     if (!/^[A-Z]$/.test(letter)) return;
 
-    if (hangGuessed.includes(letter)) {
+    if (keyboard.flat().includes(letter)) {
         toast("Already guessed!");
         return;
     }
 
-    hangGuessed.push(letter);
+    keyboard.forEach(row => {
+        if (row.includes(letter)) {
+            row[row.indexOf(letter)] = letter;
+        }
+    }); 
 
     if (!hangWord.includes(letter)) {
         hangLives--;
@@ -1884,7 +1888,7 @@ function hangGuess() {
     const won =
         hangWord
         .split("")
-        .every(l => hangGuessed.includes(l));
+        .every(l => keyboard.flat().includes(l));
 
     if (won) {
 
