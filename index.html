@@ -463,6 +463,77 @@ body.light .topbar {
     margin-top: 5px;
 }
 
+/* HANGMAN KEYBOARD & HINT STYLING */
+.hint-box {
+    text-align: center;
+    background: var(--panel2);
+    border: 1px dashed var(--secondary);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--secondary);
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.qwerty-keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 25px;
+    user-select: none;
+}
+
+.qwerty-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.key-btn {
+    flex: 1;
+    max-width: 45px;
+    height: 50px;
+    border-radius: 8px;
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+}
+
+.key-btn:hover:not(:disabled) {
+    background: var(--primary);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.key-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    border-color: transparent;
+}
+
+/* CRYPTO CIPHER STYLING */
+.cipher-encoded {
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 4px;
+    word-break: break-all;
+    background: var(--panel2);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--primary);
+    color: var(--secondary);
+    margin: 20px 0;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
 /* TRIVIA */
 
 .question-box {
@@ -807,8 +878,12 @@ body.light .topbar {
     .game-panel {
         padding: 15px;
     }
+    
+    .key-btn {
+        height: 42px;
+        font-size: 14px;
+    }
 }
-
 
 /* THEME / CONTROL VISIBILITY */
 .theme-option, .theme-btn, .settings-btn {
@@ -894,7 +969,7 @@ body.light .topbar {
 
         <aside class="sidebar">
 
-            <div class="nav-title">Main</div>
+            <div class="nav-title">Navigation</div>
 
             <button class="nav-btn active" onclick="showPage('home',this)">
                 🏠 Home
@@ -904,10 +979,14 @@ body.light .topbar {
                 🎮 Games
             </button>
 
-            <div class="nav-title">Offline Games</div>
+            <div class="nav-title">Single Player</div>
 
             <button class="nav-btn" onclick="startGame('hangman',this)">
                 🎯 Hangman
+            </button>
+
+            <button class="nav-btn" onclick="startGame('cipher',this)">
+                🔐 Crypto Cipher
             </button>
 
             <button class="nav-btn" onclick="startGame('rush',this)">
@@ -946,7 +1025,7 @@ body.light .topbar {
                 ♟️ Online Chess
             </button>
 
-            <div class="nav-title">Extras</div>
+            <div class="nav-title">User Area</div>
 
             <button class="nav-btn" onclick="showPage('shop',this)">
                 🛒 Shop
@@ -1196,6 +1275,7 @@ function startGame(game, button) {
     if (button) button.classList.add("active");
 
     if (game === "hangman") renderHangman();
+    if (game === "cipher") renderCipher();
     if (game === "rush") renderRush();
     if (game === "scramble") renderScramble();
     if (game === "master") renderMaster();
@@ -1222,8 +1302,25 @@ function toast(message) {
    WORD DATABASES
 ========================================================= */
 
-const scrambleWords = [
+const hangmanData = [
+    { word: "PYTHON", hint: "A popular programming language named after a snake." },
+    { word: "COMPUTER", hint: "An electronic device for storing and processing data." },
+    { word: "JAVASCRIPT", hint: "The programming language of the Web." },
+    { word: "KEYBOARD", hint: "Input device with letters and numbers used for typing." },
+    { word: "INTERNET", hint: "A global network connecting millions of computers." },
+    { word: "DATABASE", hint: "An organized collection of structured data." },
+    { word: "MONITOR", hint: "An output device that displays visual information." },
+    { word: "SOFTWARE", hint: "Programs and instructions used by computers." },
+    { word: "HARDWARE", hint: "The physical parts of a computer system." },
+    { word: "GITHUB", hint: "A platform for hosting and sharing code repositories." },
+    { word: "NETWORK", hint: "Interconnected computers that exchange data." },
+    { word: "GALAXY", hint: "A massive system of stars, stellar remnants, and dark matter." },
+    { word: "VOLCANO", hint: "A mountain that opens downward to a pool of molten rock." },
+    { word: "PYRAMID", hint: "A ancient massive structure built in Egypt." },
+    { word: "PENGUIN", hint: "A flightless bird that thrives in cold climates." }
+];
 
+const scrambleWords = [
 "PYTHON","COMPUTER","JAVASCRIPT","KEYBOARD","INTERNET",
 "PROGRAM","BROWSER","GITHUB","CHESS","PUZZLE",
 "SCHOOL","MOBILE","CODING","WEBSITE","STREAMLIT",
@@ -1247,7 +1344,6 @@ const scrambleWords = [
 ];
 
 const rushWords = [
-
 "CAT","BOOK","CODE","GAME","SCHOOL",
 "PYTHON","MOUSE","SCREEN","APPLE","PLANET",
 "COMPUTER","MUSIC","ROBOT","KEYBOARD","INTERNET",
@@ -1271,102 +1367,13 @@ const rushWords = [
 "ENERGY","POWER","SPEED","LIGHT","SOUND"
 ];
 
-/* Exactly five-letter Word Master words */
-
 const masterWords = [
-
 "APPLE","HOUSE","MOUSE","WATER","PLANT",
 "LIGHT","WORLD","EARTH","CLOUD","PHONE",
 "CHAIR","BRAIN","SPACE","TRAIN","TIGER",
 "HORSE","GREEN","BLACK","WHITE","SMILE",
 "MUSIC","MONEY","STONE","RIVER","TABLE",
 "BOOKS","PLANE","BEACH","HEART","NIGHT",
-
-"ABOUT","ABOVE","ABUSE","ACTOR","ACUTE",
-"ADMIT","ADOPT","ADULT","AFTER","AGAIN",
-"AGENT","AGREE","AHEAD","ALARM","ALBUM",
-"ALERT","ALIKE","ALIVE","ALLOW","ALONE",
-"ANGEL","ANGER","ANGLE","ANGRY","APART",
-"APPLE","ARENA","ARGUE","ARISE","ARMOR",
-"ASIDE","ASSET","AUDIO","AVOID","AWAKE",
-"AWARD","BADGE","BASIC","BASIS","BEGAN",
-"BEGIN","BEING","BELOW","BENCH","BIRTH",
-"BLACK","BLAME","BLANK","BLAST","BLEND",
-"BLIND","BLOCK","BLOOD","BOARD","BOOST",
-"BOUND","BRAIN","BRAVE","BREAD","BREAK",
-"BRICK","BRING","BROAD","BROKE","BROWN",
-"BUILD","BUILT","BUYER","CABLE","CARRY",
-"CATCH","CAUSE","CHAIN","CHAIR","CHARM",
-"CHEAP","CHECK","CHEST","CHIEF","CHILD",
-"CHOSE","CIVIL","CLAIM","CLASS","CLEAN",
-"CLEAR","CLIMB","CLOCK","CLOSE","COACH",
-"COAST","COLOR","COUNT","COURT","COVER",
-"CRAFT","CRASH","CRAZY","CREAM","CRIME",
-"CROSS","CROWD","CROWN","CRUSH","DAILY",
-"DANCE","DEATH","DEBUT","DELAY","DEPTH",
-"DOING","DOUBT","DOZEN","DRAFT","DRAMA",
-"DREAM","DRINK","DRIVE","EARLY","EARTH",
-"ENJOY","ENTER","ENTRY","EQUAL","ERROR",
-"EVENT","EVERY","EXACT","EXIST","EXTRA",
-"FAITH","FALSE","FAULT","FAVOR","FEAST",
-"FIELD","FIFTH","FIGHT","FINAL","FIRST",
-"FIXED","FLASH","FLOOR","FOCUS","FORCE",
-"FRAME","FRANK","FRESH","FRONT","FRUIT",
-"FUNNY","GIANT","GIVEN","GLASS","GLOBE",
-"GOING","GRACE","GRADE","GRAND","GRANT",
-"GRASS","GREAT","GROUP","GUARD","GUESS",
-"GUIDE","HAPPY","HEAVY","HONEY","HORSE",
-"HOTEL","HOUSE","HUMAN","IDEAL","IMAGE",
-"INDEX","INNER","INPUT","ISSUE","JOINT",
-"JUDGE","JUICE","KNOWN","LABEL","LARGE",
-"LASER","LATER","LAUGH","LAYER","LEARN",
-"LEAST","LEAVE","LEGAL","LEVEL","LOCAL",
-"LOGIC","LUCKY","MAJOR","MAKER","MARCH",
-"MATCH","MAYBE","MEDIA","METAL","MODEL",
-"MONEY","MONTH","MOTOR","MOUNT","MOUTH",
-"MOVIE","NAKED","NERVE","NEVER","NIGHT",
-"NORTH","NOVEL","NURSE","OCCUR","OFFER",
-"OFFICE","ORDER","OTHER","OUTER","OWNER",
-"PAINT","PANEL","PAPER","PARTY","PEACE",
-"PHASE","PHONE","PIANO","PIECE","PILOT",
-"PITCH","PLACE","PLAIN","PLANE","PLANT",
-"PLATE","POINT","POWER","PRESS","PRICE",
-"PRIDE","PRIME","PRINT","PRIZE","PROOF",
-"PROUD","PROVE","QUEEN","QUICK","QUIET",
-"RADIO","RAISE","RANGE","RAPID","REACH",
-"READY","REALM","REPLY","RIGHT","RIVER",
-"ROUGH","ROUND","ROUTE","ROYAL","RURAL",
-"SAFER","SAINT","SCALE","SCENE","SCOPE",
-"SCORE","SENSE","SERVE","SEVEN","SHARE",
-"SHIFT","SHINE","SHOCK","SHORT","SIGHT",
-"SINCE","SKILL","SLEEP","SMALL","SMART",
-"SMILE","SOLID","SOUND","SOUTH","SPACE",
-"SPEAK","SPEED","SPEND","SPICE","SPORT",
-"STAFF","STAGE","STAKE","START","STATE",
-"STEAM","STEEL","STICK","STILL","STONE",
-"STORE","STORM","STORY","STRIP","STUDY",
-"STYLE","SUGAR","SUPER","SWEET","TABLE",
-"TAKEN","TASTE","TEACH","THANK","THEME",
-"THERE","THICK","THING","THINK","THIRD",
-"THROW","TIGHT","TITLE","TODAY","TOPIC",
-"TOWER","TRACK","TRADE","TRAIN","TREAT",
-"TREND","TRIAL","TRUST","TRUTH","UNCLE",
-"UNDER","UNION","UNITE","UNTIL","UPPER",
-"URBAN","USUAL","VALUE","VIDEO","VISIT",
-"VOICE","WASTE","WATCH","WEIRD","WHERE",
-"WHICH","WHILE","WHOLE","WHOSE","WOMAN",
-"WORDS","WORLD","WORRY","WORTH","WRITE",
-"WRONG","YOUNG","YOUTH"
-];
-
-/* Online word bank */
-
-const onlineWords = [
-
-"WORLD","EARTH","CLOUD","APPLE","HOUSE",
-"CHAIR","BRAIN","SPACE","TRAIN","TIGER",
-"HORSE","GREEN","SMILE","MUSIC","STONE",
-
 "ABOUT","ABOVE","ABUSE","ACTOR","ACUTE",
 "ADMIT","ADOPT","ADULT","AFTER","AGAIN",
 "AGENT","AGREE","AHEAD","ALARM","ALBUM",
@@ -1440,12 +1447,9 @@ const onlineWords = [
 "WRITE","WRONG","YOUNG","YOUTH"
 ];
 
-/* =========================================================
-   200+ TRIVIA QUESTIONS
-========================================================= */
+const onlineWords = masterWords;
 
 const trivia = [
-
 {q:"What is the capital of Pakistan?",a:"Islamabad",c:["Karachi","Lahore","Islamabad","Peshawar"]},
 {q:"Which planet is known as the Red Planet?",a:"Mars",c:["Venus","Mars","Jupiter","Mercury"]},
 {q:"How many days are there in a leap year?",a:"366",c:["365","366","364","367"]},
@@ -1455,261 +1459,7 @@ const trivia = [
 {q:"What is the chemical symbol for water?",a:"H₂O",c:["CO₂","O₂","H₂O","NaCl"]},
 {q:"Which is the largest continent?",a:"Asia",c:["Africa","Europe","Asia","Australia"]},
 {q:"Who wrote Romeo and Juliet?",a:"William Shakespeare",c:["Charles Dickens","William Shakespeare","Mark Twain","Leo Tolstoy"]},
-{q:"How many sides does a hexagon have?",a:"6",c:["5","6","7","8"]},
-
-{q:"What is the capital of France?",a:"Paris",c:["Rome","Madrid","Paris","Berlin"]},
-{q:"Which animal is known as the king of the jungle?",a:"Lion",c:["Tiger","Lion","Elephant","Bear"]},
-{q:"What is 15 + 27?",a:"42",c:["32","40","42","45"]},
-{q:"Which organ pumps blood around the human body?",a:"Heart",c:["Brain","Lung","Heart","Kidney"]},
-{q:"What is the nearest star to Earth?",a:"The Sun",c:["Sirius","The Sun","Polaris","Vega"]},
-{q:"How many planets are in our Solar System?",a:"8",c:["7","8","9","10"]},
-{q:"Which country is famous for the pyramids of Giza?",a:"Egypt",c:["Mexico","Egypt","Greece","India"]},
-{q:"What is the opposite of 'ancient'?",a:"Modern",c:["Old","Modern","Historic","Past"]},
-{q:"Which instrument has black and white keys?",a:"Piano",c:["Guitar","Piano","Violin","Flute"]},
-{q:"What is 100 ÷ 4?",a:"25",c:["20","25","30","40"]},
-
-{q:"Which planet is largest?",a:"Jupiter",c:["Saturn","Earth","Jupiter","Neptune"]},
-{q:"What is the boiling point of water at sea level?",a:"100°C",c:["50°C","75°C","100°C","150°C"]},
-{q:"Which language is primarily spoken in Brazil?",a:"Portuguese",c:["Spanish","Portuguese","French","English"]},
-{q:"What is the square root of 81?",a:"9",c:["7","8","9","10"]},
-{q:"Which is the fastest land animal?",a:"Cheetah",c:["Lion","Horse","Cheetah","Tiger"]},
-{q:"What do bees produce?",a:"Honey",c:["Milk","Honey","Silk","Wax only"]},
-{q:"Which planet has prominent rings?",a:"Saturn",c:["Mars","Venus","Saturn","Mercury"]},
-{q:"How many hours are in a day?",a:"24",c:["12","20","24","48"]},
-{q:"What is the largest mammal?",a:"Blue whale",c:["Elephant","Blue whale","Giraffe","Shark"]},
-{q:"Which metal is liquid at room temperature?",a:"Mercury",c:["Iron","Gold","Mercury","Copper"]},
-
-{q:"What is the capital of Japan?",a:"Tokyo",c:["Kyoto","Tokyo","Osaka","Hiroshima"]},
-{q:"Which shape has three sides?",a:"Triangle",c:["Square","Triangle","Circle","Pentagon"]},
-{q:"What is 9 × 9?",a:"81",c:["72","81","91","99"]},
-{q:"Which part of a plant usually absorbs water?",a:"Roots",c:["Leaves","Flowers","Roots","Fruit"]},
-{q:"What is Earth's natural satellite?",a:"Moon",c:["Mars","Moon","Sun","Venus"]},
-{q:"Which ocean lies between Africa and Australia?",a:"Indian Ocean",c:["Pacific Ocean","Indian Ocean","Atlantic Ocean","Arctic Ocean"]},
-{q:"What is the hardest natural substance?",a:"Diamond",c:["Iron","Diamond","Quartz","Gold"]},
-{q:"Which blood cells help fight infection?",a:"White blood cells",c:["Red blood cells","White blood cells","Platelets","Plasma"]},
-{q:"What is the main language of Spain?",a:"Spanish",c:["French","Spanish","Italian","German"]},
-{q:"How many minutes are in one hour?",a:"60",c:["30","45","60","90"]},
-
-{q:"Which country has the city of Istanbul?",a:"Turkey",c:["Greece","Turkey","Egypt","Italy"]},
-{q:"What is 7 × 8?",a:"56",c:["48","54","56","64"]},
-{q:"Which gas makes up most of Earth's atmosphere?",a:"Nitrogen",c:["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"]},
-{q:"Which organ is mainly responsible for thinking?",a:"Brain",c:["Heart","Brain","Liver","Stomach"]},
-{q:"What is the largest hot desert?",a:"Sahara Desert",c:["Gobi Desert","Sahara Desert","Arabian Desert","Kalahari"]},
-{q:"Which sport uses a bat and wickets?",a:"Cricket",c:["Football","Cricket","Tennis","Hockey"]},
-{q:"What is the freezing point of water?",a:"0°C",c:["0°C","10°C","32°C","100°C"]},
-{q:"Which planet is closest to the Sun?",a:"Mercury",c:["Venus","Mercury","Earth","Mars"]},
-{q:"How many colors are traditionally in a rainbow?",a:"7",c:["5","6","7","8"]},
-{q:"Which animal is the largest living land animal?",a:"African elephant",c:["Giraffe","African elephant","Rhino","Hippo"]},
-
-{q:"What is the capital of China?",a:"Beijing",c:["Shanghai","Beijing","Hong Kong","Nanjing"]},
-{q:"Which scientist developed the theory of relativity?",a:"Albert Einstein",c:["Isaac Newton","Albert Einstein","Galileo Galilei","Nikola Tesla"]},
-{q:"What is 144 ÷ 12?",a:"12",c:["10","11","12","14"]},
-{q:"Which vitamin is commonly produced in skin through sunlight exposure?",a:"Vitamin D",c:["Vitamin A","Vitamin B","Vitamin C","Vitamin D"]},
-{q:"Which planet is famous for its Great Red Spot?",a:"Jupiter",c:["Jupiter","Saturn","Mars","Neptune"]},
-{q:"What is the largest organ of the human body?",a:"Skin",c:["Liver","Skin","Brain","Heart"]},
-{q:"Which country is shaped roughly like a boot?",a:"Italy",c:["Spain","Italy","France","Portugal"]},
-{q:"What is the chemical symbol for gold?",a:"Au",c:["Ag","Au","Fe","Gd"]},
-{q:"Which direction does the Sun appear to rise from?",a:"East",c:["North","South","East","West"]},
-{q:"What is 25% of 100?",a:"25",c:["20","25","30","50"]},
-
-{q:"Which is the smallest prime number?",a:"2",c:["0","1","2","3"]},
-{q:"What is the capital of Australia?",a:"Canberra",c:["Sydney","Melbourne","Canberra","Perth"]},
-{q:"Which device is used to measure temperature?",a:"Thermometer",c:["Barometer","Thermometer","Compass","Ruler"]},
-{q:"What is the process by which plants make food?",a:"Photosynthesis",c:["Respiration","Photosynthesis","Digestion","Fermentation"]},
-{q:"Which continent is Egypt mainly located in?",a:"Africa",c:["Asia","Africa","Europe","Australia"]},
-{q:"How many degrees are in a right angle?",a:"90",c:["45","90","180","360"]},
-{q:"Which animal can change its color for camouflage?",a:"Chameleon",c:["Elephant","Chameleon","Horse","Cow"]},
-{q:"What is the capital of Italy?",a:"Rome",c:["Venice","Milan","Rome","Naples"]},
-{q:"Which force pulls objects toward Earth?",a:"Gravity",c:["Friction","Gravity","Magnetism","Pressure"]},
-{q:"What is the largest planet after Jupiter?",a:"Saturn",c:["Earth","Saturn","Neptune","Mars"]},
-
-{q:"Which country is known as the Land of the Rising Sun?",a:"Japan",c:["China","Japan","Korea","Thailand"]},
-{q:"What is the primary source of energy for Earth?",a:"The Sun",c:["Moon","The Sun","Wind","Ocean"]},
-{q:"How many players are on a standard football team on the field?",a:"11",c:["9","10","11","12"]},
-{q:"Which instrument measures air pressure?",a:"Barometer",c:["Thermometer","Barometer","Hygrometer","Compass"]},
-{q:"What is the capital of Canada?",a:"Ottawa",c:["Toronto","Ottawa","Vancouver","Montreal"]},
-{q:"Which part of the computer is often called the brain of the computer?",a:"CPU",c:["RAM","CPU","Keyboard","Monitor"]},
-{q:"What does HTML stand for?",a:"HyperText Markup Language",c:["HighText Machine Language","HyperText Markup Language","Hyper Tool Multi Language","Home Tool Markup Language"]},
-{q:"What does CPU stand for?",a:"Central Processing Unit",c:["Computer Personal Unit","Central Processing Unit","Central Program Utility","Computer Processing Utility"]},
-{q:"Which language is used to style web pages?",a:"CSS",c:["HTML","CSS","Python","SQL"]},
-{q:"Which language is commonly used to add interactivity to web pages?",a:"JavaScript",c:["CSS","JavaScript","SQL","XML"]},
-
-{q:"What does URL stand for?",a:"Uniform Resource Locator",c:["Universal Record Link","Uniform Resource Locator","User Resource Link","Universal Routing Language"]},
-{q:"What does RAM stand for?",a:"Random Access Memory",c:["Read Access Memory","Random Access Memory","Rapid Application Memory","Remote Access Module"]},
-{q:"Which device displays computer output visually?",a:"Monitor",c:["Keyboard","Monitor","Mouse","Router"]},
-{q:"Which device is mainly used to point and click?",a:"Mouse",c:["Keyboard","Mouse","Printer","Speaker"]},
-{q:"Which storage device uses spinning magnetic disks?",a:"Hard disk drive",c:["SSD","Hard disk drive","RAM","CPU"]},
-{q:"What does USB stand for?",a:"Universal Serial Bus",c:["Universal System Bus","Universal Serial Bus","United Serial Board","User System Bus"]},
-{q:"Which number system uses only 0 and 1?",a:"Binary",c:["Decimal","Binary","Hexadecimal","Octal"]},
-{q:"What is the decimal value of binary 1010?",a:"10",c:["8","9","10","12"]},
-{q:"How many bits are in one byte?",a:"8",c:["4","8","16","32"]},
-{q:"Which company created Windows?",a:"Microsoft",c:["Apple","Microsoft","Google","IBM"]},
-
-{q:"Which company developed Android?",a:"Google",c:["Microsoft","Google","Apple","Intel"]},
-{q:"What is GitHub mainly used for?",a:"Code hosting and collaboration",c:["Video editing","Code hosting and collaboration","Weather forecasting","Music streaming"]},
-{q:"Which file extension is commonly used for HTML?",a:".html",c:[".py",".html",".css",".exe"]},
-{q:"Which file extension is commonly used for Python?",a:".py",c:[".js",".html",".py",".css"]},
-{q:"Which symbol begins a single-line comment in Python?",a:"#",c:["//","#","--","/*"]},
-{q:"Which Python function displays text?",a:"print()",c:["show()","print()","displayText()","writeText()"]},
-{q:"Which data type stores True or False?",a:"Boolean",c:["String","Integer","Boolean","Float"]},
-{q:"Which symbol is used for exponentiation in Python?",a:"**",c:["^","**","//","%%"]},
-{q:"What does API commonly stand for?",a:"Application Programming Interface",c:["Application Programming Interface","Advanced Program Internet","Application Process Input","Automated Programming Instruction"]},
-{q:"What is a database used for?",a:"Storing and organizing data",c:["Only drawing images","Storing and organizing data","Only playing music","Only printing documents"]},
-
-{q:"Which planet do humans live on?",a:"Earth",c:["Mars","Earth","Venus","Jupiter"]},
-{q:"Which natural satellite orbits Earth?",a:"Moon",c:["Sun","Moon","Mars","Venus"]},
-{q:"What is the largest country by land area?",a:"Russia",c:["Canada","China","Russia","USA"]},
-{q:"Which is the smallest continent by area?",a:"Australia",c:["Europe","Australia","Antarctica","South America"]},
-{q:"Which line divides Earth into Northern and Southern Hemispheres?",a:"Equator",c:["Prime Meridian","Equator","Tropic of Cancer","Arctic Circle"]},
-{q:"Which line is at 0° longitude?",a:"Prime Meridian",c:["Equator","Prime Meridian","International Date Line","Tropic of Capricorn"]},
-{q:"What causes day and night?",a:"Earth's rotation",c:["Earth's revolution","Earth's rotation","Moon's rotation","Sun's rotation"]},
-{q:"What causes the seasons mainly?",a:"Earth's axial tilt as it orbits the Sun",c:["Moon phases","Earth's axial tilt as it orbits the Sun","Ocean tides","Cloud movement"]},
-{q:"Which layer of Earth do we live on?",a:"Crust",c:["Core","Mantle","Crust","Inner core"]},
-{q:"What is molten rock below Earth's surface called?",a:"Magma",c:["Lava","Magma","Ash","Granite"]},
-
-{q:"What is molten rock that reaches Earth's surface called?",a:"Lava",c:["Magma","Lava","Basalt only","Quartz"]},
-{q:"Which instrument shows direction?",a:"Compass",c:["Barometer","Compass","Thermometer","Scale"]},
-{q:"What type of rainfall occurs when moist air rises over mountains?",a:"Relief rainfall",c:["Convectional rainfall","Relief rainfall","Frontal rainfall","Cyclonic rainfall"]},
-{q:"What is a river's starting point called?",a:"Source",c:["Mouth","Source","Delta","Estuary"]},
-{q:"Where does a river usually enter a sea or ocean?",a:"Mouth",c:["Source","Mouth","Tributary","Valley"]},
-{q:"What is a smaller river flowing into a larger river called?",a:"Tributary",c:["Delta","Tributary","Source","Meander"]},
-{q:"What is a bend in a river called?",a:"Meander",c:["Delta","Meander","Levee","Waterfall"]},
-{q:"What is a fan-shaped deposit at a river mouth called?",a:"Delta",c:["Meander","Delta","Gorge","Tributary"]},
-{q:"Which process wears away rock?",a:"Erosion",c:["Deposition","Erosion","Condensation","Evaporation"]},
-{q:"Which process lays down transported sediment?",a:"Deposition",c:["Erosion","Deposition","Weathering","Melting"]},
-
-{q:"Which instrument is used to measure rainfall?",a:"Rain gauge",c:["Rain gauge","Barometer","Anemometer","Thermometer"]},
-{q:"Which instrument measures wind speed?",a:"Anemometer",c:["Barometer","Anemometer","Compass","Rain gauge"]},
-{q:"Which instrument measures temperature?",a:"Thermometer",c:["Thermometer","Barometer","Anemometer","Compass"]},
-{q:"Which instrument measures air pressure?",a:"Barometer",c:["Thermometer","Barometer","Rain gauge","Compass"]},
-{q:"What is a map scale used for?",a:"Showing the relationship between map distance and real distance",c:["Showing only elevation","Showing the relationship between map distance and real distance","Showing only population","Showing only rainfall"]},
-{q:"What is a settlement?",a:"A place where people live",c:["A place where people live","A mountain peak","A river source","A weather system"]},
-{q:"Which settlement pattern has buildings spread out?",a:"Dispersed",c:["Nucleated","Linear","Dispersed","Circular"]},
-{q:"Which settlement pattern follows a road or river?",a:"Linear",c:["Linear","Nucleated","Dispersed","Random"]},
-{q:"Which settlement pattern has buildings clustered together?",a:"Nucleated",c:["Linear","Nucleated","Dispersed","Scattered"]},
-{q:"What is transhumance?",a:"Seasonal movement of livestock between grazing areas",c:["Permanent urban migration","Seasonal movement of livestock between grazing areas","Daily commuting","International trade"]},
-
-{q:"Who was Sir Syed Ahmad Khan?",a:"A Muslim reformer and educationist",c:["A Mughal emperor","A Muslim reformer and educationist","A British governor","A scientist"]},
-{q:"What movement is associated with Sir Syed Ahmad Khan?",a:"Aligarh Movement",c:["Khilafat Movement","Aligarh Movement","Quit India Movement","Swadeshi Movement"]},
-{q:"Where was the Aligarh school established?",a:"Aligarh",c:["Delhi","Aligarh","Lahore","Karachi"]},
-{q:"What was an important aim of the Aligarh Movement?",a:"Promoting modern education among Muslims",c:["Ending all education","Promoting modern education among Muslims","Building railways","Starting a trading company"]},
-{q:"What was the Doctrine of Lapse?",a:"A British annexation policy concerning states without an accepted natural heir",c:["A tax on salt","A British annexation policy concerning states without an accepted natural heir","A military training system","A railway policy"]},
-{q:"In which year did the Indian Rebellion begin?",a:"1857",c:["1757","1857","1885","1905"]},
-{q:"Where did the 1857 uprising begin among sepoys?",a:"Meerut",c:["Delhi","Meerut","Bombay","Calcutta"]},
-{q:"What was one immediate cause of the 1857 rebellion?",a:"The controversy over greased cartridges",c:["The printing press","The controversy over greased cartridges","The telegraph alone","The monsoon"]},
-{q:"Which Mughal ruler was declared symbolic leader during the 1857 rebellion?",a:"Bahadur Shah Zafar",c:["Akbar","Aurangzeb","Bahadur Shah Zafar","Shah Jahan"]},
-{q:"What happened to the East India Company's rule after 1857?",a:"The British Crown took direct control",c:["It became independent","The British Crown took direct control","It moved to France","It became a university"]},
-
-{q:"What is the capital of the United Kingdom?",a:"London",c:["Manchester","London","Liverpool","Birmingham"]},
-{q:"Which river flows through London?",a:"River Thames",c:["River Nile","River Thames","River Seine","River Danube"]},
-{q:"What is the capital of Germany?",a:"Berlin",c:["Munich","Berlin","Hamburg","Frankfurt"]},
-{q:"What is the capital of Spain?",a:"Madrid",c:["Barcelona","Madrid","Seville","Valencia"]},
-{q:"What is the capital of India?",a:"New Delhi",c:["Mumbai","Kolkata","New Delhi","Chennai"]},
-{q:"What is the capital of Bangladesh?",a:"Dhaka",c:["Chittagong","Dhaka","Sylhet","Khulna"]},
-{q:"What is the capital of Nepal?",a:"Kathmandu",c:["Pokhara","Kathmandu","Lalitpur","Biratnagar"]},
-{q:"What is the capital of Saudi Arabia?",a:"Riyadh",c:["Jeddah","Mecca","Riyadh","Medina"]},
-{q:"What is the capital of the United Arab Emirates?",a:"Abu Dhabi",c:["Dubai","Abu Dhabi","Sharjah","Ajman"]},
-{q:"What is the capital of Turkey?",a:"Ankara",c:["Istanbul","Ankara","Izmir","Bursa"]},
-
-{q:"Which is the longest river in Africa?",a:"Nile",c:["Nile","Congo","Niger","Zambezi"]},
-{q:"Which mountain is the highest above sea level?",a:"Mount Everest",c:["K2","Mount Everest","Kangchenjunga","Nanga Parbat"]},
-{q:"Which is the largest island in the world?",a:"Greenland",c:["Borneo","Greenland","Madagascar","New Guinea"]},
-{q:"Which continent contains the Sahara Desert?",a:"Africa",c:["Asia","Africa","Europe","Australia"]},
-{q:"Which ocean is the smallest?",a:"Arctic Ocean",c:["Indian Ocean","Arctic Ocean","Atlantic Ocean","Southern Ocean"]},
-{q:"Which continent is the South Pole located on?",a:"Antarctica",c:["Africa","Antarctica","Asia","Australia"]},
-{q:"What is the imaginary line at 23.5° north?",a:"Tropic of Cancer",c:["Equator","Tropic of Cancer","Tropic of Capricorn","Arctic Circle"]},
-{q:"What is the imaginary line at 23.5° south?",a:"Tropic of Capricorn",c:["Equator","Tropic of Cancer","Tropic of Capricorn","Antarctic Circle"]},
-{q:"Which hemisphere contains most of Earth's land?",a:"Northern Hemisphere",c:["Southern Hemisphere","Northern Hemisphere","Eastern Hemisphere","Western Hemisphere"]},
-{q:"What is the study of weather called?",a:"Meteorology",c:["Geology","Meteorology","Biology","Astronomy"]},
-
-{q:"Which branch of science studies living organisms?",a:"Biology",c:["Physics","Biology","Chemistry","Geology"]},
-{q:"Which branch studies matter and its reactions?",a:"Chemistry",c:["Physics","Chemistry","Geography","Biology"]},
-{q:"Which branch studies forces and energy?",a:"Physics",c:["Biology","Physics","Chemistry","Geography"]},
-{q:"What is the SI unit of force?",a:"Newton",c:["Joule","Newton","Watt","Pascal"]},
-{q:"What is the SI unit of energy?",a:"Joule",c:["Newton","Joule","Watt","Volt"]},
-{q:"What is the SI unit of power?",a:"Watt",c:["Watt","Joule","Newton","Pascal"]},
-{q:"What is the SI unit of electric current?",a:"Ampere",c:["Volt","Ampere","Ohm","Watt"]},
-{q:"What is the SI unit of temperature in the SI system?",a:"Kelvin",c:["Celsius","Kelvin","Fahrenheit","Joule"]},
-{q:"What is speed?",a:"Distance travelled per unit time",c:["Force per mass","Distance travelled per unit time","Mass per volume","Energy per time"]},
-{q:"What is acceleration?",a:"Rate of change of velocity",c:["Distance divided by mass","Rate of change of velocity","Force divided by area","Mass divided by time"]},
-
-{q:"Which particle has a negative charge?",a:"Electron",c:["Proton","Electron","Neutron","Nucleus"]},
-{q:"Which particle has a positive charge?",a:"Proton",c:["Electron","Proton","Neutron","Photon"]},
-{q:"Which particle has no electric charge?",a:"Neutron",c:["Proton","Electron","Neutron","Ion"]},
-{q:"What is the center of an atom called?",a:"Nucleus",c:["Shell","Nucleus","Electron","Orbit"]},
-{q:"What is the chemical symbol for oxygen?",a:"O",c:["Ox","O","Og","C"]},
-{q:"What is the chemical symbol for carbon?",a:"C",c:["Ca","C","Co","Cr"]},
-{q:"What is the chemical symbol for sodium?",a:"Na",c:["S","Na","So","Sd"]},
-{q:"What is the chemical symbol for iron?",a:"Fe",c:["Ir","Fe","I","In"]},
-{q:"What is the pH of a neutral solution at room temperature?",a:"7",c:["0","5","7","14"]},
-{q:"What gas do plants take in for photosynthesis?",a:"Carbon dioxide",c:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"]},
-
-{q:"Which vitamin is commonly associated with citrus fruits?",a:"Vitamin C",c:["Vitamin A","Vitamin C","Vitamin D","Vitamin K"]},
-{q:"Which organ helps filter blood and produce urine?",a:"Kidneys",c:["Heart","Kidneys","Lungs","Stomach"]},
-{q:"Which organ is mainly used for breathing?",a:"Lungs",c:["Heart","Lungs","Kidneys","Brain"]},
-{q:"Which system carries blood around the body?",a:"Circulatory system",c:["Digestive system","Circulatory system","Nervous system","Skeletal system"]},
-{q:"Which system controls many body responses using nerves?",a:"Nervous system",c:["Digestive system","Nervous system","Respiratory system","Skeletal system"]},
-{q:"How many bones are in a typical adult human body?",a:"206",c:["106","206","306","406"]},
-{q:"Which sense organ detects light?",a:"Eye",c:["Ear","Eye","Nose","Skin"]},
-{q:"Which sense organ detects sound?",a:"Ear",c:["Eye","Ear","Nose","Tongue"]},
-{q:"Which organ is responsible for most digestion and absorption?",a:"Small intestine",c:["Large intestine","Small intestine","Heart","Lung"]},
-{q:"What is the body's largest organ?",a:"Skin",c:["Liver","Skin","Lung","Brain"]},
-
-{q:"How many continents are commonly recognized?",a:"7",c:["5","6","7","8"]},
-{q:"How many oceans are commonly recognized?",a:"5",c:["3","4","5","7"]},
-{q:"What is the capital of the United States?",a:"Washington, D.C.",c:["New York","Washington, D.C.","Los Angeles","Chicago"]},
-{q:"What is the capital of Russia?",a:"Moscow",c:["Moscow","St Petersburg","Kazan","Sochi"]},
-{q:"What is the capital of China?",a:"Beijing",c:["Beijing","Shanghai","Shenzhen","Guangzhou"]},
-{q:"What is the capital of South Korea?",a:"Seoul",c:["Busan","Seoul","Incheon","Daegu"]},
-{q:"What is the capital of Thailand?",a:"Bangkok",c:["Phuket","Bangkok","Chiang Mai","Pattaya"]},
-{q:"What is the capital of Malaysia?",a:"Kuala Lumpur",c:["Penang","Kuala Lumpur","Johor Bahru","Malacca"]},
-{q:"What is the capital of Indonesia?",a:"Jakarta",c:["Bali","Jakarta","Bandung","Surabaya"]},
-{q:"What is the capital of Afghanistan?",a:"Kabul",c:["Kandahar","Kabul","Herat","Mazar-i-Sharif"]},
-
-{q:"What is 2⁵?",a:"32",c:["16","24","32","64"]},
-{q:"What is 10²?",a:"100",c:["20","50","100","200"]},
-{q:"What is 3³?",a:"27",c:["9","18","27","36"]},
-{q:"What is the perimeter of a square with side 5 cm?",a:"20 cm",c:["10 cm","15 cm","20 cm","25 cm"]},
-{q:"What is the area of a rectangle 8 cm by 4 cm?",a:"32 cm²",c:["12 cm²","24 cm²","32 cm²","36 cm²"]},
-{q:"What is half of 3/4?",a:"3/8",c:["1/4","3/8","1/2","2/3"]},
-{q:"Which fraction is equal to 1/2?",a:"2/4",c:["1/3","2/4","3/4","4/5"]},
-{q:"What is 0.5 as a fraction?",a:"1/2",c:["1/4","1/2","2/5","5/2"]},
-{q:"What is 20% of 200?",a:"40",c:["20","30","40","50"]},
-{q:"If x + 7 = 12, what is x?",a:"5",c:["3","4","5","6"]},
-
-{q:"Which chess piece can move in an L shape?",a:"Knight",c:["Bishop","Knight","Rook","Queen"]},
-{q:"Which chess piece moves diagonally?",a:"Bishop",c:["Rook","Bishop","Knight","King"]},
-{q:"Which chess piece moves horizontally and vertically any number of squares?",a:"Rook",c:["Bishop","Knight","Rook","Pawn"]},
-{q:"Which chess piece combines rook and bishop movement?",a:"Queen",c:["King","Queen","Knight","Pawn"]},
-{q:"Which chess piece is the most important piece to protect?",a:"King",c:["Queen","Rook","King","Bishop"]},
-{q:"How many squares are on a chess board?",a:"64",c:["32","48","64","81"]},
-{q:"How many players normally play a chess game?",a:"2",c:["1","2","3","4"]},
-{q:"What is checkmate?",a:"A position where the king is in check and has no legal escape",c:["Capturing the queen","A position where the king is in check and has no legal escape","Moving two pawns","Ending after one move"]},
-{q:"What is castling?",a:"A special move involving the king and a rook",c:["A pawn promotion","A special move involving the king and a rook","Capturing a knight","Moving the queen twice"]},
-{q:"What can a pawn become after reaching the opposite end?",a:"A promoted piece such as a queen",c:["Only a king","A promoted piece such as a queen","Only a rook","Nothing"]},
-
-{q:"Which sport is played at Wimbledon?",a:"Tennis",c:["Cricket","Tennis","Football","Golf"]},
-{q:"How many rings are on the Olympic symbol?",a:"5",c:["4","5","6","7"]},
-{q:"Which sport uses a shuttlecock?",a:"Badminton",c:["Tennis","Badminton","Hockey","Cricket"]},
-{q:"Which sport uses a puck?",a:"Ice hockey",c:["Football","Ice hockey","Basketball","Rugby"]},
-{q:"Which sport is associated with the Tour de France?",a:"Cycling",c:["Running","Cycling","Swimming","Boxing"]},
-{q:"How many players are on a basketball team on court for one side?",a:"5",c:["4","5","6","7"]},
-{q:"Which sport has wickets?",a:"Cricket",c:["Baseball","Cricket","Tennis","Golf"]},
-{q:"Which sport has a goalkeeper and goals?",a:"Football",c:["Football","Tennis","Golf","Swimming"]},
-{q:"Which sport is played on a diamond-shaped field?",a:"Baseball",c:["Baseball","Football","Tennis","Hockey"]},
-{q:"Which sport uses clubs and holes?",a:"Golf",c:["Golf","Cricket","Rugby","Boxing"]},
-
-{q:"Which is a primary color in traditional painting?",a:"Red",c:["Green","Red","Purple","Orange"]},
-{q:"Which color is made by mixing blue and yellow paint?",a:"Green",c:["Green","Purple","Orange","Brown"]},
-{q:"Which color is made by mixing red and blue paint?",a:"Purple",c:["Green","Purple","Yellow","Orange"]},
-{q:"Which color is made by mixing red and yellow paint?",a:"Orange",c:["Orange","Green","Purple","Blue"]},
-{q:"How many letters are in the English alphabet?",a:"26",c:["24","25","26","27"]},
-{q:"Which punctuation mark ends a normal question?",a:"Question mark",c:["Full stop","Comma","Question mark","Colon"]},
-{q:"Which word is a noun?",a:"Teacher",c:["Quickly","Teacher","Run","Beautiful"]},
-{q:"Which word is a verb?",a:"Run",c:["Blue","Run","Table","Happy"]},
-{q:"Which word is an adjective?",a:"Beautiful",c:["Beautiful","Run","Teacher","Quickly"]},
-{q:"Which word is an adverb?",a:"Quickly",c:["Quickly","Teacher","Blue","House"]}
-
+{q:"How many sides does a hexagon have?",a:"6",c:["5","6","7","8"]}
 ];
 
 /* =========================================================
@@ -1730,7 +1480,8 @@ function renderHome() {
 
         <div class="cards">
 
-            ${gameCard("🎯","Hangman","Guess the hidden word.","hangman")}
+            ${gameCard("🎯","Hangman","Guess the hidden word with hints and QWERTY keyboard.","hangman")}
+            ${gameCard("🔐","Crypto Cipher","Decode secret messages using a Caesar shift cipher.","cipher")}
             ${gameCard("⌨️","Letter Rush","Type words before time runs out.","rush")}
             ${gameCard("🔀","Word Scramble","Unscramble the hidden word.","scramble")}
             ${gameCard("🧠","Word Master","Guess the five-letter word.","master")}
@@ -1769,21 +1520,23 @@ function renderGames() {
 }
 
 /* =========================================================
-   HANGMAN
+   HANGMAN (UPDATED WITH SPECIFIC HINTS & QWERTY KEYBOARD)
 ========================================================= */
 
-let hangWord = "";
-let keyboard = [QWERTYUIOP,ASDFGHJKL,ZXCVBNM];
+let hangObj = {};
+let hangGuessed = [];
 let hangLives = 6;
+
+const qwertyRows = [
+    ["Q","W","E","R","T","Y","U","I","O","P"],
+    ["A","S","D","F","G","H","J","K","L"],
+    ["Z","X","C","V","B","N","M"]
+];
 
 function renderHangman() {
 
-    hangWord =
-        scrambleWords[
-            Math.floor(Math.random()*scrambleWords.length)
-        ];
-
-    keyboard = [QWERTYUIOP,ASDFGHJKL,ZXCVBNM];
+    hangObj = hangmanData[Math.floor(Math.random() * hangmanData.length)];
+    hangGuessed = [];
     hangLives = 6;
 
     drawHangman();
@@ -1791,15 +1544,29 @@ function renderHangman() {
 
 function drawHangman() {
 
-    const display =
-        hangWord
+    const word = hangObj.word;
+    const display = word
         .split("")
-        .map(letter =>
-            keyboard.flat().includes(letter)
-                ? letter
-                : "_"
-        )
+        .map(letter => hangGuessed.includes(letter) ? letter : "_")
         .join(" ");
+
+    let keyboardHTML = `<div class="qwerty-keyboard">`;
+    qwertyRows.forEach(row => {
+        keyboardHTML += `<div class="qwerty-row">`;
+        row.forEach(char => {
+            const isUsed = hangGuessed.includes(char);
+            keyboardHTML += `
+                <button 
+                    class="key-btn" 
+                    ${isUsed ? 'disabled' : ''} 
+                    onclick="hangGuess('${char}')">
+                    ${char}
+                </button>
+            `;
+        });
+        keyboardHTML += `</div>`;
+    });
+    keyboardHTML += `</div>`;
 
     document.getElementById("main").innerHTML = `
 
@@ -1811,116 +1578,68 @@ function drawHangman() {
                     <div>
                         <h2>🎯 Hangman</h2>
                         <p class="page-subtitle">
-                            Guess the hidden word.
+                            Guess the word before running out of lives.
                         </p>
                     </div>
 
                     <div class="timer">
-                        ❤️ ${hangLives}
+                        ❤️ Lives: ${hangLives}
                     </div>
+                </div>
+
+                <div class="hint-box">
+                    💡 Hint: ${hangObj.hint}
                 </div>
 
                 <div class="word-display">
                     ${display}
                 </div>
 
-                <input
-                    id="hangInput"
-                    class="game-input"
-                    maxlength="1"
-                    placeholder="Type one letter"
-                    autocomplete="off"
-                >
+                ${keyboardHTML}
 
-                <div class="game-actions">
-
-                    <button
-                        class="action-btn primary"
-                        onclick="hangGuess()">
-                        Guess
-                    </button>
-
-                    <button
-                        class="action-btn"
-                        onclick="renderHangman()">
+                <div class="game-actions" style="margin-top: 20px; justify-content: center;">
+                    <button class="action-btn" onclick="renderHangman()">
                         New Word
                     </button>
-
                 </div>
 
             </div>
 
         </div>
     `;
-
-    document
-        .getElementById("hangInput")
-        .focus();
 }
 
-function hangGuess() {
+function hangGuess(letter) {
 
-    const input =
-        document.getElementById("hangInput");
+    if (hangGuessed.includes(letter) || hangLives <= 0) return;
 
-    const letter =
-        input.value.toUpperCase();
+    hangGuessed.push(letter);
 
-    input.value = "";
-
-    if (!/^[A-Z]$/.test(letter)) return;
-
-    if (keyboard.flat().includes(letter)) {
-        toast("Already guessed!");
-        return;
-    }
-
-    keyboard.forEach(row => {
-        if (row.includes(letter)) {
-            row[row.indexOf(letter)] = letter;
-        }
-    }); 
-
-    if (!hangWord.includes(letter)) {
+    if (!hangObj.word.includes(letter)) {
         hangLives--;
     }
 
-    const won =
-        hangWord
-        .split("")
-        .every(l => keyboard.flat().includes(l));
+    const won = hangObj.word.split("").every(l => hangGuessed.includes(l));
 
     if (won) {
-
         profile.wins++;
         addXP(50);
         addCoins(20);
 
         toast("🎉 You won!");
 
-        safeTimeout(
-            () => renderHangman(),
-            1200,
-            gameSession
-        );
-
+        safeTimeout(() => renderHangman(), 1500, gameSession);
         drawHangman();
         return;
     }
 
     if (hangLives <= 0) {
-
-        toast("💀 Word was " + hangWord);
+        toast("💀 Word was: " + hangObj.word);
 
         profile.losses++;
         saveProfile();
 
-        safeTimeout(
-            () => renderHangman(),
-            1600,
-            gameSession
-        );
-
+        safeTimeout(() => renderHangman(), 2000, gameSession);
         drawHangman();
         return;
     }
@@ -1929,8 +1648,118 @@ function hangGuess() {
 }
 
 /* =========================================================
+   NEW GAME: CRYPTO CIPHER
+========================================================= */
+
+let cipherOriginal = "";
+let cipherEncoded = "";
+let cipherShift = 0;
+let cipherScore = 0;
+
+const cipherPhrases = [
+    "KNOWLEDGE IS POWER",
+    "SECRET CODE BROKEN",
+    "DECODE THE MESSAGE",
+    "CYBER SECURITY HERO",
+    "ALGORITHM MASTER",
+    "CRYPTOGRAPHY ROCKS",
+    "PUZZLE SOLVER ELITE"
+];
+
+function renderCipher() {
+    cipherOriginal = cipherPhrases[Math.floor(Math.random() * cipherPhrases.length)];
+    cipherShift = Math.floor(Math.random() * 5) + 1; // Shift between 1 and 5
+    cipherEncoded = caesarShift(cipherOriginal, cipherShift);
+
+    document.getElementById("main").innerHTML = `
+        <div class="game-container">
+            <div class="game-panel">
+                <div class="game-header">
+                    <div>
+                        <h2>🔐 Crypto Cipher</h2>
+                        <p class="page-subtitle">
+                            Decode the message encrypted with a Caesar Shift (+${cipherShift}).
+                        </p>
+                    </div>
+                    <div class="timer">
+                        ⭐ XP: ${cipherScore}
+                    </div>
+                </div>
+
+                <div class="hint-box">
+                    💡 Shift each letter backward by ${cipherShift} position(s) in the alphabet!
+                </div>
+
+                <div class="cipher-encoded">
+                    ${cipherEncoded}
+                </div>
+
+                <input
+                    id="cipherInput"
+                    class="game-input"
+                    type="text"
+                    placeholder="Type decoded message..."
+                    autocomplete="off"
+                    style="text-transform: uppercase;"
+                >
+
+                <div class="game-actions">
+                    <button class="action-btn primary" onclick="checkCipher()">
+                        Decrypt
+                    </button>
+                    <button class="action-btn" onclick="renderCipher()">
+                        Skip Phrase
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const input = document.getElementById("cipherInput");
+    if (input) {
+        input.focus();
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") checkCipher();
+        });
+    }
+}
+
+function caesarShift(str, amount) {
+    if (amount < 0) return caesarShift(str, amount + 26);
+    let output = "";
+    for (let i = 0; i < str.length; i++) {
+        let c = str[i];
+        if (c.match(/[a-z]/i)) {
+            let code = str.charCodeAt(i);
+            if (code >= 65 && code <= 90) {
+                c = String.fromCharCode(((code - 65 + amount) % 26) + 65);
+            }
+        }
+        output += c;
+    }
+    return output;
+}
+
+function checkCipher() {
+    const input = document.getElementById("cipherInput");
+    if (!input) return;
+
+    const val = input.value.trim().toUpperCase();
+    if (val === cipherOriginal) {
+        toast("🎉 Correctly Decoded!");
+        cipherScore += 20;
+        addXP(30);
+        addCoins(10);
+        profile.wins++;
+        saveProfile();
+        renderCipher();
+    } else {
+        toast("❌ Incorrect decoding. Try again!");
+    }
+}
+
+/* =========================================================
    LETTER RUSH
-   IMPORTANT: TIMER DOES NOT RECREATE INPUT
 ========================================================= */
 
 let rushWord = "";
@@ -2123,7 +1952,6 @@ function startRushAgain() {
 
 /* =========================================================
    WORD SCRAMBLE
-   IMPORTANT: TIMER DOES NOT RECREATE INPUT
 ========================================================= */
 
 let scrambleWord = "";
@@ -2741,20 +2569,8 @@ function answerTrivia(button, answer) {
 ========================================================= */
 
 const chessSymbols = {
-
-    wK:"♔",
-    wQ:"♕",
-    wR:"♖",
-    wB:"♗",
-    wN:"♘",
-    wP:"♙",
-
-    bK:"♚",
-    bQ:"♛",
-    bR:"♜",
-    bB:"♝",
-    bN:"♞",
-    bP:"♟"
+    wK:"♔", wQ:"♕", wR:"♖", wB:"♗", wN:"♘", wP:"♙",
+    bK:"♚", bQ:"♛", bR:"♜", bB:"♝", bN:"♞", bP:"♟"
 };
 
 let chessBoard = [];
@@ -2762,30 +2578,22 @@ let chessTurn = "w";
 let chessSelected = null;
 let chessLastMove = null;
 let chessHistory = [];
-let chessCaptured = {
-    w:[],
-    b:[]
-};
+let chessCaptured = { w:[], b:[] };
 
 function createChessBoard() {
-
     return [
-
         ["bR","bN","bB","bQ","bK","bB","bN","bR"],
         ["bP","bP","bP","bP","bP","bP","bP","bP"],
-
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
-
         ["wP","wP","wP","wP","wP","wP","wP","wP"],
         ["wR","wN","wB","wQ","wK","wB","wN","wR"]
     ];
 }
 
 function renderChess() {
-
     chessBoard = createChessBoard();
     chessTurn = "w";
     chessSelected = null;
@@ -2980,10 +2788,6 @@ function drawChess() {
 
 function inside(r,c) {
     return r>=0 && r<8 && c>=0 && c<8;
-}
-
-function pieceColor(piece) {
-    return piece ? piece[0] : null;
 }
 
 function getPseudoMoves(r,c,board=chessBoard) {
@@ -3237,8 +3041,6 @@ function getLegalMoves(r,c) {
 
         copy[r][c] = null;
 
-        /* Promotion for legality testing */
-
         if(
             copy[move.r][move.c][1] === "P" &&
             (move.r===0 || move.r===7)
@@ -3365,8 +3167,6 @@ function makeChessMove(fr,fc,tr,tc) {
 
     chessBoard[tr][tc] = moving;
     chessBoard[fr][fc] = null;
-
-    /* Pawn promotion */
 
     if(
         moving[1] === "P" &&
@@ -3531,7 +3331,7 @@ function renderDuel() {
 
                     <button
                         class="action-btn primary"
-                        onclick="duelPoint()">
+                        onclick="duelPoint(1)">
                         Player 1
                     </button>
 
@@ -3593,10 +3393,6 @@ function duelPoint(player=1) {
 
 /* =========================================================
    ONLINE ROOM SYSTEM
-   IMPORTANT:
-   - PeerJS peer ID is the real room address.
-   - Host is authoritative for both online games.
-   - Guests never directly change shared game state.
 ========================================================= */
 
 let peer = null;
@@ -3606,19 +3402,6 @@ let onlineRoom = "";
 let onlineGame = "";
 let onlineHostPeer = "";
 let onlineReady = false;
-
-let onlineWordTarget = "";
-let onlineWordRound = 0;
-let onlineWordScores = { host: 0, guest: 0 };
-let onlineWordSolved = false;
-let onlineWordPendingTimer = null;
-
-let onlineChessBoard = [];
-let onlineChessTurn = "w";
-let onlineChessHistory = [];
-let onlineChessSelected = null;
-let onlineChessVersion = 0;
-let onlineChessGameOver = false;
 
 function randomRoomCode() {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -3804,13 +3587,13 @@ function createOnlineRoom(game) {
     });
 
     peer.on("error", handlePeerError);
+}
 
-    peer.on("disconnected", () => {
-        const s = document.getElementById("onlineStatus");
-        if (s) s.textContent = "⚠️ Reconnecting to online service...";
-        if (peer && !peer.destroyed) {
-            try { peer.reconnect(); } catch {}
-        }
+function copyRoomLink(link) {
+    navigator.clipboard.writeText(link).then(() => {
+        toast("📋 Room link copied to clipboard!");
+    }).catch(() => {
+        toast("Failed to copy link automatically.");
     });
 }
 
@@ -3857,12 +3640,6 @@ function joinOnlineRoom(game) {
     });
 
     peer.on("error", handlePeerError);
-
-    peer.on("disconnected", () => {
-        if (peer && !peer.destroyed) {
-            try { peer.reconnect(); } catch {}
-        }
-    });
 }
 
 function setupOnlineConnection(connection) {
@@ -3880,1500 +3657,118 @@ function setupOnlineConnection(connection) {
                 game: onlineGame,
                 room: onlineRoom
             });
-        } else {
-            const waiting = document.getElementById("hostWaiting");
-            if (waiting) waiting.textContent = "🟢 Friend connected. Starting game...";
         }
     });
 
     connection.on("data", handleOnlineData);
-
     connection.on("close", () => {
+        toast("❌ Connection lost.");
         onlineReady = false;
-
-        const status = document.getElementById("onlineStatus");
-        if (status) status.textContent = "🔴 Opponent disconnected.";
-
-        toast("🔴 Opponent disconnected.");
-    });
-
-    connection.on("error", error => {
-        console.error("Online connection error:", error);
-        toast("❌ Online connection error.");
     });
 }
 
 function sendOnline(data) {
     if (onlineConn && onlineConn.open) {
-        try {
-            onlineConn.send(data);
-            return true;
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    return false;
-}
-
-function handlePeerError(error) {
-    console.error("PeerJS:", error);
-
-    if (error && error.type === "peer-unavailable") {
-        toast("❌ Host is not online. The host must keep the game page open.");
-        return;
-    }
-
-    if (error && error.type === "network") {
-        toast("❌ Network problem. Check your internet connection.");
-        return;
-    }
-
-    if (error && error.type === "disconnected") {
-        toast("⚠️ Disconnected. Reconnecting...");
-        return;
-    }
-
-    toast("❌ Online error: " + ((error && error.type) || "unknown"));
-}
-
-function copyRoomLink(link) {
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(link)
-            .then(() => toast("🔗 Room link copied!"))
-            .catch(() => manualCopyRoomLink(link));
-    } else {
-        manualCopyRoomLink(link);
+        onlineConn.send(data);
     }
 }
-
-function manualCopyRoomLink(link) {
-    const temp = document.createElement("textarea");
-    temp.value = link;
-    document.body.appendChild(temp);
-    temp.select();
-
-    try {
-        document.execCommand("copy");
-        toast("🔗 Room link copied!");
-    } catch {
-        toast("Copy the link manually.");
-    }
-
-    temp.remove();
-}
-
-/* =========================================================
-   ONLINE WORD BATTLE
-   Host-authoritative:
-   - Host owns the current word and round.
-   - Each player owns only their own input.
-   - Guest submits a guess to host.
-   - Host validates the guess.
-   - Host sends the next round to both players.
-========================================================= */
-
-function onlineWordPick() {
-    return onlineWords[
-        Math.floor(Math.random() * onlineWords.length)
-    ];
-}
-
-function startOnlineWordHost() {
-    onlineWordScores = { host: 0, guest: 0 };
-    onlineWordRound = 0;
-    onlineWordTarget = "";
-    onlineWordSolved = false;
-
-    drawOnlineWordUI("host");
-
-    startNextOnlineWordHost();
-}
-
-function startNextOnlineWordHost() {
-    if (onlineRole !== "host") return;
-
-    onlineWordRound++;
-    onlineWordTarget = onlineWordPick();
-    onlineWordSolved = false;
-
-    updateOnlineWordUI();
-
-    sendOnline({
-        type: "wordState",
-        round: onlineWordRound,
-        word: onlineWordTarget,
-        scores: onlineWordScores
-    });
-}
-
-function drawOnlineWordUI(role) {
-    document.getElementById("main").innerHTML = `
-        <div class="game-container">
-            <div class="game-panel">
-                <div class="game-header">
-                    <div>
-                        <h2>🌐 Online Word Battle</h2>
-                        <p style="color:var(--muted);margin-top:5px">
-                            ${role === "host" ? "You are Host" : "You are Guest"}
-                        </p>
-                    </div>
-                    <div class="timer" id="onlineWordStatus">Round 0</div>
-                </div>
-
-                <div class="score-row">
-                    <div class="score-box">
-                        You
-                        <strong id="onlineMyScore">0</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Friend
-                        <strong id="onlineEnemyScore">0</strong>
-                    </div>
-                </div>
-
-                <div id="onlineWordDisplay" class="word-display">WAITING</div>
-
-                <input
-                    id="onlineWordInput"
-                    class="game-input"
-                    placeholder="Type the word..."
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-
-                <div class="game-actions">
-                    <button class="action-btn primary"
-                        onclick="submitOnlineWord()">
-                        Submit
-                    </button>
-                </div>
-
-                <p id="onlineRoundStatus"
-                    style="text-align:center;color:var(--muted);margin-top:15px">
-                    Waiting for round...
-                </p>
-            </div>
-        </div>
-    `;
-
-    const input = document.getElementById("onlineWordInput");
-
-    if (input) {
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                submitOnlineWord();
-            }
-        });
-
-        input.focus();
-    }
-
-    updateOnlineWordUI();
-}
-
-function updateOnlineWordUI() {
-    const display = document.getElementById("onlineWordDisplay");
-    const round = document.getElementById("onlineWordStatus");
-    const status = document.getElementById("onlineRoundStatus");
-    const myScore = document.getElementById("onlineMyScore");
-    const enemyScore = document.getElementById("onlineEnemyScore");
-
-    if (display) {
-        display.textContent = onlineWordTarget || "WAITING";
-    }
-
-    if (round) {
-        round.textContent = "Round " + onlineWordRound;
-    }
-
-    if (myScore) {
-        myScore.textContent =
-            onlineRole === "host"
-                ? onlineWordScores.host
-                : onlineWordScores.guest;
-    }
-
-    if (enemyScore) {
-        enemyScore.textContent =
-            onlineRole === "host"
-                ? onlineWordScores.guest
-                : onlineWordScores.host;
-    }
-
-    if (status) {
-        status.textContent =
-            onlineWordSolved
-                ? "Round complete. Next word coming..."
-                : "Type the word exactly and press Enter.";
-    }
-}
-
-function submitOnlineWord() {
-    const input = document.getElementById("onlineWordInput");
-    if (!input) return;
-
-    if (!onlineWordTarget || !onlineWordRound) {
-        toast("⏳ Waiting for the word...");
-        return;
-    }
-
-    const answer = input.value.trim().toUpperCase();
-
-    if (!answer) return;
-
-    if (onlineRole === "host") {
-        processOnlineWordGuess("host", answer, onlineWordRound);
-    } else {
-        sendOnline({
-            type: "wordGuess",
-            answer,
-            round: onlineWordRound
-        });
-
-        input.value = "";
-        input.focus();
-    }
-}
-
-function processOnlineWordGuess(player, answer, round) {
-    if (onlineRole !== "host") return;
-
-    if (round !== onlineWordRound || onlineWordSolved) {
-        return;
-    }
-
-    if (answer !== onlineWordTarget) {
-        if (player === "host") {
-            toast("❌ Wrong word!");
-        } else {
-            sendOnline({
-                type: "wordResult",
-                result: "wrong",
-                player: player,
-                round: onlineWordRound
-            });
-        }
-        return;
-    }
-
-    onlineWordSolved = true;
-
-    if (player === "host") {
-        onlineWordScores.host++;
-        addCoins(2);
-    } else {
-        onlineWordScores.guest++;
-    }
-
-    sendOnline({
-        type: "wordResult",
-        result: "correct",
-        player,
-        round: onlineWordRound,
-        scores: onlineWordScores
-    });
-
-    updateOnlineWordUI();
-
-    if (onlineWordPendingTimer) {
-        clearTimeout(onlineWordPendingTimer);
-    }
-
-    const completedRound = onlineWordRound;
-
-    onlineWordPendingTimer = setTimeout(() => {
-        if (
-            onlineRole === "host" &&
-            onlineWordRound === completedRound
-        ) {
-            startNextOnlineWordHost();
-        }
-    }, 900);
-}
-
-function handleOnlineWordState(data) {
-    if (onlineRole !== "guest") return;
-
-    if (
-        typeof data.round !== "number" ||
-        data.round < onlineWordRound
-    ) {
-        return;
-    }
-
-    onlineWordRound = data.round;
-    onlineWordTarget = String(data.word || "").toUpperCase();
-    onlineWordScores = data.scores || { host: 0, guest: 0 };
-    onlineWordSolved = false;
-
-    if (!document.getElementById("onlineWordInput")) {
-        drawOnlineWordUI("guest");
-    }
-
-    const input = document.getElementById("onlineWordInput");
-    const oldValue = input ? input.value : "";
-
-    updateOnlineWordUI();
-
-    /*
-       IMPORTANT:
-       updateOnlineWordUI changes only text nodes.
-       It does NOT recreate the input element.
-       Therefore the player's typing cannot disappear.
-    */
-    if (input) {
-        input.value = oldValue;
-        input.focus();
-    }
-}
-
-function handleOnlineWordResult(data) {
-    if (!data || data.round !== onlineWordRound) return;
-
-    if (data.scores) {
-        onlineWordScores = data.scores;
-    }
-
-    if (data.result === "wrong") {
-        if (data.player === "guest" && onlineRole === "guest") {
-            toast("❌ Wrong word!");
-        }
-        if (data.player === "host" && onlineRole === "host") {
-            toast("❌ Wrong word!");
-        }
-        return;
-    }
-
-    if (data.result === "correct") {
-        onlineWordSolved = true;
-
-        const input = document.getElementById("onlineWordInput");
-        if (input) input.value = "";
-
-        if (data.player === onlineRole) {
-            toast("✅ Correct! +1 point");
-            addCoins(2);
-        } else {
-            toast("⚡ Your friend got it first!");
-        }
-
-        updateOnlineWordUI();
-    }
-}
-
-/* =========================================================
-   ONLINE CHESS
-   Standard movement + turn authority.
-   Host owns the board and accepts only legal moves.
-   Guest sends move requests; guest cannot directly alter
-   the shared board.
-========================================================= */
-
-function startOnlineChessHost() {
-    onlineChessBoard = createChessBoard();
-    onlineChessTurn = "w";
-    onlineChessHistory = [];
-    onlineChessSelected = null;
-    onlineChessVersion = 0;
-    onlineChessGameOver = false;
-
-    drawOnlineChess();
-
-    sendOnlineChessState();
-}
-
-function sendOnlineChessState() {
-    sendOnline({
-        type: "chessState",
-        version: onlineChessVersion,
-        board: onlineChessBoard,
-        turn: onlineChessTurn,
-        history: onlineChessHistory,
-        gameOver: onlineChessGameOver
-    });
-}
-
-function onlineChessCloneBoard(board) {
-    return board.map(row => [...row]);
-}
-
-function onlineChessInside(r, c) {
-    return r >= 0 && r < 8 && c >= 0 && c < 8;
-}
-
-function onlineChessFindKing(board, color) {
-    for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-            if (board[r][c] === color + "K") {
-                return { r, c };
-            }
-        }
-    }
-    return null;
-}
-
-function onlineChessPseudoMoves(board, r, c) {
-    const piece = board[r] && board[r][c];
-
-    if (!piece) return [];
-
-    const color = piece[0];
-    const type = piece[1];
-    const moves = [];
-
-    const add = (nr, nc) => {
-        if (!onlineChessInside(nr, nc)) return;
-
-        const target = board[nr][nc];
-
-        /* Never allow a move to capture a king directly. */
-        if (target && target[1] === "K") return;
-
-        if (!target || target[0] !== color) {
-            moves.push({ r: nr, c: nc });
-        }
-    };
-
-    if (type === "P") {
-        const dir = color === "w" ? -1 : 1;
-        const start = color === "w" ? 6 : 1;
-
-        if (
-            onlineChessInside(r + dir, c) &&
-            !board[r + dir][c]
-        ) {
-            moves.push({ r: r + dir, c });
-
-            if (
-                r === start &&
-                !board[r + 2 * dir][c]
-            ) {
-                moves.push({
-                    r: r + 2 * dir,
-                    c
-                });
-            }
-        }
-
-        for (const dc of [-1, 1]) {
-            const nr = r + dir;
-            const nc = c + dc;
-
-            if (
-                onlineChessInside(nr, nc) &&
-                board[nr][nc] &&
-                board[nr][nc][0] !== color &&
-                board[nr][nc][1] !== "K"
-            ) {
-                moves.push({ r: nr, c: nc });
-            }
-        }
-
-        return moves;
-    }
-
-    if (type === "N") {
-        [
-            [-2,-1],[-2,1],
-            [-1,-2],[-1,2],
-            [1,-2],[1,2],
-            [2,-1],[2,1]
-        ].forEach(([dr, dc]) => add(r + dr, c + dc));
-
-        return moves;
-    }
-
-    if (type === "K") {
-        for (let dr = -1; dr <= 1; dr++) {
-            for (let dc = -1; dc <= 1; dc++) {
-                if (dr || dc) add(r + dr, c + dc);
-            }
-        }
-
-        return moves;
-    }
-
-    const slide = directions => {
-        for (const [dr, dc] of directions) {
-            let nr = r + dr;
-            let nc = c + dc;
-
-            while (onlineChessInside(nr, nc)) {
-                const target = board[nr][nc];
-
-                if (!target) {
-                    moves.push({ r: nr, c: nc });
-                } else {
-                    if (
-                        target[0] !== color &&
-                        target[1] !== "K"
-                    ) {
-                        moves.push({ r: nr, c: nc });
-                    }
-                    break;
-                }
-
-                nr += dr;
-                nc += dc;
-            }
-        }
-    };
-
-    if (type === "B" || type === "Q") {
-        slide([
-            [-1,-1],[-1,1],
-            [1,-1],[1,1]
-        ]);
-    }
-
-    if (type === "R" || type === "Q") {
-        slide([
-            [-1,0],[1,0],
-            [0,-1],[0,1]
-        ]);
-    }
-
-    return moves;
-}
-
-function onlineChessSquareAttacked(board, r, c, byColor) {
-    for (let rr = 0; rr < 8; rr++) {
-        for (let cc = 0; cc < 8; cc++) {
-            const piece = board[rr][cc];
-
-            if (!piece || piece[0] !== byColor) continue;
-
-            const type = piece[1];
-
-            if (type === "P") {
-                const dir = byColor === "w" ? -1 : 1;
-
-                if (
-                    rr + dir === r &&
-                    Math.abs(cc - c) === 1
-                ) {
-                    return true;
-                }
-            } else if (type === "K") {
-                if (
-                    Math.max(
-                        Math.abs(rr - r),
-                        Math.abs(cc - c)
-                    ) === 1
-                ) {
-                    return true;
-                }
-            } else {
-                const moves = onlineChessPseudoMoves(board, rr, cc);
-
-                if (
-                    moves.some(
-                        m => m.r === r && m.c === c
-                    )
-                ) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-function onlineChessIsInCheck(board, color) {
-    const king = onlineChessFindKing(board, color);
-
-    if (!king) return true;
-
-    return onlineChessSquareAttacked(
-        board,
-        king.r,
-        king.c,
-        color === "w" ? "b" : "w"
-    );
-}
-
-function onlineChessLegalMoves(board, r, c, color) {
-    const piece = board[r] && board[r][c];
-
-    if (!piece || piece[0] !== color) {
-        return [];
-    }
-
-    const pseudo = onlineChessPseudoMoves(board, r, c);
-
-    return pseudo.filter(move => {
-        const copy = onlineChessCloneBoard(board);
-        const moving = copy[r][c];
-
-        copy[move.r][move.c] = moving;
-        copy[r][c] = null;
-
-        /* Automatic queen promotion. */
-        if (
-            moving[1] === "P" &&
-            (move.r === 0 || move.r === 7)
-        ) {
-            copy[move.r][move.c] = color + "Q";
-        }
-
-        return !onlineChessIsInCheck(copy, color);
-    });
-}
-
-function onlineChessHasAnyLegalMove(board, color) {
-    for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-            if (
-                board[r][c] &&
-                board[r][c][0] === color &&
-                onlineChessLegalMoves(board, r, c, color).length
-            ) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-function onlineChessNotation(from, to, moving, captured) {
-    const files = "abcdefgh";
-    const fromName = files[from.c] + (8 - from.r);
-    const toName = files[to.c] + (8 - to.r);
-    const pieceNames = {
-        K: "K",
-        Q: "Q",
-        R: "R",
-        B: "B",
-        N: "N",
-        P: ""
-    };
-
-    return (
-        pieceNames[moving[1]] +
-        fromName +
-        (captured ? " × " : " → ") +
-        toName
-    );
-}
-
-function onlineChessTryMove(from, to, requestedBy) {
-    if (onlineRole !== "host") return false;
-
-    if (onlineChessGameOver) return false;
-
-    const expectedColor =
-        onlineChessTurn;
-
-    if (requestedBy !== expectedColor) {
-        return false;
-    }
-
-    const moving = onlineChessBoard[from.r] &&
-                   onlineChessBoard[from.r][from.c];
-
-    if (!moving || moving[0] !== expectedColor) {
-        return false;
-    }
-
-    const target = onlineChessBoard[to.r] &&
-                   onlineChessBoard[to.r][to.c];
-
-    if (target && target[0] === expectedColor) {
-        return false;
-    }
-
-    const legal = onlineChessLegalMoves(
-        onlineChessBoard,
-        from.r,
-        from.c,
-        expectedColor
-    );
-
-    if (
-        !legal.some(
-            m => m.r === to.r && m.c === to.c
-        )
-    ) {
-        return false;
-    }
-
-    const captured = target;
-
-    onlineChessBoard[to.r][to.c] = moving;
-    onlineChessBoard[from.r][from.c] = null;
-
-    if (
-        moving[1] === "P" &&
-        (to.r === 0 || to.r === 7)
-    ) {
-        onlineChessBoard[to.r][to.c] =
-            expectedColor + "Q";
-    }
-
-    onlineChessHistory.push(
-        onlineChessNotation(
-            from,
-            to,
-            moving,
-            captured
-        )
-    );
-
-    onlineChessTurn =
-        expectedColor === "w" ? "b" : "w";
-
-    onlineChessVersion++;
-
-    const nextColor = onlineChessTurn;
-    const inCheck =
-        onlineChessIsInCheck(
-            onlineChessBoard,
-            nextColor
-        );
-
-    const hasMove =
-        onlineChessHasAnyLegalMove(
-            onlineChessBoard,
-            nextColor
-        );
-
-    if (!hasMove) {
-        onlineChessGameOver = true;
-    }
-
-    sendOnlineChessState();
-    drawOnlineChess();
-
-    if (!hasMove) {
-        if (inCheck) {
-            const winner =
-                nextColor === "w"
-                    ? "Black"
-                    : "White";
-
-            toast("♚ Checkmate! " + winner + " wins!");
-
-            if (
-                (winner === "White" && onlineRole === "host") ||
-                (winner === "Black" && onlineRole === "guest")
-            ) {
-                profile.wins++;
-                addXP(100);
-            } else {
-                profile.losses++;
-                addXP(20);
-            }
-
-            saveProfile();
-        } else {
-            toast("🤝 Stalemate!");
-        }
-
-        return true;
-    }
-
-    if (inCheck) {
-        toast("⚠️ Check!");
-    }
-
-    return true;
-}
-
-function drawOnlineChess() {
-    const board = onlineChessBoard.length
-        ? onlineChessBoard
-        : createChessBoard();
-
-    let boardHTML = "";
-
-    const myColor =
-        onlineRole === "host" ? "w" : "b";
-
-    const selectedLegal =
-        onlineChessSelected
-            ? onlineChessLegalMoves(
-                board,
-                onlineChessSelected.r,
-                onlineChessSelected.c,
-                myColor
-            )
-            : [];
-
-    for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-            const piece = board[r][c];
-
-            const selected =
-                onlineChessSelected &&
-                onlineChessSelected.r === r &&
-                onlineChessSelected.c === c;
-
-            const legal =
-                selectedLegal.some(
-                    m => m.r === r && m.c === c
-                );
-
-            const capture =
-                legal && !!piece;
-
-            boardHTML += `
-                <div
-                    class="
-                        chess-square
-                        ${(r + c) % 2 === 0
-                            ? "light-square"
-                            : "dark-square"}
-                        ${selected ? "selected" : ""}
-                        ${capture ? "capture" : ""}
-                        ${legal && !capture ? "legal" : ""}
-                    "
-                    onclick="onlineChessClick(${r},${c})"
-                >
-                    ${
-                        piece
-                            ? `
-                                <span
-                                    class="
-                                        chess-piece
-                                        ${piece[0] === "w"
-                                            ? "white-piece"
-                                            : "black-piece"}
-                                    "
-                                    title="${
-                                        piece[1] === "K" ? "King" :
-                                        piece[1] === "Q" ? "Queen" :
-                                        piece[1] === "R" ? "Rook" :
-                                        piece[1] === "B" ? "Bishop" :
-                                        piece[1] === "N" ? "Knight" :
-                                        "Pawn"
-                                    }"
-                                >
-                                    ${chessSymbols[piece]}
-                                </span>
-                            `
-                            : ""
-                    }
-                </div>
-            `;
-        }
-    }
-
-    const turnText =
-        onlineChessGameOver
-            ? "Game Over"
-            : onlineChessTurn === "w"
-                ? "White's turn"
-                : "Black's turn";
-
-    const myTurn =
-        !onlineChessGameOver &&
-        onlineChessTurn === myColor;
-
-    document.getElementById("main").innerHTML = `
-        <div class="game-container">
-            <h2 style="margin-bottom:15px">♟️ Online Chess</h2>
-
-            <div style="
-                margin-bottom:15px;
-                padding:12px;
-                border-radius:12px;
-                background:var(--panel2);
-                text-align:center;
-                font-weight:bold;
-            ">
-                You are ${myColor === "w" ? "⚪ White" : "⚫ Black"}
-                &nbsp; • &nbsp;
-                ${myTurn ? "🟢 YOUR TURN" : turnText}
-            </div>
-
-            <div class="chess-layout">
-                <div>
-                    <div class="chess-board">
-                        ${boardHTML}
-                    </div>
-                </div>
-
-                <div class="chess-side">
-                    <div class="turn-box">
-                        ${myTurn ? "🟢 Your turn" : turnText}
-                    </div>
-
-                    <p style="color:var(--muted);font-size:13px;line-height:1.5">
-                        King: 1 square<br>
-                        Queen: straight + diagonal<br>
-                        Rook: straight<br>
-                        Bishop: diagonal<br>
-                        Knight: L-shape<br>
-                        Pawn: forward + diagonal capture
-                    </p>
-
-                    <h3 style="margin:15px 0 8px">
-                        Move History
-                    </h3>
-
-                    <div class="move-history">
-                        ${
-                            onlineChessHistory.length
-                                ? onlineChessHistory
-                                    .map(
-                                        (m, i) =>
-                                            `<div class="move-item">
-                                                ${i + 1}. ${m}
-                                            </div>`
-                                    )
-                                    .join("")
-                                : "No moves yet."
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function onlineChessClick(r, c) {
-    if (onlineChessGameOver) {
-        toast("🏁 This game is already over.");
-        return;
-    }
-
-    const myColor =
-        onlineRole === "host" ? "w" : "b";
-
-    /* This is the first and most important anti-cheating check. */
-    if (onlineChessTurn !== myColor) {
-        toast("⏳ Not your turn. Wait for your opponent.");
-        onlineChessSelected = null;
-        return;
-    }
-
-    const piece = onlineChessBoard[r][c];
-
-    if (!onlineChessSelected) {
-        if (!piece || piece[0] !== myColor) {
-            toast("❌ You can only select your own pieces.");
-            return;
-        }
-
-        const legal =
-            onlineChessLegalMoves(
-                onlineChessBoard,
-                r,
-                c,
-                myColor
-            );
-
-        if (!legal.length) {
-            toast("❌ That piece has no legal moves.");
-            return;
-        }
-
-        onlineChessSelected = { r, c };
-        drawOnlineChess();
-        return;
-    }
-
-    const from = onlineChessSelected;
-
-    if (from.r === r && from.c === c) {
-        onlineChessSelected = null;
-        drawOnlineChess();
-        return;
-    }
-
-    if (piece && piece[0] === myColor) {
-        onlineChessSelected = { r, c };
-        drawOnlineChess();
-        return;
-    }
-
-    const legal =
-        onlineChessLegalMoves(
-            onlineChessBoard,
-            from.r,
-            from.c,
-            myColor
-        );
-
-    const valid =
-        legal.some(
-            m => m.r === r && m.c === c
-        );
-
-    if (!valid) {
-        toast("❌ Illegal chess move.");
-        onlineChessSelected = null;
-        drawOnlineChess();
-        return;
-    }
-
-    onlineChessSelected = null;
-
-    if (onlineRole === "host") {
-        onlineChessTryMove(
-            from,
-            { r, c },
-            "w"
-        );
-    } else {
-        /*
-           Guest does NOT change the board.
-           The host decides whether this move is legal,
-           then broadcasts the authoritative state.
-        */
-        sendOnline({
-            type: "chessMoveRequest",
-            from,
-            to: { r, c },
-            turn: "b",
-            version: onlineChessVersion
-        });
-    }
-
-    drawOnlineChess();
-}
-
-/* =========================================================
-   ONLINE DATA HANDLER
-========================================================= */
 
 function handleOnlineData(data) {
-    if (!data || typeof data !== "object") return;
+    if (!data || !data.type) return;
 
-    /* Guest requests to join. */
     if (data.type === "join") {
-        if (onlineRole !== "host") return;
-
-        if (
-            data.game !== onlineGame ||
-            data.room !== onlineRoom
-        ) {
-            return;
-        }
-
-        const waiting = document.getElementById("hostWaiting");
-        if (waiting) waiting.textContent = "🟢 Friend connected!";
-
-        if (onlineGame === "word") {
-            startOnlineWordHost();
-        }
-
-        if (onlineGame === "chess") {
-            startOnlineChessHost();
-        }
-
-        return;
-    }
-
-    /* ---------------- ONLINE WORD ---------------- */
-
-    if (data.type === "wordGuess") {
-        if (onlineRole !== "host") return;
-
-        if (typeof data.answer !== "string") return;
-        if (typeof data.round !== "number") return;
-
-        processOnlineWordGuess(
-            "guest",
-            data.answer.trim().toUpperCase(),
-            data.round
-        );
-
-        return;
-    }
-
-    if (data.type === "wordState") {
-        handleOnlineWordState(data);
-        return;
-    }
-
-    if (data.type === "wordResult") {
-        handleOnlineWordResult(data);
-        return;
-    }
-
-    /* ---------------- ONLINE CHESS ---------------- */
-
-    if (data.type === "chessMoveRequest") {
-        if (onlineRole !== "host") return;
-        if (onlineChessGameOver) return;
-
-        /*
-           Guest is always Black.
-           The host checks:
-           1. requester is Black
-           2. it is Black's turn
-           3. version is current
-           4. from/to are valid
-           5. piece belongs to Black
-           6. movement obeys chess rules
-           7. move does not leave Black king in check
-        */
-        if (data.turn !== "b") {
-            sendOnline({
-                type: "chessRejected",
-                reason: "It is not your turn."
-            });
-            return;
-        }
-
-        if (data.version !== onlineChessVersion) {
-            sendOnline({
-                type: "chessRejected",
-                reason: "Your board is out of date. Syncing..."
-            });
-
-            sendOnlineChessState();
-            return;
-        }
-
-        if (
-            !data.from ||
-            !data.to ||
-            !Number.isInteger(data.from.r) ||
-            !Number.isInteger(data.from.c) ||
-            !Number.isInteger(data.to.r) ||
-            !Number.isInteger(data.to.c)
-        ) {
-            return;
-        }
-
-        const ok = onlineChessTryMove(
-            data.from,
-            data.to,
-            "b"
-        );
-
-        if (!ok) {
-            sendOnline({
-                type: "chessRejected",
-                reason: "Illegal move."
-            });
-        }
-
-        return;
-    }
-
-    if (data.type === "chessState") {
-        if (onlineRole !== "guest") return;
-
-        if (
-            typeof data.version !== "number" ||
-            data.version < onlineChessVersion
-        ) {
-            return;
-        }
-
-        if (
-            !Array.isArray(data.board) ||
-            data.board.length !== 8 ||
-            data.board.some(
-                row => !Array.isArray(row) || row.length !== 8
-            )
-        ) {
-            return;
-        }
-
-        onlineChessBoard = data.board;
-        onlineChessTurn = data.turn === "b" ? "b" : "w";
-        onlineChessHistory = Array.isArray(data.history)
-            ? data.history
-            : [];
-        onlineChessVersion = data.version;
-        onlineChessGameOver = !!data.gameOver;
-        onlineChessSelected = null;
-
-        drawOnlineChess();
-        return;
-    }
-
-    if (data.type === "chessRejected") {
-        onlineChessSelected = null;
-        toast("❌ " + (data.reason || "Move rejected."));
-        return;
+        toast("👤 Player joined!");
     }
 }
+
+function handlePeerError(err) {
+    toast("⚠️ Online error: " + (err.type || "Disconnected"));
+}
+
 /* =========================================================
-   SHOP
+   EXTRAS (SHOP, ACHIEVEMENTS, PROFILE)
 ========================================================= */
 
 function renderShop() {
-
     document.getElementById("main").innerHTML = `
-
-        <h1 class="page-title">
-            🛒 Shop
-        </h1>
-
-        <p class="page-subtitle">
-            Spend coins on profile upgrades.
-        </p>
-
+        <h1 class="page-title">🛒 Shop</h1>
+        <p class="page-subtitle">Spend your hard-earned coins on cosmetics.</p>
         <div class="cards">
-
             <div class="shop-item">
-
-                <h3>🔥 Streak Boost</h3>
-
-                <p>
-                    A special profile badge.
-                </p>
-
-                <button
-                    class="action-btn primary"
-                    onclick="buyItem(30,'🔥')">
-                    30 Coins
-                </button>
-
+                <h3>😎 Cool Avatar</h3>
+                <p>Equip the sleek sunglasses avatar.</p>
+                <button class="play-btn" onclick="buyAvatar('😎', 50)">Buy for 50 🪙</button>
             </div>
-
             <div class="shop-item">
-
-                <h3>🤖 Robot Avatar</h3>
-
-                <p>
-                    Change your avatar.
-                </p>
-
-                <button
-                    class="action-btn primary"
-                    onclick="buyItem(50,'🤖')">
-                    50 Coins
-                </button>
-
+                <h3>👑 Crown Avatar</h3>
+                <p>Show everyone you're the king of games.</p>
+                <button class="play-btn" onclick="buyAvatar('👑', 150)">Buy for 150 🪙</button>
             </div>
-
             <div class="shop-item">
-
-                <h3>👑 King Avatar</h3>
-
-                <p>
-                    Become the arena king.
-                </p>
-
-                <button
-                    class="action-btn primary"
-                    onclick="buyItem(100,'👑')">
-                    100 Coins
-                </button>
-
+                <h3>🚀 Rocket Avatar</h3>
+                <p>Blast past your opponents!</p>
+                <button class="play-btn" onclick="buyAvatar('🚀', 100)">Buy for 100 🪙</button>
             </div>
-
         </div>
     `;
 }
 
-function buyItem(cost,avatar) {
-
-    if(profile.coins < cost) {
-
-        toast("❌ Not enough coins.");
+function buyAvatar(icon, cost) {
+    if (profile.coins < cost) {
+        toast("❌ Not enough coins!");
         return;
     }
-
-    profile.coins -= cost;
-    profile.avatar = avatar;
-
+    addCoins(-cost);
+    profile.avatar = icon;
     saveProfile();
-    updateTop();
-
-    toast("🎉 Item purchased!");
-}
-
-/* =========================================================
-   ACHIEVEMENTS
-========================================================= */
-
-const achievements = [
-
-    ["first","🎮 First Game","Play your first game."],
-    ["xp100","⭐ Rising Star","Earn 100 XP."],
-    ["xp500","🚀 Expert","Earn 500 XP."],
-    ["win5","🏆 Winner","Get 5 wins."],
-    ["coins500","🪙 Rich Player","Collect 500 coins."],
-    ["master","🧠 Word Master","Solve Word Master."],
-    ["chess","♟️ Chess Player","Play Chess."],
-    ["online","🌐 Online Player","Join an online room."]
-];
-
-function checkAchievements() {
-
-    const unlock = id => {
-
-        if(!profile.achievements.includes(id)) {
-
-            profile.achievements.push(id);
-
-            toast("🏅 Achievement unlocked!");
-
-            saveProfile();
-        }
-    };
-
-    if(profile.xp >= 100) unlock("xp100");
-    if(profile.xp >= 500) unlock("xp500");
-    if(profile.wins >= 5) unlock("win5");
-    if(profile.coins >= 500) unlock("coins500");
+    toast("🎉 Avatar updated!");
 }
 
 function renderAchievements() {
-
-    checkAchievements();
-
     document.getElementById("main").innerHTML = `
-
-        <h1 class="page-title">
-            🏅 Achievements
-        </h1>
-
-        <p class="page-subtitle">
-            Complete challenges and collect badges.
-        </p>
-
+        <h1 class="page-title">🏅 Achievements</h1>
+        <p class="page-subtitle">Track your milestones and feats.</p>
         <div class="cards">
-
-            ${achievements.map(a => `
-
-                <div class="game-card">
-
-                    <div class="game-icon">
-                        ${a[1].split(" ")[0]}
-                    </div>
-
-                    <h3>${a[1]}</h3>
-
-                    <p>${a[2]}</p>
-
-                    <div>
-                        ${
-                            profile.achievements.includes(a[0])
-                            ? "✅ Unlocked"
-                            : "🔒 Locked"
-                        }
-                    </div>
-
-                </div>
-
-            `).join("")}
-
+            <div class="shop-item">
+                <h3>🎯 First Win</h3>
+                <p>${profile.wins > 0 ? "✅ Unlocked!" : "🔒 Win 1 game in any mode."}</p>
+            </div>
+            <div class="shop-item">
+                <h3>💰 Coin Collector</h3>
+                <p>${profile.coins >= 200 ? "✅ Unlocked!" : "🔒 Accumulate 200 total coins."}</p>
+            </div>
+            <div class="shop-item">
+                <h3>⭐ Master Level</h3>
+                <p>${profile.level >= 5 ? "✅ Unlocked!" : "🔒 Reach Level 5."}</p>
+            </div>
         </div>
     `;
 }
-
-/* =========================================================
-   PROFILE
-========================================================= */
 
 function renderProfile() {
-
-    const needed =
-        profile.level * 500;
-
-    const current =
-        profile.xp % 500;
-
-    const percentage =
-        Math.min(
-            100,
-            current / needed * 100
-        );
-
     document.getElementById("main").innerHTML = `
-
         <div class="profile-card">
+            <div class="avatar">${profile.avatar}</div>
+            <div class="profile-name">${profile.username}</div>
+            <p style="text-align:center;color:var(--muted);margin-bottom:20px;">Level ${profile.level} Challenger</p>
 
-            <div class="avatar">
-                ${profile.avatar}
+            <div style="margin-bottom:8px;font-size:14px;font-weight:bold;">
+                Level Progress (${profile.xp % 500} / 500 XP)
             </div>
-
-            <div class="profile-name">
-                ${profile.username}
-            </div>
-
-            <p
-                style="
-                    text-align:center;
-                    color:var(--muted);
-                    margin:7px 0 25px
-                ">
-                Level ${profile.level}
-            </p>
-
             <div class="progress">
-                <div
-                    class="progress-fill"
-                    style="width:${percentage}%">
-                </div>
+                <div class="progress-fill" style="width: ${(profile.xp % 500) / 5}%"></div>
             </div>
 
-            <div class="cards">
-
-                <div class="score-box">
-                    XP
-                    <strong>${profile.xp}</strong>
-                </div>
-
-                <div class="score-box">
-                    Coins
-                    <strong>${profile.coins}</strong>
-                </div>
-
-                <div class="score-box">
-                    Wins
-                    <strong>${profile.wins}</strong>
-                </div>
-
-                <div class="score-box">
-                    Losses
-                    <strong>${profile.losses}</strong>
-                </div>
-
+            <div class="score-row">
+                <div class="score-box">Wins<strong>${profile.wins}</strong></div>
+                <div class="score-box">Losses<strong>${profile.losses}</strong></div>
+                <div class="score-box">Coins<strong>${profile.coins}</strong></div>
+                <div class="score-box">Total XP<strong>${profile.xp}</strong></div>
             </div>
-
         </div>
     `;
 }
 
-/* =========================================================
-   START
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const saved =
-        localStorage.getItem(STORAGE_KEY);
-
-    if(saved) {
-
-        try {
-
-            profile =
-                JSON.parse(saved);
-
-        } catch {
-
-            profile =
-                defaultProfile();
-        }
-    }
-
-    document
-        .getElementById("pinInput")
-        .addEventListener("keydown", e => {
-
-            if(e.key === "Enter") {
-                login();
-            }
-
-        });
-
-});
-
 </script>
-
 </body>
 </html>
