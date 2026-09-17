@@ -1,0 +1,5649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+
+<title>Word Games Arena — Online</title>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#070b16;
+    --panel:#10182b;
+    --panel2:#151f36;
+    --panel3:#1c2742;
+    --text:#f5f7ff;
+    --muted:#8d99b5;
+    --primary:#6c63ff;
+    --primary2:#8b5cf6;
+    --secondary:#00d4ff;
+    --success:#20e38b;
+    --danger:#ff4d6d;
+    --warning:#ffc857;
+    --border:rgba(255,255,255,.09);
+    --shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+body.light{
+    --bg:#eef2ff;
+    --panel:#fff;
+    --panel2:#f4f6ff;
+    --panel3:#e9edff;
+    --text:#171a2b;
+    --muted:#667085;
+    --border:rgba(20,30,60,.1);
+    --shadow:0 20px 50px rgba(30,40,80,.15);
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 10% 10%,rgba(108,99,255,.18),transparent 30%),
+        radial-gradient(circle at 90% 20%,rgba(0,212,255,.12),transparent 25%),
+        var(--bg);
+    color:var(--text);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+button,input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+button:disabled{
+    cursor:not-allowed;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+#loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:25px;
+}
+
+.login-box{
+    width:min(500px,100%);
+    padding:40px;
+    border-radius:30px;
+    background:rgba(16,24,43,.92);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(20px);
+    text-align:center;
+    animation:rise .6s ease;
+}
+
+body.light .login-box{
+    background:rgba(255,255,255,.94);
+}
+
+.logo{
+    font-size:70px;
+    line-height:1;
+    font-weight:1000;
+    letter-spacing:-5px;
+    background:linear-gradient(90deg,#6c63ff,#00d4ff,#ff4fa3);
+    background-clip:text;
+    color:transparent;
+}
+
+.login-box h1{
+    margin-top:12px;
+}
+
+.login-subtitle{
+    color:var(--muted);
+    margin:10px 0 25px;
+}
+
+.input{
+    width:100%;
+    padding:14px 16px;
+    margin-bottom:12px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:var(--panel2);
+    color:var(--text);
+    outline:none;
+}
+
+.input:focus{
+    border-color:var(--primary);
+}
+
+.avatar-grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:8px;
+    margin:12px 0 22px;
+}
+
+.avatar{
+    height:52px;
+    border:2px solid transparent;
+    border-radius:13px;
+    background:var(--panel2);
+    font-size:25px;
+}
+
+.avatar.selected{
+    border-color:var(--secondary);
+    box-shadow:0 0 18px rgba(0,212,255,.3);
+}
+
+.primary-btn{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:14px;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    color:white;
+    font-weight:900;
+    transition:.2s;
+}
+
+.primary-btn:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.08);
+}
+
+.login-note{
+    margin-top:14px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+    height:74px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 25px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(7,11,22,.75);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--border);
+}
+
+body.light .topbar{
+    background:rgba(255,255,255,.8);
+}
+
+.brand{
+    font-size:21px;
+    font-weight:1000;
+}
+
+.brand span{
+    color:var(--secondary);
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+.icon-btn{
+    width:42px;
+    height:42px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--panel);
+    color:var(--text);
+}
+
+.user-mini{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:13px;
+}
+
+.mini-avatar{
+    font-size:21px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    width:min(1250px,94%);
+    margin:30px auto 70px;
+}
+
+.page{
+    animation:fade .25s ease;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+    padding:35px;
+    border:1px solid var(--border);
+    border-radius:28px;
+    background:
+        radial-gradient(circle at 90% 10%,rgba(0,212,255,.15),transparent 25%),
+        radial-gradient(circle at 10% 90%,rgba(108,99,255,.18),transparent 25%),
+        var(--panel);
+}
+
+.hero h1{
+    font-size:clamp(30px,5vw,55px);
+}
+
+.hero p{
+    color:var(--muted);
+    margin-top:7px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-top:25px;
+}
+
+.stat{
+    padding:18px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:17px;
+}
+
+.stat-icon{
+    font-size:24px;
+}
+
+.stat-label{
+    color:var(--muted);
+    font-size:11px;
+    margin-top:5px;
+}
+
+.stat-value{
+    font-size:21px;
+    font-weight:900;
+    margin-top:3px;
+}
+
+/* =========================
+   GAME CARDS
+========================= */
+
+.section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:30px 0 15px;
+}
+
+.section-title h2{
+    font-size:25px;
+}
+
+.game-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.game-card{
+    min-height:205px;
+    padding:25px;
+    position:relative;
+    overflow:hidden;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:22px;
+    transition:.25s;
+}
+
+.game-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(108,99,255,.55);
+    box-shadow:0 15px 40px rgba(0,0,0,.2);
+}
+
+.game-icon{
+    font-size:45px;
+    margin-bottom:14px;
+}
+
+.game-card h3{
+    font-size:21px;
+    margin-bottom:7px;
+}
+
+.game-card p{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+}
+
+.play-btn{
+    margin-top:15px;
+    padding:10px 16px;
+    border:0;
+    border-radius:10px;
+    background:var(--primary);
+    color:white;
+    font-weight:900;
+}
+
+.online-btn{
+    background:linear-gradient(135deg,#00a8ff,#00d4ff);
+}
+
+/* =========================
+   GAME PANEL
+========================= */
+
+.game-panel{
+    max-width:900px;
+    margin:auto;
+    padding:28px;
+    border:1px solid var(--border);
+    border-radius:28px;
+    background:var(--panel);
+    box-shadow:var(--shadow);
+}
+
+.back-btn{
+    padding:10px 15px;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:var(--panel2);
+    color:var(--text);
+}
+
+.game-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin:20px 0;
+}
+
+.game-header h1{
+    font-size:30px;
+}
+
+.game-info{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.badge{
+    padding:8px 12px;
+    border-radius:10px;
+    background:var(--panel2);
+    color:var(--muted);
+    font-size:13px;
+}
+
+.hint-box{
+    padding:14px;
+    margin:15px 0;
+    border-radius:13px;
+    background:rgba(255,200,87,.08);
+    color:var(--warning);
+}
+
+/* =========================
+   HANGMAN
+========================= */
+
+.hangman-art{
+    min-height:170px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:90px;
+}
+
+.word{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:25px 0;
+}
+
+.letter{
+    width:43px;
+    height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:4px solid var(--primary);
+    font-size:28px;
+    font-weight:900;
+}
+
+.keyboard{
+    display:grid;
+    grid-template-columns:repeat(9,1fr);
+    gap:7px;
+}
+
+.key{
+    min-height:43px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:var(--panel2);
+    color:var(--text);
+    font-weight:800;
+}
+
+.key:hover:not(:disabled){
+    background:var(--primary);
+    color:white;
+}
+
+.key:disabled{
+    opacity:.35;
+}
+
+/* =========================
+   SCRAMBLE
+========================= */
+
+.scramble-word{
+    padding:35px 10px;
+    text-align:center;
+    font-size:clamp(35px,8vw,65px);
+    letter-spacing:8px;
+    font-weight:1000;
+}
+
+.answer-row{
+    display:flex;
+    gap:10px;
+}
+
+.answer-row .input{
+    margin:0;
+}
+
+/* =========================
+   TRIVIA
+========================= */
+
+.question{
+    font-size:23px;
+    font-weight:800;
+    line-height:1.4;
+    margin:25px 0;
+}
+
+.answers{
+    display:grid;
+    gap:10px;
+}
+
+.answer{
+    padding:16px;
+    text-align:left;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:var(--panel2);
+    color:var(--text);
+}
+
+.answer.correct{
+    border-color:var(--success);
+    background:rgba(32,227,139,.12);
+}
+
+.answer.wrong{
+    border-color:var(--danger);
+    background:rgba(255,77,109,.12);
+}
+
+/* =========================
+   WORD MASTER
+========================= */
+
+.master-grid{
+    display:grid;
+    grid-template-columns:repeat(5,55px);
+    gap:7px;
+    justify-content:center;
+    margin:25px 0;
+}
+
+.tile{
+    width:55px;
+    height:55px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:2px solid var(--border);
+    border-radius:8px;
+    font-size:25px;
+    font-weight:900;
+}
+
+.tile.correct{
+    background:#159447;
+    border-color:#159447;
+}
+
+.tile.present{
+    background:#a27610;
+    border-color:#a27610;
+}
+
+.tile.absent{
+    background:#394052;
+    border-color:#394052;
+}
+
+/* =========================
+   CHESS
+========================= */
+
+.chess-wrap{
+    max-width:620px;
+    margin:auto;
+}
+
+.chess-board{
+    width:min(620px,100%);
+    aspect-ratio:1;
+    display:grid;
+    grid-template-columns:repeat(8,1fr);
+    border:6px solid var(--panel3);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+
+.square{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:clamp(27px,7vw,52px);
+    user-select:none;
+}
+
+.square.light-square{
+    background:#f0d9b5;
+}
+
+.square.dark-square{
+    background:#b58863;
+}
+
+.square.selected-square{
+    box-shadow:inset 0 0 0 5px #00d4ff;
+}
+
+.square.legal-square::after{
+    content:"";
+    width:24%;
+    height:24%;
+    border-radius:50%;
+    background:rgba(0,0,0,.28);
+    position:absolute;
+}
+
+.square.capture-square{
+    box-shadow:inset 0 0 0 5px rgba(255,70,100,.75);
+}
+
+.chess-status{
+    text-align:center;
+    margin:15px 0;
+    font-weight:800;
+}
+
+.chess-controls{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:15px;
+    flex-wrap:wrap;
+}
+
+.chess-controls button{
+    padding:10px 15px;
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+    border-radius:10px;
+}
+
+/* =========================
+   ONLINE
+========================= */
+
+.online-box{
+    padding:20px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--panel2);
+    margin-top:15px;
+}
+
+.online-code{
+    padding:15px;
+    margin:12px 0;
+    border-radius:12px;
+    background:var(--panel3);
+    font-size:22px;
+    font-weight:1000;
+    text-align:center;
+    letter-spacing:2px;
+}
+
+.connection{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:10px 0;
+    font-size:13px;
+    color:var(--muted);
+}
+
+.online-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:var(--danger);
+}
+
+.online-dot.connected{
+    background:var(--success);
+    box-shadow:0 0 12px var(--success);
+}
+
+.share-link{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:var(--text);
+    margin-top:8px;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile-card{
+    max-width:750px;
+    margin:auto;
+    padding:30px;
+    border-radius:25px;
+    background:var(--panel);
+    border:1px solid var(--border);
+}
+
+.profile-head{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.big-avatar{
+    width:90px;
+    height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:25px;
+    background:var(--panel2);
+    font-size:50px;
+}
+
+.rank{
+    color:var(--secondary);
+    font-weight:900;
+    margin-top:4px;
+}
+
+.xp-bar{
+    height:12px;
+    margin-top:20px;
+    border-radius:20px;
+    overflow:hidden;
+    background:var(--panel2);
+}
+
+.xp-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--primary),var(--secondary));
+    transition:.5s;
+}
+
+.profile-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:25px;
+}
+
+/* =========================
+   SHOP
+========================= */
+
+.shop-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-top:20px;
+}
+
+.shop-item{
+    padding:20px;
+    text-align:center;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--panel);
+}
+
+.shop-icon{
+    font-size:42px;
+}
+
+.shop-item button{
+    margin-top:12px;
+    padding:9px 13px;
+    border:0;
+    border-radius:9px;
+    background:var(--primary);
+    color:white;
+}
+
+/* =========================
+   ACHIEVEMENTS
+========================= */
+
+.achievement-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:13px;
+}
+
+.achievement{
+    padding:20px;
+    border:1px solid var(--border);
+    border-radius:17px;
+    background:var(--panel);
+}
+
+.achievement.locked{
+    opacity:.4;
+}
+
+.achievement-icon{
+    font-size:35px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+#toastContainer{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:1000;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.toast{
+    max-width:350px;
+    padding:14px 18px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:var(--panel);
+    box-shadow:var(--shadow);
+    animation:slideIn .3s ease;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+    .game-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stats{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .shop-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px){
+
+    .topbar{
+        padding:0 12px;
+    }
+
+    .brand{
+        font-size:16px;
+    }
+
+    .user-mini{
+        display:none;
+    }
+
+    .main{
+        width:94%;
+    }
+
+    .hero{
+        padding:23px;
+    }
+
+    .game-grid,
+    .achievement-grid{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .keyboard{
+        grid-template-columns:repeat(7,1fr);
+    }
+
+    .answer-row{
+        flex-direction:column;
+    }
+
+    .master-grid{
+        grid-template-columns:repeat(5,48px);
+    }
+
+    .tile{
+        width:48px;
+        height:48px;
+    }
+
+    .profile-grid{
+        grid-template-columns:1fr;
+    }
+
+    .login-box{
+        padding:25px;
+    }
+}
+
+@keyframes rise{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes fade{
+    from{opacity:0}
+    to{opacity:1}
+}
+
+@keyframes slideIn{
+    from{
+        opacity:0;
+        transform:translateX(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     LOGIN
+========================= -->
+
+<section id="loginScreen">
+
+<div class="login-box">
+
+<div class="logo">WGA</div>
+
+<h1>Word Games Arena</h1>
+
+<p class="login-subtitle">
+Create your player profile and enter the arena.
+</p>
+
+<input
+id="usernameInput"
+class="input"
+maxlength="18"
+placeholder="Enter your username"
+autocomplete="off">
+
+<input
+id="pinInput"
+class="input"
+type="password"
+maxlength="8"
+placeholder="Create a PIN"
+autocomplete="off">
+
+<p style="text-align:left;color:var(--muted);font-size:13px">
+Choose your avatar
+</p>
+
+<div id="avatarGrid" class="avatar-grid"></div>
+
+<button class="primary-btn" onclick="login()">
+🚀 ENTER THE ARENA
+</button>
+
+<p class="login-note">
+Your profile is saved locally on this browser.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     APP
+========================= -->
+
+<div id="app" class="hidden">
+
+<header class="topbar">
+
+<div class="brand">
+WORD <span>GAMES</span> ARENA
+</div>
+
+<div class="top-actions">
+
+<button class="icon-btn"
+onclick="toggleTheme()"
+title="Theme">
+🌙
+</button>
+
+<button class="icon-btn"
+onclick="toggleSound()"
+title="Sound">
+🔊
+</button>
+
+<div class="user-mini">
+<span id="miniAvatar" class="mini-avatar">😎</span>
+<b id="miniName">Player</b>
+</div>
+
+</div>
+
+</header>
+
+<main id="main" class="main"></main>
+
+</div>
+
+<div id="toastContainer"></div>
+
+
+<script>
+
+/* =========================================================
+   WORD GAMES ARENA
+   ADVANCED SINGLE FILE ENGINE
+
+   IMPORTANT ARCHITECTURE FIX:
+
+   Every game gets a unique game session ID.
+   Timers must verify that their session is still active.
+
+   This prevents old Scramble/Rush timers from
+   changing the screen after the player starts another game.
+========================================================= */
+
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const STORAGE_KEY="WGA_ADVANCED_PROFILE";
+
+const avatars=[
+"😎","🤖","👑","🦊","🐼","🐸",
+"🦁","🐯","🐨","🐵","👽","🚀"
+];
+
+const ranks=[
+{name:"Rookie",min:0},
+{name:"Scout",min:100},
+{name:"Duelist",min:300},
+{name:"Strategist",min:700},
+{name:"Champion",min:1500},
+{name:"Legend",min:3000}
+];
+
+const words=[
+{word:"PYTHON",hint:"A popular programming language"},
+{word:"COMPUTER",hint:"An electronic machine"},
+{word:"JAVASCRIPT",hint:"A language used on websites"},
+{word:"ELEPHANT",hint:"A very large land animal"},
+{word:"MOUNTAIN",hint:"A very high natural feature"},
+{word:"KEYBOARD",hint:"Used for typing"},
+{word:"GALAXY",hint:"A huge collection of stars"},
+{word:"ROCKET",hint:"It can travel into space"},
+{word:"OCEAN",hint:"A huge body of salt water"},
+{word:"RAINBOW",hint:"Appears after rain"},
+{word:"DIAMOND",hint:"A very hard precious stone"},
+{word:"ADVENTURE",hint:"An exciting experience"},
+{word:"CHAMPION",hint:"A winner"},
+{word:"KNOWLEDGE",hint:"What you gain by learning"},
+{word:"CREATIVE",hint:"Good at producing new ideas"},
+{word:"FUTURE",hint:"Time that has not happened yet"},
+{word:"SCIENCE",hint:"Study of the natural world"},
+{word:"HISTORY",hint:"Study of past events"},
+{word:"PLANET",hint:"Earth is one"},
+{word:"FRIENDSHIP",hint:"A bond between friends"}
+];
+
+const scrambleWords=[
+"PYTHON","COMPUTER","ROCKET","GALAXY",
+"SCIENCE","HISTORY","KEYBOARD","ADVENTURE",
+"CHAMPION","CREATIVE","PLANET","KNOWLEDGE"
+];
+
+const masterWords=[
+"APPLE","HOUSE","PLANT","WORLD","LIGHT",
+"WATER","MUSIC","PHONE","BRAIN","SPACE",
+"EARTH","CLOUD","TRAIN","SMART","GAMES"
+];
+
+const trivia=[
+{
+q:"Which planet is known as the Red Planet?",
+a:["Earth","Mars","Jupiter","Venus"],
+c:1
+},
+{
+q:"How many sides does a hexagon have?",
+a:["5","6","7","8"],
+c:1
+},
+{
+q:"Which language is commonly used to style web pages?",
+a:["CSS","Python","SQL","C++"],
+c:0
+},
+{
+q:"What is the largest ocean on Earth?",
+a:["Atlantic","Indian","Pacific","Arctic"],
+c:2
+},
+{
+q:"Which device is mainly used to type text?",
+a:["Monitor","Keyboard","Speaker","Printer"],
+c:1
+},
+{
+q:"What does CPU stand for?",
+a:[
+"Central Processing Unit",
+"Computer Power Utility",
+"Central Program User",
+"Core Processing Utility"
+],
+c:0
+},
+{
+q:"How many days are normally in a week?",
+a:["5","6","7","8"],
+c:2
+},
+{
+q:"Which gas do humans need for normal breathing?",
+a:["Oxygen","Helium","Carbon dioxide","Hydrogen"],
+c:0
+}
+];
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let profile=null;
+let selectedAvatar=avatars[0];
+
+let soundEnabled=true;
+
+let currentGame="home";
+
+/*
+   Every time a new game starts this number changes.
+   Old timers become invalid.
+*/
+let gameSession=0;
+
+const timers=new Set();
+
+function newSession(){
+
+    gameSession++;
+
+    stopAllTimers();
+
+    return gameSession;
+}
+
+function safeTimer(callback,delay,session){
+
+    const id=setTimeout(()=>{
+
+        timers.delete(id);
+
+        if(session!==gameSession)return;
+
+        callback();
+
+    },delay);
+
+    timers.add(id);
+
+    return id;
+}
+
+function safeInterval(callback,delay,session){
+
+    const id=setInterval(()=>{
+
+        if(session!==gameSession){
+
+            clearInterval(id);
+            timers.delete(id);
+            return;
+        }
+
+        callback();
+
+    },delay);
+
+    timers.add(id);
+
+    return id;
+}
+
+function stopAllTimers(){
+
+    timers.forEach(id=>{
+        clearTimeout(id);
+        clearInterval(id);
+    });
+
+    timers.clear();
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function defaultProfile(username,pin){
+
+return{
+
+username,
+pin,
+avatar:selectedAvatar,
+
+coins:100,
+xp:0,
+level:1,
+
+wins:0,
+losses:0,
+
+streak:0,
+bestStreak:0,
+
+totalGames:0,
+correctAnswers:0,
+
+hangmanBest:0,
+scrambleBest:0,
+rushBest:0,
+triviaBest:0,
+masterBest:0,
+
+unlockedAvatars:["😎"],
+
+achievements:[],
+
+dailyDate:"",
+dailyCompleted:false
+
+};
+
+}
+
+
+/* =========================================================
+   AVATAR LOGIN
+========================================================= */
+
+function setupAvatars(){
+
+const grid=document.getElementById("avatarGrid");
+
+grid.innerHTML=avatars.map((avatar,index)=>`
+
+<button
+class="avatar ${index===0?"selected":""}"
+onclick="selectAvatar('${avatar}',this)">
+${avatar}
+</button>
+
+`).join("");
+
+}
+
+function selectAvatar(avatar,element){
+
+selectedAvatar=avatar;
+
+document.querySelectorAll(".avatar").forEach(x=>{
+x.classList.remove("selected");
+});
+
+element.classList.add("selected");
+
+}
+
+function login(){
+
+const username=document
+.getElementById("usernameInput")
+.value.trim();
+
+const pin=document
+.getElementById("pinInput")
+.value.trim();
+
+if(username.length<2){
+
+toast("⚠️ Username must be at least 2 characters.");
+
+return;
+
+}
+
+if(pin.length<4){
+
+toast("⚠️ PIN must contain at least 4 characters.");
+
+return;
+
+}
+
+const savedRaw=localStorage.getItem(STORAGE_KEY);
+
+if(savedRaw){
+
+try{
+
+const saved=JSON.parse(savedRaw);
+
+if(
+saved.username.toLowerCase()!==username.toLowerCase()
+||
+saved.pin!==pin
+){
+
+toast("❌ Username or PIN is incorrect.");
+
+return;
+
+}
+
+profile=saved;
+
+}catch(e){
+
+localStorage.removeItem(STORAGE_KEY);
+
+profile=defaultProfile(username,pin);
+
+save();
+
+}
+
+}else{
+
+profile=defaultProfile(username,pin);
+
+save();
+
+}
+
+selectedAvatar=profile.avatar;
+
+enterApp();
+
+}
+
+function enterApp(){
+
+document
+.getElementById("loginScreen")
+.classList.add("hidden");
+
+document
+.getElementById("app")
+.classList.remove("hidden");
+
+updateMiniProfile();
+
+renderHome();
+
+}
+
+function logout(){
+
+stopAllTimers();
+
+profile=null;
+
+document
+.getElementById("app")
+.classList.add("hidden");
+
+document
+.getElementById("loginScreen")
+.classList.remove("hidden");
+
+document.getElementById("usernameInput").value="";
+document.getElementById("pinInput").value="";
+
+toast("👋 Logged out.");
+
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function save(){
+
+if(!profile)return;
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(profile)
+);
+
+}
+
+function updateMiniProfile(){
+
+if(!profile)return;
+
+document.getElementById("miniAvatar")
+.textContent=profile.avatar;
+
+document.getElementById("miniName")
+.textContent=profile.username;
+
+}
+
+
+/* =========================================================
+   LEVEL
+========================================================= */
+
+function getRank(){
+
+let current=ranks[0];
+
+for(const rank of ranks){
+
+if(profile.xp>=rank.min){
+current=rank;
+}
+
+}
+
+return current.name;
+
+}
+
+function xpForNextLevel(){
+
+return profile.level*100;
+
+}
+
+function addXP(amount){
+
+profile.xp+=amount;
+
+while(profile.xp>=xpForNextLevel()){
+
+profile.xp-=xpForNextLevel();
+
+profile.level++;
+
+profile.coins+=50;
+
+toast(
+`🎉 LEVEL UP! Level ${profile.level}`
+);
+
+sound(700,120);
+
+}
+
+checkAchievements();
+
+save();
+
+}
+
+function reward(xp,coins){
+
+addXP(xp);
+
+profile.coins+=coins;
+
+save();
+
+updateMiniProfile();
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function renderHome(){
+
+newSession();
+
+currentGame="home";
+
+const main=document.getElementById("main");
+
+main.innerHTML=`
+
+<section class="page">
+
+<div class="hero">
+
+<h1>
+Welcome back, ${escapeHTML(profile.username)}! 👋
+</h1>
+
+<p>
+Choose a game and enter the arena.
+</p>
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-icon">⭐</div>
+<div class="stat-label">LEVEL</div>
+<div class="stat-value">${profile.level}</div>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🏆</div>
+<div class="stat-label">RANK</div>
+<div class="stat-value">${getRank()}</div>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🪙</div>
+<div class="stat-label">COINS</div>
+<div class="stat-value">${profile.coins}</div>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🔥</div>
+<div class="stat-label">STREAK</div>
+<div class="stat-value">${profile.streak}</div>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🎮</div>
+<div class="stat-label">GAMES</div>
+<div class="stat-value">${profile.totalGames}</div>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="section-title">
+
+<h2>🎮 Game Arcade</h2>
+
+<button
+class="back-btn"
+onclick="renderProfile()">
+👤 Profile
+</button>
+
+</div>
+
+
+<div class="game-grid">
+
+${gameCard(
+"😵",
+"Hangman Arena",
+"Guess the hidden word before you run out of lives.",
+"hangman"
+)}
+
+${gameCard(
+"🔀",
+"Word Scramble",
+"Unscramble letters before the timer reaches zero.",
+"scramble"
+)}
+
+${gameCard(
+"⚡",
+"Letter Rush",
+"Solve as many words as possible in 60 seconds.",
+"rush"
+)}
+
+${gameCard(
+"🟩",
+"Word Master",
+"Find the hidden five-letter word.",
+"master"
+)}
+
+${gameCard(
+"🧠",
+"Trivia Blitz",
+"Answer questions and build a combo.",
+"trivia"
+)}
+
+${gameCard(
+"♟️",
+"Chess Arena",
+"Play chess against a friend locally or online.",
+"chess"
+)}
+
+</div>
+
+
+<div class="section-title">
+<h2>🌐 Online Arena</h2>
+</div>
+
+<div class="game-grid">
+
+${gameCard(
+"🌐",
+"Online Chess",
+"Create a room and battle your friend online.",
+"onlineChess",
+true
+)}
+
+${gameCard(
+"⚔️",
+"Online Word Battle",
+"Challenge a friend to a real-time word battle.",
+"onlineWord",
+true
+)}
+
+${gameCard(
+"👥",
+"Local Duel",
+"Two players can battle on the same device.",
+"duel"
+)}
+
+</div>
+
+
+<div class="section-title">
+<h2>🏆 More</h2>
+</div>
+
+<div class="game-grid">
+
+${gameCard(
+"🎯",
+"Daily Challenge",
+"Complete today's special challenge.",
+"daily"
+)}
+
+${gameCard(
+"🛍️",
+"Arena Shop",
+"Spend coins on avatars.",
+"shop"
+)}
+
+${gameCard(
+"🏅",
+"Achievements",
+"Unlock achievements.",
+"achievements"
+)}
+
+</div>
+
+</section>
+
+`;
+
+}
+
+function gameCard(icon,title,description,game,online=false){
+
+return`
+
+<div class="game-card">
+
+<div class="game-icon">${icon}</div>
+
+<h3>${title}</h3>
+
+<p>${description}</p>
+
+<button
+class="play-btn ${online?"online-btn":""}"
+onclick="startGame('${game}')">
+
+${online?"🌐 ONLINE →":"PLAY →"}
+
+</button>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   ROUTER
+========================================================= */
+
+function startGame(game){
+
+/*
+   THIS IS THE IMPORTANT FIX.
+
+   Every route first destroys all old timers.
+   Therefore an old Scramble or Rush interval
+   can NEVER redraw the new game.
+*/
+
+newSession();
+
+currentGame=game;
+
+if(game==="hangman")renderHangman();
+else if(game==="scramble")renderScramble();
+else if(game==="rush")renderRush();
+else if(game==="master")renderMaster();
+else if(game==="trivia")renderTrivia();
+else if(game==="duel")renderDuel();
+else if(game==="chess")renderChess();
+else if(game==="daily")renderDaily();
+else if(game==="shop")renderShop();
+else if(game==="achievements")renderAchievements();
+else if(game==="onlineChess")renderOnlineLobby("chess");
+else if(game==="onlineWord")renderOnlineLobby("word");
+
+}
+
+
+/* =========================================================
+   GAME SHELL
+========================================================= */
+
+function gameShell(title,content){
+
+document.getElementById("main").innerHTML=`
+
+<section class="page">
+
+<div class="game-panel">
+
+<button
+class="back-btn"
+onclick="renderHome()">
+← Back to Arena
+</button>
+
+<div class="game-header">
+
+<h1>${title}</h1>
+
+<div class="game-info">
+
+<span class="badge">
+🪙 ${profile.coins}
+</span>
+
+<span class="badge">
+⭐ LVL ${profile.level}
+</span>
+
+</div>
+
+</div>
+
+${content}
+
+</div>
+
+</section>
+
+`;
+
+}
+
+
+/* =========================================================
+   HANGMAN
+========================================================= */
+
+let hangman={};
+
+function renderHangman(){
+
+const data=
+words[Math.floor(Math.random()*words.length)];
+
+hangman={
+word:data.word,
+hint:data.hint,
+guessed:[],
+lives:6,
+score:0,
+session:gameSession
+};
+
+drawHangman();
+
+}
+
+function drawHangman(){
+
+if(hangman.session!==gameSession)return;
+
+const wordDisplay=
+hangman.word.split("").map(letter=>`
+
+<div class="letter">
+${hangman.guessed.includes(letter)?letter:""}
+</div>
+
+`).join("");
+
+const keys="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+.split("")
+.map(letter=>`
+
+<button
+class="key"
+onclick="guessHangman('${letter}')"
+${hangman.guessed.includes(letter)?"disabled":""}>
+${letter}
+</button>
+
+`).join("");
+
+const parts=[
+"🪵","🪵","🪢","😐","😟","😵","💀"
+];
+
+const mistakes=6-hangman.lives;
+
+gameShell("😵 Hangman Arena",`
+
+<div class="hangman-art">
+${parts[Math.min(mistakes,6)]}
+</div>
+
+<div class="game-info">
+
+<span class="badge">
+❤️ Lives: ${hangman.lives}
+</span>
+
+<span class="badge">
+🏆 Score: ${hangman.score}
+</span>
+
+</div>
+
+<div class="hint-box">
+💡 ${hangman.hint}
+</div>
+
+<div class="word">
+${wordDisplay}
+</div>
+
+<div class="keyboard">
+${keys}
+</div>
+
+<div style="text-align:center;margin-top:20px">
+
+<button
+class="primary-btn"
+style="max-width:250px"
+onclick="renderHangman()">
+🔄 New Word
+</button>
+
+</div>
+
+`);
+
+}
+
+function guessHangman(letter){
+
+if(hangman.session!==gameSession)return;
+
+if(hangman.guessed.includes(letter))return;
+
+hangman.guessed.push(letter);
+
+if(hangman.word.includes(letter)){
+
+hangman.score+=20;
+
+sound(650,70);
+
+toast("✅ Correct!");
+
+}else{
+
+hangman.lives--;
+
+sound(180,120);
+
+toast("❌ Wrong letter!");
+
+}
+
+const won=
+hangman.word
+.split("")
+.every(x=>hangman.guessed.includes(x));
+
+if(won){
+
+profile.wins++;
+profile.totalGames++;
+profile.streak++;
+
+profile.bestStreak=
+Math.max(profile.bestStreak,profile.streak);
+
+profile.hangmanBest=
+Math.max(profile.hangmanBest,hangman.score);
+
+reward(60,30);
+
+achievement("first_win");
+
+toast("🏆 YOU WON! +60 XP");
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderHangman();
+},900,s);
+
+return;
+
+}
+
+if(hangman.lives<=0){
+
+profile.losses++;
+profile.totalGames++;
+profile.streak=0;
+
+save();
+
+toast(`💥 The word was ${hangman.word}`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderHangman();
+},1200,s);
+
+return;
+
+}
+
+drawHangman();
+
+}
+
+
+/* =========================================================
+   SCRAMBLE
+========================================================= */
+
+let scramble={};
+
+function renderScramble(){
+
+clearScrambleState();
+
+const word=
+scrambleWords[
+Math.floor(Math.random()*scrambleWords.length)
+];
+
+scramble={
+word,
+time:30,
+score:0,
+session:gameSession
+};
+
+drawScramble();
+
+const s=gameSession;
+
+scramble.timer=
+safeInterval(()=>{
+
+if(scramble.session!==gameSession)return;
+
+scramble.time--;
+
+const timeBadge=
+document.getElementById("scrambleTime");
+
+if(timeBadge){
+timeBadge.textContent=`⏱️ ${scramble.time}s`;
+}
+
+if(scramble.time<=0){
+
+endScramble();
+
+}
+
+},1000,s);
+
+}
+
+function clearScrambleState(){
+
+if(scramble.timer){
+
+clearInterval(scramble.timer);
+
+timers.delete(scramble.timer);
+
+}
+
+}
+
+function shuffle(str){
+
+return str
+.split("")
+.sort(()=>Math.random()-.5)
+.join("");
+
+}
+
+function drawScramble(){
+
+gameShell("🔀 Word Scramble",`
+
+<div class="game-info">
+
+<span class="badge" id="scrambleTime">
+⏱️ ${scramble.time}s
+</span>
+
+<span class="badge">
+🏆 ${scramble.score}
+</span>
+
+</div>
+
+<div class="scramble-word">
+${shuffle(scramble.word)}
+</div>
+
+<div class="answer-row">
+
+<input
+id="scrambleInput"
+class="input"
+placeholder="Type the answer..."
+autocomplete="off"
+onkeydown="if(event.key==='Enter')checkScramble()">
+
+<button
+class="play-btn"
+onclick="checkScramble()">
+CHECK
+</button>
+
+</div>
+
+<div style="text-align:center;margin-top:18px">
+
+<button
+class="back-btn"
+onclick="renderScramble()">
+🔄 New Word
+</button>
+
+</div>
+
+`);
+
+const input=document.getElementById("scrambleInput");
+
+if(input)input.focus();
+
+}
+
+function checkScramble(){
+
+if(scramble.session!==gameSession)return;
+
+const input=document.getElementById("scrambleInput");
+
+if(!input)return;
+
+const answer=input.value
+.trim()
+.toUpperCase();
+
+if(answer===scramble.word){
+
+clearScrambleState();
+
+scramble.score=
+Math.max(50,scramble.time*10);
+
+profile.wins++;
+profile.totalGames++;
+profile.streak++;
+
+profile.scrambleBest=
+Math.max(
+profile.scrambleBest,
+scramble.score
+);
+
+reward(45,20);
+
+toast(`🎉 Correct! +${scramble.score}`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderScramble();
+},1000,s);
+
+}else{
+
+toast("❌ Not quite. Try again!");
+
+input.value="";
+input.focus();
+
+}
+
+}
+
+function endScramble(){
+
+clearScrambleState();
+
+profile.losses++;
+profile.totalGames++;
+profile.streak=0;
+
+save();
+
+toast(`⏰ Time! Word was ${scramble.word}`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderScramble();
+},1200,s);
+
+}
+
+
+/* =========================================================
+   LETTER RUSH
+========================================================= */
+
+let rush={};
+
+function renderRush(){
+
+rush={
+time:60,
+score:0,
+word:"",
+timer:null,
+session:gameSession
+};
+
+newRushWord();
+
+gameShell("⚡ Letter Rush",`
+
+<div class="game-info">
+
+<span class="badge" id="rushTime">
+⏱️ 60s
+</span>
+
+<span class="badge" id="rushScore">
+🏆 0
+</span>
+
+</div>
+
+<div
+class="scramble-word"
+id="rushWord">
+${shuffle(rush.word)}
+</div>
+
+<div class="answer-row">
+
+<input
+id="rushInput"
+class="input"
+placeholder="Solve the word..."
+onkeydown="if(event.key==='Enter')checkRush()">
+
+<button
+class="play-btn"
+onclick="checkRush()">
+GO
+</button>
+
+</div>
+
+<p style="text-align:center;color:var(--muted);margin-top:15px">
+Solve as many as possible!
+</p>
+
+`);
+
+const input=document.getElementById("rushInput");
+
+if(input)input.focus();
+
+const s=gameSession;
+
+rush.timer=
+safeInterval(()=>{
+
+rush.time--;
+
+const t=document.getElementById("rushTime");
+
+if(t){
+t.textContent=`⏱️ ${rush.time}s`;
+}
+
+if(rush.time<=0){
+
+endRush();
+
+}
+
+},1000,s);
+
+}
+
+function newRushWord(){
+
+rush.word=
+scrambleWords[
+Math.floor(Math.random()*scrambleWords.length)
+];
+
+}
+
+function checkRush(){
+
+if(rush.session!==gameSession)return;
+
+const input=document.getElementById("rushInput");
+
+if(!input)return;
+
+if(
+input.value
+.trim()
+.toUpperCase()===rush.word
+){
+
+rush.score+=100;
+
+profile.correctAnswers++;
+
+toast("⚡ +100!");
+
+newRushWord();
+
+input.value="";
+
+const word=document.getElementById("rushWord");
+
+if(word){
+word.textContent=shuffle(rush.word);
+}
+
+const score=document.getElementById("rushScore");
+
+if(score){
+score.textContent=`🏆 ${rush.score}`;
+}
+
+sound(800,60);
+
+}else{
+
+toast("❌ Wrong!");
+
+input.value="";
+
+}
+
+}
+
+function endRush(){
+
+if(rush.session!==gameSession)return;
+
+if(rush.timer){
+
+clearInterval(rush.timer);
+
+timers.delete(rush.timer);
+
+}
+
+profile.totalGames++;
+
+profile.rushBest=
+Math.max(
+profile.rushBest||0,
+rush.score
+);
+
+if(rush.score>0){
+
+profile.wins++;
+
+reward(
+Math.min(100,Math.floor(rush.score/20)),
+Math.min(100,Math.floor(rush.score/50))
+);
+
+}else{
+
+profile.losses++;
+profile.streak=0;
+
+save();
+
+}
+
+toast(`⚡ Rush finished: ${rush.score}`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderHome();
+},1500,s);
+
+}
+
+
+/* =========================================================
+   WORD MASTER
+========================================================= */
+
+let master={};
+
+function renderMaster(){
+
+master={
+word:
+masterWords[
+Math.floor(Math.random()*masterWords.length)
+],
+guesses:[],
+max:6,
+session:gameSession
+};
+
+drawMaster();
+
+}
+
+function drawMaster(){
+
+if(master.session!==gameSession)return;
+
+const rows=[];
+
+for(let r=0;r<master.max;r++){
+
+const guess=master.guesses[r]||"";
+
+let row="";
+
+for(let i=0;i<5;i++){
+
+const letter=guess[i]||"";
+
+let cls="";
+
+if(letter){
+
+if(master.word[i]===letter){
+cls="correct";
+}else if(master.word.includes(letter)){
+cls="present";
+}else{
+cls="absent";
+}
+
+}
+
+row+=`
+
+<div class="tile ${cls}">
+${letter}
+</div>
+
+`;
+
+}
+
+rows.push(row);
+
+}
+
+gameShell("🟩 Word Master",`
+
+<div class="game-info">
+
+<span class="badge">
+Attempts: ${master.guesses.length}/${master.max}
+</span>
+
+</div>
+
+<div class="master-grid">
+${rows.join("")}
+</div>
+
+<div class="answer-row">
+
+<input
+id="masterInput"
+class="input"
+maxlength="5"
+placeholder="5-letter word"
+onkeydown="if(event.key==='Enter')submitMaster()">
+
+<button
+class="play-btn"
+onclick="submitMaster()">
+ENTER
+</button>
+
+</div>
+
+<p style="text-align:center;color:var(--muted);margin-top:15px">
+🟩 Correct &nbsp;
+🟨 Wrong position &nbsp;
+⬛ Not included
+</p>
+
+`);
+
+const input=document.getElementById("masterInput");
+
+if(input)input.focus();
+
+}
+
+function submitMaster(){
+
+if(master.session!==gameSession)return;
+
+const input=document.getElementById("masterInput");
+
+if(!input)return;
+
+const guess=input.value
+.trim()
+.toUpperCase();
+
+if(guess.length!==5){
+
+toast("⚠️ Enter exactly 5 letters.");
+
+return;
+
+}
+
+master.guesses.push(guess);
+
+if(guess===master.word){
+
+profile.wins++;
+profile.totalGames++;
+profile.streak++;
+
+const score=
+Math.max(
+100,
+600-master.guesses.length*80
+);
+
+profile.masterBest=
+Math.max(
+profile.masterBest,
+score
+);
+
+reward(80,40);
+
+achievement("master");
+
+toast(`🟩 PERFECT! +${score}`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderMaster();
+},1300,s);
+
+return;
+
+}
+
+if(master.guesses.length>=master.max){
+
+profile.losses++;
+profile.totalGames++;
+profile.streak=0;
+
+save();
+
+toast(`The word was ${master.word}`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderMaster();
+},1300,s);
+
+return;
+
+}
+
+drawMaster();
+
+}
+
+
+/* =========================================================
+   TRIVIA
+========================================================= */
+
+let triviaGame={};
+
+function renderTrivia(){
+
+triviaGame={
+questions:[...trivia].sort(()=>Math.random()-.5),
+index:0,
+score:0,
+combo:0,
+session:gameSession
+};
+
+drawTrivia();
+
+}
+
+function drawTrivia(){
+
+if(triviaGame.session!==gameSession)return;
+
+if(
+triviaGame.index>=
+triviaGame.questions.length
+){
+
+finishTrivia();
+
+return;
+
+}
+
+const item=
+triviaGame.questions[
+triviaGame.index
+];
+
+gameShell("🧠 Trivia Blitz",`
+
+<div class="game-info">
+
+<span class="badge">
+Question ${triviaGame.index+1}/${triviaGame.questions.length}
+</span>
+
+<span class="badge">
+🔥 Combo ${triviaGame.combo}
+</span>
+
+<span class="badge">
+🏆 ${triviaGame.score}
+</span>
+
+</div>
+
+<div class="question">
+${item.q}
+</div>
+
+<div class="answers">
+
+${item.a.map((answer,i)=>`
+
+<button
+class="answer"
+onclick="answerTrivia(${i})">
+
+${String.fromCharCode(65+i)}.
+${answer}
+
+</button>
+
+`).join("")}
+
+</div>
+
+`);
+
+}
+
+function answerTrivia(choice){
+
+if(triviaGame.session!==gameSession)return;
+
+const item=
+triviaGame.questions[
+triviaGame.index
+];
+
+const buttons=
+document.querySelectorAll(".answer");
+
+buttons.forEach(x=>{
+x.disabled=true;
+});
+
+if(choice===item.c){
+
+triviaGame.combo++;
+
+const points=
+100+
+triviaGame.combo*25;
+
+triviaGame.score+=points;
+
+profile.correctAnswers++;
+
+buttons[choice].classList.add("correct");
+
+toast(`✅ Correct! +${points}`);
+
+sound(850,80);
+
+}else{
+
+triviaGame.combo=0;
+
+buttons[choice].classList.add("wrong");
+
+buttons[item.c].classList.add("correct");
+
+toast("❌ Wrong!");
+
+sound(200,100);
+
+}
+
+const s=gameSession;
+
+safeTimer(()=>{
+
+triviaGame.index++;
+
+drawTrivia();
+
+},900,s);
+
+}
+
+function finishTrivia(){
+
+profile.totalGames++;
+
+profile.triviaBest=
+Math.max(
+profile.triviaBest,
+triviaGame.score
+);
+
+if(triviaGame.score>0){
+
+profile.wins++;
+
+reward(
+Math.min(150,Math.floor(triviaGame.score/5)),
+Math.min(100,Math.floor(triviaGame.score/20))
+);
+
+}else{
+
+profile.losses++;
+profile.streak=0;
+
+save();
+
+}
+
+achievement("quiz");
+
+gameShell("🏆 Trivia Complete",`
+
+<div style="text-align:center;padding:40px 10px">
+
+<div style="font-size:65px">
+🏆
+</div>
+
+<h2 style="font-size:35px;margin:10px">
+${triviaGame.score}
+</h2>
+
+<p style="color:var(--muted)">
+Final score
+</p>
+
+<button
+class="primary-btn"
+style="max-width:300px;margin-top:25px"
+onclick="renderTrivia()">
+🔄 PLAY AGAIN
+</button>
+
+</div>
+
+`);
+
+}
+
+
+/* =========================================================
+   LOCAL DUEL
+========================================================= */
+
+let duel={};
+
+function renderDuel(){
+
+duel={
+p1:0,
+p2:0,
+round:1,
+turn:1,
+word:null,
+session:gameSession
+};
+
+nextDuelRound();
+
+}
+
+function nextDuelRound(){
+
+duel.word=
+words[
+Math.floor(Math.random()*words.length)
+];
+
+duel.turn=
+duel.round%2===1?1:2;
+
+drawDuel();
+
+}
+
+function drawDuel(){
+
+if(duel.session!==gameSession)return;
+
+gameShell("👥 Local 2 Player Duel",`
+
+<div class="stats" style="grid-template-columns:1fr 1fr">
+
+<div class="stat">
+<div class="stat-icon">🔵</div>
+<div class="stat-label">PLAYER 1</div>
+<div class="stat-value">${duel.p1}</div>
+</div>
+
+<div class="stat">
+<div class="stat-icon">🔴</div>
+<div class="stat-label">PLAYER 2</div>
+<div class="stat-value">${duel.p2}</div>
+</div>
+
+</div>
+
+<div class="hint-box">
+💡 ${duel.word.hint}
+</div>
+
+<div class="scramble-word">
+${"_ ".repeat(duel.word.word.length)}
+</div>
+
+<p style="text-align:center;margin-bottom:15px">
+🎯 Player ${duel.turn}'s turn
+</p>
+
+<div class="answer-row">
+
+<input
+id="duelInput"
+class="input"
+placeholder="Guess the word..."
+onkeydown="if(event.key==='Enter')duelGuess()">
+
+<button
+class="play-btn"
+onclick="duelGuess()">
+GUESS
+</button>
+
+</div>
+
+`);
+
+}
+
+function duelGuess(){
+
+if(duel.session!==gameSession)return;
+
+const input=document.getElementById("duelInput");
+
+if(!input)return;
+
+const answer=
+input.value.trim().toUpperCase();
+
+if(answer===duel.word.word){
+
+if(duel.turn===1){
+duel.p1++;
+}else{
+duel.p2++;
+}
+
+toast(`🎯 Player ${duel.turn} scored!`);
+
+duel.round++;
+
+if(duel.p1>=3||duel.p2>=3){
+
+const winner=
+duel.p1>=3?1:2;
+
+toast(`🏆 Player ${winner} wins!`);
+
+const s=gameSession;
+
+safeTimer(()=>{
+renderHome();
+},1400,s);
+
+}else{
+
+const s=gameSession;
+
+safeTimer(()=>{
+nextDuelRound();
+},700,s);
+
+}
+
+}else{
+
+duel.turn=
+duel.turn===1?2:1;
+
+toast(`❌ Wrong! Player ${duel.turn}'s turn.`);
+
+drawDuel();
+
+}
+
+}
+
+
+/* =========================================================
+   CHESS ENGINE
+========================================================= */
+
+const chessPieces={
+w:{
+k:"♔",
+q:"♕",
+r:"♖",
+b:"♗",
+n:"♘",
+p:"♙"
+},
+b:{
+k:"♚",
+q:"♛",
+r:"♜",
+b:"♝",
+n:"♞",
+p:"♟"
+}
+};
+
+let chess={};
+
+function initialChessBoard(){
+
+return[
+[
+{c:"b",t:"r"},
+{c:"b",t:"n"},
+{c:"b",t:"b"},
+{c:"b",t:"q"},
+{c:"b",t:"k"},
+{c:"b",t:"b"},
+{c:"b",t:"n"},
+{c:"b",t:"r"}
+],
+[
+{c:"b",t:"p"},
+{c:"b",t:"p"},
+{c:"b",t:"p"},
+{c:"b",t:"p"},
+{c:"b",t:"p"},
+{c:"b",t:"p"},
+{c:"b",t:"p"},
+{c:"b",t:"p"}
+],
+[
+null,null,null,null,null,null,null,null
+],
+[
+null,null,null,null,null,null,null,null
+],
+[
+null,null,null,null,null,null,null,null
+],
+[
+null,null,null,null,null,null,null,null
+],
+[
+{c:"w",t:"p"},
+{c:"w",t:"p"},
+{c:"w",t:"p"},
+{c:"w",t:"p"},
+{c:"w",t:"p"},
+{c:"w",t:"p"},
+{c:"w",t:"p"},
+{c:"w",t:"p"}
+],
+[
+{c:"w",t:"r"},
+{c:"w",t:"n"},
+{c:"w",t:"b"},
+{c:"w",t:"q"},
+{c:"w",t:"k"},
+{c:"w",t:"b"},
+{c:"w",t:"n"},
+{c:"w",t:"r"}
+]
+];
+
+}
+
+function renderChess(){
+
+chess={
+board:initialChessBoard(),
+turn:"w",
+selected:null,
+over:false,
+session:gameSession
+};
+
+drawChess();
+
+}
+
+function drawChess(){
+
+if(chess.session!==gameSession)return;
+
+let html="";
+
+for(let r=0;r<8;r++){
+
+for(let c=0;c<8;c++){
+
+const piece=chess.board[r][c];
+
+const selected=
+chess.selected &&
+chess.selected.r===r &&
+chess.selected.c===c;
+
+const legal=
+chess.selected &&
+isChessLegal(
+chess.selected.r,
+chess.selected.c,
+r,
+c
+);
+
+const cls=[
+(r+c)%2===0?"light-square":"dark-square",
+selected?"selected-square":"",
+legal?"legal-square":"",
+piece &&
+chess.selected &&
+legal &&
+piece.c!==chess.board[chess.selected.r][chess.selected.c]?.c
+?"capture-square":""
+].join(" ");
+
+html+=`
+
+<div
+class="square ${cls}"
+onclick="clickChessSquare(${r},${c})">
+
+${piece?chessPieces[piece.c][piece.t]:""}
+
+</div>
+
+`;
+
+}
+
+}
+
+gameShell("♟️ Chess Arena",`
+
+<div class="chess-wrap">
+
+<div class="chess-status">
+${chess.over
+?"🏁 Game Over"
+:`${chess.turn==="w"?"⚪ White":"⚫ Black"} turn`}
+</div>
+
+<div class="chess-board">
+${html}
+</div>
+
+<div class="chess-controls">
+
+<button onclick="renderChess()">
+🔄 New Chess Game
+</button>
+
+<button onclick="renderHome()">
+🏠 Arena
+</button>
+
+</div>
+
+<p style="text-align:center;color:var(--muted);margin-top:15px">
+Click a piece, then click its destination.
+</p>
+
+</div>
+
+`);
+
+}
+
+function clickChessSquare(r,c){
+
+if(chess.over)return;
+
+const piece=chess.board[r][c];
+
+if(!chess.selected){
+
+if(piece && piece.c===chess.turn){
+
+chess.selected={r,c};
+
+drawChess();
+
+}
+
+return;
+
+}
+
+const sr=chess.selected.r;
+const sc=chess.selected.c;
+
+if(sr===r&&sc===c){
+
+chess.selected=null;
+
+drawChess();
+
+return;
+
+}
+
+if(piece && piece.c===chess.turn){
+
+chess.selected={r,c};
+
+drawChess();
+
+return;
+
+}
+
+if(
+isChessLegal(sr,sc,r,c)
+){
+
+moveChess(sr,sc,r,c);
+
+}
+
+}
+
+function insideBoard(r,c){
+
+return r>=0&&r<8&&c>=0&&c<8;
+
+}
+
+function clearPath(sr,sc,tr,tc){
+
+const dr=Math.sign(tr-sr);
+const dc=Math.sign(tc-sc);
+
+let r=sr+dr;
+let c=sc+dc;
+
+while(r!==tr||c!==tc){
+
+if(chess.board[r][c])return false;
+
+r+=dr;
+c+=dc;
+
+}
+
+return true;
+
+}
+
+function isChessLegal(sr,sc,tr,tc){
+
+if(!insideBoard(sr,sc)||!insideBoard(tr,tc)){
+return false;
+}
+
+const piece=chess.board[sr][sc];
+
+if(!piece)return false;
+
+if(piece.c!==chess.turn)return false;
+
+const target=chess.board[tr][tc];
+
+if(target&&target.c===piece.c)return false;
+
+const dr=tr-sr;
+const dc=tc-sc;
+
+const adr=Math.abs(dr);
+const adc=Math.abs(dc);
+
+if(piece.t==="p"){
+
+const direction=piece.c==="w"?-1:1;
+
+const start=piece.c==="w"?6:1;
+
+if(
+dc===0 &&
+dr===direction &&
+!target
+)return true;
+
+if(
+dc===0 &&
+sr===start &&
+dr===direction*2 &&
+!target &&
+!chess.board[sr+direction][sc]
+)return true;
+
+if(
+adc===1 &&
+dr===direction &&
+target &&
+target.c!==piece.c
+)return true;
+
+return false;
+
+}
+
+if(piece.t==="n"){
+
+return(
+adr===2&&adc===1
+||
+adr===1&&adc===2
+);
+
+}
+
+if(piece.t==="k"){
+
+return adr<=1&&adc<=1;
+
+}
+
+if(piece.t==="r"){
+
+if(dr!==0&&dc!==0)return false;
+
+return clearPath(sr,sc,tr,tc);
+
+}
+
+if(piece.t==="b"){
+
+if(adr!==adc)return false;
+
+return clearPath(sr,sc,tr,tc);
+
+}
+
+if(piece.t==="q"){
+
+if(
+dr!==0&&
+dc!==0&&
+adr!==adc
+)return false;
+
+return clearPath(sr,sc,tr,tc);
+
+}
+
+return false;
+
+}
+
+function moveChess(sr,sc,tr,tc){
+
+const piece=chess.board[sr][sc];
+
+const captured=chess.board[tr][tc];
+
+chess.board[tr][tc]=piece;
+
+chess.board[sr][sc]=null;
+
+/*
+   Automatic pawn promotion to queen.
+*/
+
+if(
+piece.t==="p" &&
+(tr===0||tr===7)
+){
+
+piece.t="q";
+
+toast("👑 Pawn promoted to Queen!");
+
+}
+
+chess.turn=
+chess.turn==="w"?"b":"w";
+
+chess.selected=null;
+
+sound(captured?350:550,70);
+
+drawChess();
+
+}
+
+
+/* =========================================================
+   ONLINE MULTIPLAYER
+========================================================= */
+
+let peer=null;
+let connection=null;
+
+let online={
+mode:null,
+role:null,
+roomId:null,
+session:0,
+connected:false,
+gameStarted:false,
+chess:null,
+word:null
+};
+
+
+/*
+   Clean all PeerJS connections when leaving
+   an online screen.
+*/
+
+function cleanupPeer(){
+
+if(connection){
+
+try{
+connection.close();
+}catch(e){}
+
+connection=null;
+
+}
+
+if(peer){
+
+try{
+peer.destroy();
+}catch(e){}
+
+peer=null;
+
+}
+
+online.connected=false;
+
+}
+
+
+/* =========================================================
+   ONLINE LOBBY
+========================================================= */
+
+function renderOnlineLobby(mode){
+
+newSession();
+
+cleanupPeer();
+
+online={
+mode,
+role:null,
+roomId:null,
+session:gameSession,
+connected:false,
+gameStarted:false,
+chess:null,
+word:null
+};
+
+const title=
+mode==="chess"
+?"🌐 Online Chess"
+:"⚔️ Online Word Battle";
+
+gameShell(title,`
+
+<div class="online-box">
+
+<h2>
+${mode==="chess"
+?"Play Chess With Your Friend"
+:"Battle Your Friend With Words"}
+</h2>
+
+<p style="color:var(--muted);margin-top:8px">
+Create a private room and send the link to your friend.
+</p>
+
+<div style="display:grid;gap:12px;margin-top:20px">
+
+<button
+class="primary-btn"
+onclick="createOnlineRoom('${mode}')">
+🚀 CREATE ONLINE ROOM
+</button>
+
+<button
+class="back-btn"
+style="width:100%"
+onclick="showJoinRoom('${mode}')">
+🔗 JOIN A ROOM
+</button>
+
+</div>
+
+<div
+id="joinArea"
+style="margin-top:15px">
+</div>
+
+</div>
+
+<div
+id="onlineStatus"
+class="connection">
+
+<span class="online-dot"></span>
+Waiting for connection...
+
+</div>
+
+`);
+
+const urlRoom=getRoomFromURL();
+
+if(urlRoom){
+
+setTimeout(()=>{
+showJoinRoom(mode,urlRoom);
+},100);
+
+}
+
+}
+
+function showJoinRoom(mode,prefill=""){
+
+const area=document.getElementById("joinArea");
+
+if(!area)return;
+
+area.innerHTML=`
+
+<input
+id="roomInput"
+class="input"
+placeholder="Paste Room ID"
+value="${escapeHTML(prefill)}">
+
+<button
+class="primary-btn"
+onclick="joinOnlineRoom('${mode}')">
+🎮 JOIN ROOM
+</button>
+
+`;
+
+}
+
+
+/* =========================================================
+   CREATE ROOM
+========================================================= */
+
+function createOnlineRoom(mode){
+
+newSession();
+
+cleanupPeer();
+
+online.mode=mode;
+online.role="host";
+online.session=gameSession;
+
+const status=document.getElementById("onlineStatus");
+
+if(status){
+
+status.innerHTML=`
+<span class="online-dot"></span>
+Creating room...
+`;
+
+}
+
+peer=new Peer();
+
+peer.on("open",id=>{
+
+if(online.session!==gameSession)return;
+
+online.roomId=id;
+
+const roomURL=
+location.href.split("#")[0]+
+"#room="+encodeURIComponent(id)+
+"&game="+encodeURIComponent(mode);
+
+const main=document.getElementById("main");
+
+const box=document.querySelector(".online-box");
+
+if(box){
+
+box.innerHTML=`
+
+<h2>🎉 Room Created!</h2>
+
+<p style="color:var(--muted);margin-top:8px">
+Send this link to your friend.
+</p>
+
+<div class="online-code">
+${escapeHTML(id)}
+</div>
+
+<input
+class="share-link"
+readonly
+value="${escapeHTML(roomURL)}"
+id="shareURL">
+
+<div style="display:flex;gap:10px;margin-top:10px">
+
+<button
+class="primary-btn"
+onclick="copyRoomLink()">
+📋 COPY LINK
+</button>
+
+<button
+class="back-btn"
+onclick="shareRoomLink()">
+📤 SHARE
+</button>
+
+</div>
+
+<p style="color:var(--muted);font-size:13px;margin-top:15px">
+Waiting for your friend to join...
+</p>
+
+`;
+
+}
+
+setOnlineStatus("Room ready — waiting for opponent...",false);
+
+});
+
+peer.on("connection",conn=>{
+
+if(online.session!==gameSession)return;
+
+connection=conn;
+
+setupConnection(conn,true);
+
+});
+
+peer.on("error",err=>{
+
+console.error(err);
+
+setOnlineStatus(
+"❌ Connection error: "+err.type,
+false
+);
+
+});
+
+}
+
+function copyRoomLink(){
+
+const input=document.getElementById("shareURL");
+
+if(!input)return;
+
+navigator.clipboard
+?.writeText(input.value)
+.then(()=>{
+toast("🔗 Room link copied!");
+})
+.catch(()=>{
+input.select();
+document.execCommand("copy");
+toast("🔗 Room link copied!");
+});
+
+}
+
+function shareRoomLink(){
+
+const input=document.getElementById("shareURL");
+
+if(!input)return;
+
+if(navigator.share){
+
+navigator.share({
+title:"Word Games Arena",
+text:"Join my online game!",
+url:input.value
+});
+
+}else{
+
+copyRoomLink();
+
+}
+
+}
+
+
+/* =========================================================
+   JOIN ROOM
+========================================================= */
+
+function joinOnlineRoom(mode){
+
+const input=document.getElementById("roomInput");
+
+if(!input)return;
+
+const roomId=input.value.trim();
+
+if(!roomId){
+
+toast("⚠️ Enter a room ID.");
+
+return;
+
+}
+
+newSession();
+
+cleanupPeer();
+
+online.mode=mode;
+online.role="guest";
+online.roomId=roomId;
+online.session=gameSession;
+
+setOnlineStatus(
+"Connecting to room...",
+false
+);
+
+peer=new Peer();
+
+peer.on("open",()=>{
+
+if(online.session!==gameSession)return;
+
+connection=peer.connect(roomId,{
+reliable:true
+});
+
+setupConnection(connection,false);
+
+});
+
+peer.on("error",err=>{
+
+console.error(err);
+
+setOnlineStatus(
+"❌ Could not connect: "+err.type,
+false
+);
+
+});
+
+}
+
+
+/* =========================================================
+   PEER CONNECTION
+========================================================= */
+
+function setupConnection(conn,isHost){
+
+connection=conn;
+
+conn.on("open",()=>{
+
+if(online.session!==gameSession)return;
+
+online.connected=true;
+
+setOnlineStatus(
+"🟢 Connected to opponent!",
+true
+);
+
+sendOnline({
+type:"hello",
+username:profile.username,
+avatar:profile.avatar,
+mode:online.mode
+});
+
+if(isHost){
+
+const s=gameSession;
+
+safeTimer(()=>{
+
+if(online.mode==="chess"){
+
+startOnlineChessHost();
+
+}else{
+
+startOnlineWordHost();
+
+}
+
+},700,s);
+
+}
+
+});
+
+conn.on("data",data=>{
+
+if(online.session!==gameSession)return;
+
+handleOnlineData(data);
+
+});
+
+conn.on("close",()=>{
+
+online.connected=false;
+
+setOnlineStatus(
+"🔴 Opponent disconnected.",
+false
+);
+
+toast("⚠️ Opponent disconnected.");
+
+});
+
+conn.on("error",err=>{
+
+console.error(err);
+
+setOnlineStatus(
+"❌ Connection error.",
+false
+);
+
+});
+
+}
+
+function sendOnline(data){
+
+if(
+connection &&
+connection.open
+){
+
+connection.send(data);
+
+}
+
+}
+
+function setOnlineStatus(text,connected){
+
+const status=document.getElementById("onlineStatus");
+
+if(!status)return;
+
+status.innerHTML=`
+
+<span class="online-dot ${connected?"connected":""}"></span>
+${escapeHTML(text)}
+
+`;
+
+}
+
+
+/* =========================================================
+   URL ROOM DETECTION
+========================================================= */
+
+function getRoomFromURL(){
+
+const hash=location.hash;
+
+if(!hash)return"";
+
+const match=hash.match(/room=([^&]+)/);
+
+return match
+?decodeURIComponent(match[1])
+:"";
+
+}
+
+function getGameFromURL(){
+
+const hash=location.hash;
+
+if(!hash)return"";
+
+const match=hash.match(/game=([^&]+)/);
+
+return match
+?decodeURIComponent(match[1])
+:"";
+
+}
+
+
+/* =========================================================
+   ONLINE CHESS
+========================================================= */
+
+function startOnlineChessHost(){
+
+online.gameStarted=true;
+
+online.chess={
+board:initialChessBoard(),
+turn:"w",
+hostColor:"w",
+guestColor:"b",
+selected:null,
+over:false
+};
+
+sendOnline({
+type:"onlineChessStart",
+board:online.chess.board,
+turn:"w",
+yourColor:"b"
+});
+
+drawOnlineChess();
+
+}
+
+function startOnlineChessGuest(data){
+
+online.gameStarted=true;
+
+online.chess={
+board:data.board,
+turn:data.turn,
+hostColor:"w",
+guestColor:"b",
+myColor:"b",
+selected:null,
+over:false
+};
+
+drawOnlineChess();
+
+}
+
+function drawOnlineChess(){
+
+const ch=online.chess;
+
+if(!ch)return;
+
+let html="";
+
+for(let r=0;r<8;r++){
+
+for(let c=0;c<8;c++){
+
+const piece=ch.board[r][c];
+
+const selected=
+ch.selected &&
+ch.selected.r===r &&
+ch.selected.c===c;
+
+const legal=
+ch.selected &&
+isOnlineChessLegal(
+ch.selected.r,
+ch.selected.c,
+r,
+c
+);
+
+html+=`
+
+<div
+class="square ${(r+c)%2===0?"light-square":"dark-square"}
+${selected?'style="box-shadow:inset 0 0 0 5px #00d4ff"':""}
+${legal?'data-legal="true"':""}
+onclick="clickOnlineChessSquare(${r},${c})">
+
+${piece?chessPieces[piece.c][piece.t]:""}
+
+</div>
+
+`;
+
+}
+
+}
+
+const myColor=
+online.role==="host"?"w":"b";
+
+gameShell("🌐 Online Chess",`
+
+<div class="online-box">
+
+<div class="connection">
+
+<span class="online-dot connected"></span>
+Connected to ${online.role==="host"?"Guest":"Host"}
+
+</div>
+
+</div>
+
+<div class="chess-wrap">
+
+<div class="chess-status">
+
+${ch.over
+?"🏁 Game Over"
+:
+`${ch.turn==="w"?"⚪ White":"⚫ Black"} turn`
+}
+
+<br>
+
+<span style="color:var(--muted);font-size:13px">
+You are ${myColor==="w"?"White ⚪":"Black ⚫"}
+</span>
+
+</div>
+
+<div class="chess-board">
+${html}
+</div>
+
+<div class="chess-controls">
+
+<button onclick="sendRematchRequest()">
+🔄 Rematch
+</button>
+
+<button onclick="renderHome()">
+🏠 Arena
+</button>
+
+</div>
+
+</div>
+
+`);
+
+}
+
+function isOnlineChessLegal(sr,sc,tr,tc){
+
+const originalTurn=chess.turn;
+
+chess.turn=online.chess.turn;
+
+const result=isChessLegalOnline(
+online.chess.board,
+sr,sc,tr,tc
+);
+
+chess.turn=originalTurn;
+
+return result;
+
+}
+
+function isChessLegalOnline(board,sr,sc,tr,tc){
+
+if(
+!insideBoard(sr,sc)||
+!insideBoard(tr,tc)
+)return false;
+
+const piece=board[sr][sc];
+
+if(!piece)return false;
+
+const myColor=
+online.role==="host"?"w":"b";
+
+if(piece.c!==myColor)return false;
+
+const target=board[tr][tc];
+
+if(target&&target.c===piece.c)return false;
+
+const dr=tr-sr;
+const dc=tc-sc;
+
+const adr=Math.abs(dr);
+const adc=Math.abs(dc);
+
+if(piece.t==="p"){
+
+const direction=
+piece.c==="w"?-1:1;
+
+const start=
+piece.c==="w"?6:1;
+
+if(
+dc===0&&
+dr===direction&&
+!target
+)return true;
+
+if(
+dc===0&&
+sr===start&&
+dr===direction*2&&
+!target&&
+!board[sr+direction][sc]
+)return true;
+
+if(
+adc===1&&
+dr===direction&&
+target&&
+target.c!==piece.c
+)return true;
+
+return false;
+
+}
+
+if(piece.t==="n"){
+
+return(
+adr===2&&adc===1||
+adr===1&&adc===2
+);
+
+}
+
+if(piece.t==="k"){
+
+return adr<=1&&adc<=1;
+
+}
+
+function path(){
+
+const stepR=Math.sign(dr);
+const stepC=Math.sign(dc);
+
+let r=sr+stepR;
+let c=sc+stepC;
+
+while(r!==tr||c!==tc){
+
+if(board[r][c])return false;
+
+r+=stepR;
+c+=stepC;
+
+}
+
+return true;
+
+}
+
+if(piece.t==="r"){
+
+if(dr!==0&&dc!==0)return false;
+
+return path();
+
+}
+
+if(piece.t==="b"){
+
+if(adr!==adc)return false;
+
+return path();
+
+}
+
+if(piece.t==="q"){
+
+if(
+dr!==0&&
+dc!==0&&
+adr!==adc
+)return false;
+
+return path();
+
+}
+
+return false;
+
+}
+
+function clickOnlineChessSquare(r,c){
+
+const ch=online.chess;
+
+if(!ch||ch.over)return;
+
+const myColor=
+online.role==="host"?"w":"b";
+
+if(ch.turn!==myColor){
+
+toast("⏳ Wait for your opponent.");
+
+return;
+
+}
+
+const piece=ch.board[r][c];
+
+if(!ch.selected){
+
+if(piece&&piece.c===myColor){
+
+ch.selected={r,c};
+
+drawOnlineChess();
+
+}
+
+return;
+
+}
+
+const sr=ch.selected.r;
+const sc=ch.selected.c;
+
+if(
+piece&&
+piece.c===myColor
+){
+
+ch.selected={r,c};
+
+drawOnlineChess();
+
+return;
+
+}
+
+if(
+isOnlineChessLegal(sr,sc,r,c)
+){
+
+const movedPiece=ch.board[sr][sc];
+
+const newBoard=cloneBoard(ch.board);
+
+newBoard[r][c]=newBoard[sr][sc];
+newBoard[sr][sc]=null;
+
+if(
+movedPiece.t==="p"&&
+(r===0||r===7)
+){
+
+newBoard[r][c].t="q";
+
+}
+
+const nextTurn=
+ch.turn==="w"?"b":"w";
+
+ch.board=newBoard;
+ch.turn=nextTurn;
+ch.selected=null;
+
+sendOnline({
+type:"onlineChessMove",
+board:newBoard,
+turn:nextTurn
+});
+
+drawOnlineChess();
+
+}
+
+}
+
+function handleOnlineChessMove(data){
+
+if(!online.chess)return;
+
+online.chess.board=data.board;
+online.chess.turn=data.turn;
+online.chess.selected=null;
+
+drawOnlineChess();
+
+}
+
+
+/* =========================================================
+   ONLINE WORD BATTLE
+========================================================= */
+
+function startOnlineWordHost(){
+
+online.gameStarted=true;
+
+const word=
+scrambleWords[
+Math.floor(Math.random()*scrambleWords.length)
+];
+
+online.word={
+word,
+hostScore:0,
+guestScore:0,
+round:1,
+time:30,
+turn:"both"
+};
+
+sendOnline({
+type:"onlineWordStart",
+word:word,
+round:1,
+time:30
+});
+
+drawOnlineWord();
+
+startOnlineWordTimer();
+
+}
+
+function startOnlineWordGuest(data){
+
+online.gameStarted=true;
+
+online.word={
+word:data.word,
+hostScore:0,
+guestScore:0,
+round:data.round,
+time:data.time,
+turn:"both"
+};
+
+drawOnlineWord();
+
+startOnlineWordTimer();
+
+}
+
+function drawOnlineWord(){
+
+const w=online.word;
+
+if(!w)return;
+
+const myScore=
+online.role==="host"
+?w.hostScore
+:w.guestScore;
+
+const enemyScore=
+online.role==="host"
+?w.guestScore
+:w.hostScore;
+
+gameShell("⚔️ Online Word Battle",`
+
+<div class="online-box">
+
+<div class="connection">
+
+<span class="online-dot connected"></span>
+LIVE ONLINE BATTLE
+
+</div>
+
+<div class="game-info">
+
+<span class="badge">
+⏱️ ${w.time}s
+</span>
+
+<span class="badge">
+👤 You: ${myScore}
+</span>
+
+<span class="badge">
+⚔️ Opponent: ${enemyScore}
+</span>
+
+<span class="badge">
+Round ${w.round}
+</span>
+
+</div>
+
+</div>
+
+<div class="scramble-word">
+${shuffle(w.word)}
+</div>
+
+<div class="answer-row">
+
+<input
+id="onlineWordInput"
+class="input"
+placeholder="Solve the word..."
+onkeydown="if(event.key==='Enter')submitOnlineWord()">
+
+<button
+class="play-btn online-btn"
+onclick="submitOnlineWord()">
+⚔️ ATTACK
+</button>
+
+</div>
+
+<p style="text-align:center;color:var(--muted);margin-top:15px">
+First player to reach 5 points wins.
+</p>
+
+`);
+
+const input=
+document.getElementById("onlineWordInput");
+
+if(input)input.focus();
+
+}
+
+function submitOnlineWord(){
+
+if(!online.word)return;
+
+const input=
+document.getElementById("onlineWordInput");
+
+if(!input)return;
+
+const answer=
+input.value.trim().toUpperCase();
+
+if(answer!==online.word.word){
+
+toast("❌ Wrong!");
+
+input.value="";
+
+return;
+
+}
+
+sendOnline({
+type:"onlineWordCorrect",
+player:online.role
+});
+
+input.value="";
+
+toast("⚡ Correct!");
+
+}
+
+function startOnlineWordTimer(){
+
+const session=gameSession;
+
+safeInterval(()=>{
+
+if(!online.word)return;
+
+online.word.time--;
+
+const time=online.word.time;
+
+if(time<=0){
+
+finishOnlineWordRound();
+
+}
+
+drawOnlineWord();
+
+},1000,session);
+
+}
+
+function finishOnlineWordRound(){
+
+if(!online.word)return;
+
+if(online.word.round>=5){
+
+finishOnlineWord();
+
+return;
+
+}
+
+const next=
+scrambleWords[
+Math.floor(Math.random()*scrambleWords.length)
+];
+
+online.word.word=next;
+online.word.round++;
+online.word.time=30;
+
+sendOnline({
+type:"onlineWordNext",
+word:next,
+round:online.word.round,
+time:30
+});
+
+}
+
+function handleOnlineWordCorrect(player){
+
+if(!online.word)return;
+
+if(player==="host"){
+
+online.word.hostScore++;
+
+}else{
+
+online.word.guestScore++;
+
+}
+
+const score=
+online.role==="host"
+?online.word.hostScore
+:online.word.guestScore;
+
+if(score>=5){
+
+sendOnline({
+type:"onlineWordWinner",
+winner:player
+});
+
+finishOnlineWord(player);
+
+return;
+
+}
+
+const next=
+scrambleWords[
+Math.floor(Math.random()*scrambleWords.length)
+];
+
+online.word.word=next;
+online.word.round++;
+online.word.time=30;
+
+sendOnline({
+type:"onlineWordNext",
+word:next,
+round:online.word.round,
+time:30
+});
+
+drawOnlineWord();
+
+}
+
+function finishOnlineWord(winner){
+
+stopAllTimers();
+
+const myColor=
+online.role==="host"
+?"host"
+:"guest";
+
+let message="🏁 Battle finished!";
+
+if(winner){
+
+if(winner===myColor){
+
+message="🏆 YOU WIN!";
+
+profile.wins++;
+
+reward(100,50);
+
+}else{
+
+message="💥 YOU LOST!";
+
+profile.losses++;
+
+profile.streak=0;
+
+save();
+
+}
+
+}
+
+gameShell("⚔️ Online Battle Complete",`
+
+<div style="text-align:center;padding:40px">
+
+<div style="font-size:70px">
+${winner===myColor?"🏆":"⚔️"}
+</div>
+
+<h2 style="font-size:32px">
+${message}
+</h2>
+
+<p style="color:var(--muted);margin-top:10px">
+Final score:
+${online.word?.hostScore||0}
+-
+${online.word?.guestScore||0}
+</p>
+
+<button
+class="primary-btn"
+style="max-width:280px;margin-top:25px"
+onclick="renderHome()">
+🏠 RETURN TO ARENA
+</button>
+
+</div>
+
+`);
+
+}
+
+
+/* =========================================================
+   ONLINE MESSAGE ROUTER
+========================================================= */
+
+function handleOnlineData(data){
+
+if(!data||!data.type)return;
+
+if(data.type==="hello"){
+
+toast(
+`👋 ${data.username} joined!`
+);
+
+return;
+
+}
+
+if(data.type==="onlineChessStart"){
+
+online.gameStarted=true;
+
+online.chess={
+board:data.board,
+turn:data.turn,
+myColor:"b",
+selected:null,
+over:false
+};
+
+drawOnlineChess();
+
+return;
+
+}
+
+if(data.type==="onlineChessMove"){
+
+handleOnlineChessMove(data);
+
+return;
+
+}
+
+if(data.type==="onlineWordStart"){
+
+startOnlineWordGuest(data);
+
+return;
+
+}
+
+if(data.type==="onlineWordCorrect"){
+
+handleOnlineWordCorrect(data.player);
+
+return;
+
+}
+
+if(data.type==="onlineWordNext"){
+
+if(!online.word)return;
+
+online.word.word=data.word;
+online.word.round=data.round;
+online.word.time=data.time;
+
+drawOnlineWord();
+
+return;
+
+}
+
+if(data.type==="onlineWordWinner"){
+
+finishOnlineWord(data.winner);
+
+return;
+
+}
+
+if(data.type==="rematch"){
+
+if(online.mode==="chess"){
+
+online.chess={
+board:initialChessBoard(),
+turn:"w",
+selected:null,
+over:false
+};
+
+if(online.role==="host"){
+
+sendOnline({
+type:"onlineChessStart",
+board:online.chess.board,
+turn:"w",
+yourColor:"b"
+});
+
+}
+
+drawOnlineChess();
+
+}else{
+
+if(online.role==="host"){
+startOnlineWordHost();
+}
+
+}
+
+return;
+
+}
+
+}
+
+
+/* =========================================================
+   REMATCH
+========================================================= */
+
+function sendRematchRequest(){
+
+if(!connection||!connection.open){
+
+toast("❌ Not connected.");
+
+return;
+
+}
+
+sendOnline({
+type:"rematch"
+});
+
+if(online.mode==="chess"){
+
+online.chess={
+board:initialChessBoard(),
+turn:"w",
+selected:null,
+over:false
+};
+
+if(online.role==="host"){
+
+sendOnline({
+type:"onlineChessStart",
+board:online.chess.board,
+turn:"w",
+yourColor:"b"
+});
+
+}
+
+drawOnlineChess();
+
+}else{
+
+if(online.role==="host"){
+
+startOnlineWordHost();
+
+}else{
+
+toast("🔄 Rematch requested.");
+
+}
+
+}
+
+}
+
+
+/* =========================================================
+   DAILY
+========================================================= */
+
+function renderDaily(){
+
+const today=
+new Date().toISOString().slice(0,10);
+
+const completed=
+profile.dailyDate===today&&
+profile.dailyCompleted;
+
+gameShell("🎯 Daily Challenge",`
+
+<div style="text-align:center;padding:35px 10px">
+
+<div style="font-size:70px">
+🎯
+</div>
+
+<h2>Daily Word Challenge</h2>
+
+<p style="color:var(--muted);margin:12px">
+
+${
+completed
+?"You already completed today's challenge."
+:"Solve today's special word challenge!"
+}
+
+</p>
+
+<button
+class="primary-btn"
+style="max-width:300px"
+onclick="playDaily()"
+${completed?"disabled":""}>
+
+${completed?"✅ COMPLETED":"🚀 START CHALLENGE"}
+
+</button>
+
+</div>
+
+`);
+
+}
+
+function playDaily(){
+
+const today=
+new Date().toISOString().slice(0,10);
+
+const index=
+[...today].reduce(
+(sum,char)=>sum+char.charCodeAt(0),
+0
+)%words.length;
+
+const challenge=words[index];
+
+const answer=prompt(
+`🎯 DAILY CHALLENGE\n\nHint: ${challenge.hint}\n\nEnter the word:`
+);
+
+if(!answer)return;
+
+if(
+answer.trim().toUpperCase()===
+challenge.word
+){
+
+profile.dailyDate=today;
+profile.dailyCompleted=true;
+
+profile.wins++;
+profile.totalGames++;
+profile.streak++;
+
+reward(150,100);
+
+achievement("daily");
+
+toast("🌟 Daily Challenge Complete!");
+
+}else{
+
+profile.dailyDate=today;
+profile.dailyCompleted=false;
+
+profile.losses++;
+profile.streak=0;
+
+save();
+
+toast(
+`❌ Answer was ${challenge.word}`
+);
+
+}
+
+renderDaily();
+
+}
+
+
+/* =========================================================
+   SHOP
+========================================================= */
+
+const shopItems=[
+{id:"🤠",name:"Cowboy",price:150},
+{id:"🥷",name:"Ninja",price:200},
+{id:"🧙",name:"Wizard",price:250},
+{id:"👾",name:"Arcade",price:300},
+{id:"🦄",name:"Unicorn",price:400},
+{id:"🐲",name:"Dragon",price:500}
+];
+
+function renderShop(){
+
+gameShell("🛍️ Arena Shop",`
+
+<div class="game-info">
+
+<span class="badge">
+🪙 ${profile.coins} Coins
+</span>
+
+</div>
+
+<div class="shop-grid">
+
+${shopItems.map(item=>{
+
+const owned=
+profile.unlockedAvatars
+.includes(item.id);
+
+const equipped=
+profile.avatar===item.id;
+
+return`
+
+<div class="shop-item">
+
+<div class="shop-icon">
+${item.id}
+</div>
+
+<h3>${item.name}</h3>
+
+<p style="color:var(--muted);margin-top:5px">
+${owned?"Unlocked":item.price+" coins"}
+</p>
+
+<button
+onclick="buyAvatar('${item.id}',${item.price})"
+${equipped?"disabled":""}>
+
+${
+equipped
+?"✅ EQUIPPED"
+:owned
+?"EQUIP"
+:"BUY"
+}
+
+</button>
+
+</div>
+
+`;
+
+}).join("")}
+
+</div>
+
+`);
+
+}
+
+function buyAvatar(avatar,price){
+
+if(
+profile.unlockedAvatars
+.includes(avatar)
+){
+
+profile.avatar=avatar;
+
+save();
+
+updateMiniProfile();
+
+toast("👤 Avatar equipped!");
+
+renderShop();
+
+return;
+
+}
+
+if(profile.coins<price){
+
+toast("🪙 Not enough coins.");
+
+return;
+
+}
+
+profile.coins-=price;
+
+profile.unlockedAvatars.push(avatar);
+
+profile.avatar=avatar;
+
+save();
+
+updateMiniProfile();
+
+toast(`🎉 ${avatar} unlocked!`);
+
+renderShop();
+
+}
+
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+
+const achievementData=[
+{
+id:"first_win",
+icon:"🏆",
+title:"First Victory",
+desc:"Win your first game."
+},
+{
+id:"master",
+icon:"🟩",
+title:"Word Master",
+desc:"Solve Word Master."
+},
+{
+id:"quiz",
+icon:"🧠",
+title:"Brain Power",
+desc:"Complete a trivia game."
+},
+{
+id:"daily",
+icon:"🎯",
+title:"Daily Hero",
+desc:"Complete a daily challenge."
+},
+{
+id:"streak5",
+icon:"🔥",
+title:"On Fire",
+desc:"Reach a 5-game streak."
+},
+{
+id:"level5",
+icon:"⭐",
+title:"Rising Star",
+desc:"Reach level 5."
+},
+{
+id:"online",
+icon:"🌐",
+title:"Online Warrior",
+desc:"Play an online battle."
+}
+];
+
+function achievement(id){
+
+if(profile.achievements.includes(id))return;
+
+profile.achievements.push(id);
+
+profile.coins+=50;
+
+save();
+
+const item=
+achievementData.find(x=>x.id===id);
+
+if(item){
+
+toast(
+`🏅 Achievement unlocked: ${item.title}!`
+);
+
+}
+
+}
+
+function checkAchievements(){
+
+if(profile.streak>=5){
+achievement("streak5");
+}
+
+if(profile.level>=5){
+achievement("level5");
+}
+
+}
+
+function renderAchievements(){
+
+checkAchievements();
+
+gameShell("🏅 Achievements",`
+
+<div class="achievement-grid">
+
+${achievementData.map(item=>{
+
+const unlocked=
+profile.achievements.includes(item.id);
+
+return`
+
+<div class="achievement ${unlocked?"":"locked"}">
+
+<div class="achievement-icon">
+${unlocked?item.icon:"🔒"}
+</div>
+
+<h3 style="margin-top:10px">
+${item.title}
+</h3>
+
+<p style="color:var(--muted);margin-top:5px">
+${item.desc}
+</p>
+
+</div>
+
+`;
+
+}).join("")}
+
+</div>
+
+`);
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function renderProfile(){
+
+newSession();
+
+const next=xpForNextLevel();
+
+const percentage=
+Math.min(
+100,
+Math.floor(
+(profile.xp/next)*100
+)
+);
+
+gameShell("👤 Player Profile",`
+
+<div class="profile-card">
+
+<div class="profile-head">
+
+<div class="big-avatar">
+${profile.avatar}
+</div>
+
+<div>
+
+<h2>
+${escapeHTML(profile.username)}
+</h2>
+
+<div class="rank">
+${getRank()} • Level ${profile.level}
+</div>
+
+<p style="color:var(--muted);margin-top:5px">
+${profile.xp}/${next} XP
+</p>
+
+</div>
+
+</div>
+
+<div class="xp-bar">
+
+<div
+class="xp-fill"
+style="width:${percentage}%">
+</div>
+
+</div>
+
+<div class="profile-grid">
+
+<div class="stat">
+<div class="stat-label">WINS</div>
+<div class="stat-value">${profile.wins}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">LOSSES</div>
+<div class="stat-value">${profile.losses}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">BEST STREAK</div>
+<div class="stat-value">${profile.bestStreak}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">CORRECT ANSWERS</div>
+<div class="stat-value">${profile.correctAnswers}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">HANGMAN BEST</div>
+<div class="stat-value">${profile.hangmanBest}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">SCRAMBLE BEST</div>
+<div class="stat-value">${profile.scrambleBest}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">RUSH BEST</div>
+<div class="stat-value">${profile.rushBest}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">TRIVIA BEST</div>
+<div class="stat-value">${profile.triviaBest}</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">MASTER BEST</div>
+<div class="stat-value">${profile.masterBest}</div>
+</div>
+
+</div>
+
+<div style="display:flex;gap:10px;margin-top:25px">
+
+<button
+class="primary-btn"
+onclick="renderShop()">
+🛍️ Shop
+</button>
+
+<button
+class="primary-btn"
+onclick="logout()">
+🚪 Logout
+</button>
+
+</div>
+
+<button
+class="back-btn"
+style="margin-top:12px;width:100%"
+onclick="resetProgress()">
+⚠️ Reset Progress
+</button>
+
+</div>
+
+`);
+
+}
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+function toggleTheme(){
+
+document.body.classList.toggle("light");
+
+localStorage.setItem(
+"WGA_THEME",
+document.body.classList.contains("light")
+?"light"
+:"dark"
+);
+
+}
+
+function loadTheme(){
+
+if(
+localStorage.getItem("WGA_THEME")==="light"
+){
+
+document.body.classList.add("light");
+
+}
+
+}
+
+
+/* =========================================================
+   SOUND
+========================================================= */
+
+let audioContext=null;
+
+function sound(freq=500,duration=80){
+
+if(!soundEnabled)return;
+
+try{
+
+if(!audioContext){
+
+audioContext=
+new(
+window.AudioContext||
+window.webkitAudioContext
+)();
+
+}
+
+const oscillator=
+audioContext.createOscillator();
+
+const gain=
+audioContext.createGain();
+
+oscillator.frequency.value=freq;
+oscillator.type="sine";
+
+gain.gain.setValueAtTime(
+.05,
+audioContext.currentTime
+);
+
+gain.gain.exponentialRampToValueAtTime(
+.001,
+audioContext.currentTime+
+duration/1000
+);
+
+oscillator.connect(gain);
+gain.connect(audioContext.destination);
+
+oscillator.start();
+
+oscillator.stop(
+audioContext.currentTime+
+duration/1000
+);
+
+}catch(e){}
+
+}
+
+function toggleSound(){
+
+soundEnabled=!soundEnabled;
+
+toast(
+soundEnabled
+?"🔊 Sound ON"
+:"🔇 Sound OFF"
+);
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetProgress(){
+
+if(
+!confirm(
+"Are you sure you want to delete all game progress?"
+)
+)return;
+
+stopAllTimers();
+
+cleanupPeer();
+
+localStorage.removeItem(STORAGE_KEY);
+
+location.reload();
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function toast(message){
+
+const container=
+document.getElementById("toastContainer");
+
+if(!container)return;
+
+const element=
+document.createElement("div");
+
+element.className="toast";
+
+element.textContent=message;
+
+container.appendChild(element);
+
+setTimeout(()=>{
+element.remove();
+},2500);
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(text){
+
+return String(text)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================================
+   CLONE CHESS BOARD
+========================================================= */
+
+function cloneBoard(board){
+
+return board.map(row=>
+row.map(piece=>
+piece
+?{c:piece.c,t:piece.t}
+:null
+)
+);
+
+}
+
+
+/* =========================================================
+   KEYBOARD CONTROLS
+========================================================= */
+
+document.addEventListener("keydown",event=>{
+
+if(!profile)return;
+
+const active=document.activeElement;
+
+if(
+active &&
+(
+active.tagName==="INPUT"||
+active.tagName==="TEXTAREA"
+)
+){
+
+return;
+
+}
+
+if(event.key==="Escape"){
+
+renderHome();
+
+}
+
+if(event.key==="1"){
+
+startGame("hangman");
+
+}
+
+if(event.key==="2"){
+
+startGame("scramble");
+
+}
+
+if(event.key==="3"){
+
+startGame("rush");
+
+}
+
+if(event.key==="4"){
+
+startGame("master");
+
+}
+
+if(event.key==="5"){
+
+startGame("trivia");
+
+}
+
+if(event.key==="6"){
+
+startGame("chess");
+
+}
+
+});
+
+
+/* =========================================================
+   AUTO SAVE
+========================================================= */
+
+setInterval(()=>{
+
+if(profile){
+
+checkAchievements();
+
+save();
+
+}
+
+},5000);
+
+
+/* =========================================================
+   STARTUP
+========================================================= */
+
+setupAvatars();
+
+loadTheme();
+
+const existing=
+localStorage.getItem(STORAGE_KEY);
+
+if(existing){
+
+try{
+
+const saved=JSON.parse(existing);
+
+document.getElementById("usernameInput")
+.placeholder=
+`Username: ${saved.username}`;
+
+}catch(e){}
+
+}
+
+
+/* =========================================================
+   ONLINE LINK AUTO DETECTION
+========================================================= */
+
+window.addEventListener("load",()=>{
+
+const room=getRoomFromURL();
+
+const game=getGameFromURL();
+
+if(
+room &&
+game &&
+(game==="chess"||game==="word")
+){
+
+/*
+   User opened a shared game link.
+   They still login first.
+   After login the lobby automatically
+   shows the room.
+*/
+
+}
+
+});
+
+
+/* =========================================================
+   AFTER LOGIN:
+   AUTO OPEN SHARED ROOM
+========================================================= */
+
+const originalEnterApp=enterApp;
+
+enterApp=function(){
+
+originalEnterApp();
+
+const room=getRoomFromURL();
+const game=getGameFromURL();
+
+if(
+room &&
+game==="chess"
+){
+
+const s=gameSession;
+
+safeTimer(()=>{
+
+renderOnlineLobby("chess");
+
+safeTimer(()=>{
+
+showJoinRoom("chess",room);
+
+},100,s);
+
+},200,s);
+
+}
+
+if(
+room &&
+game==="word"
+){
+
+const s=gameSession;
+
+safeTimer(()=>{
+
+renderOnlineLobby("word");
+
+safeTimer(()=>{
+
+showJoinRoom("word",room);
+
+},100,s);
+
+},200,s);
+
+}
+
+};
+
+</script>
+
+</body>
+</html>
+
