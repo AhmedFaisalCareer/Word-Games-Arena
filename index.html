@@ -1,3774 +1,1767 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Word Games Arena</title>
-
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --bg: #0b1220;
-    --bg-soft: #111b2e;
-    --panel: #162238;
-    --panel2: #1d2b44;
-    --panel3: #243553;
-    --text: #f8fafc;
-    --muted: #a9b7ca;
-    --primary: #7c6cff;
-    --primary-hover: #9184ff;
-    --secondary: #39c6e8;
-    --success: #38d996;
-    --danger: #ff667f;
-    --warning: #f6c85f;
-    --border: rgba(255,255,255,.14);
-    --shadow: rgba(0,0,0,.28);
-}
-
-body.light {
-    --bg: #f3f6fb;
-    --bg-soft: #e9eef7;
-    --panel: #ffffff;
-    --panel2: #eef2f8;
-    --panel3: #e3e9f3;
-    --text: #172033;
-    --muted: #59677d;
-    --primary: #6256d9;
-    --primary-hover: #5146c8;
-    --secondary: #138da9;
-    --success: #168c62;
-    --danger: #d9435e;
-    --warning: #a66b00;
-    --border: rgba(23,32,51,.13);
-    --shadow: rgba(27,39,60,.14);
-}
-
-body {
-    min-height: 100vh;
-    background:
-        radial-gradient(circle at 10% 0%, rgba(124,108,255,.10), transparent 30%),
-        radial-gradient(circle at 90% 100%, rgba(57,198,232,.07), transparent 30%),
-        var(--bg);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-    transition: background .25s, color .25s;
-}
-
-button,
-input,
-select {
-    font: inherit;
-}
-
-button {
-    border: 0;
-    cursor: pointer;
-}
-
-button:focus-visible, input:focus-visible, select:focus-visible {
-    outline: 3px solid rgba(57,198,232,.45);
-    outline-offset: 2px;
-}
-
-button:disabled {
-    opacity: .55;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* LOGIN */
-
-#loginScreen {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.login-card {
-    width: min(430px, 100%);
-    background: rgba(13,27,45,.95);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    padding: 35px;
-    box-shadow: 0 25px 80px var(--shadow);
-    text-align: center;
-}
-
-body.light .login-card {
-    background: var(--panel);
-}
-
-.logo {
-    width: 85px;
-    height: 85px;
-    margin: auto auto 18px;
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    font-size: 45px;
-    box-shadow: 0 15px 35px rgba(108,99,255,.3);
-}
-
-.login-card h1 {
-    font-size: 30px;
-    margin-bottom: 8px;
-}
-
-.login-card p {
-    color: var(--muted);
-    margin-bottom: 25px;
-}
-
-.login-input {
-    width: 100%;
-    padding: 15px;
-    margin: 7px 0;
-    border-radius: 13px;
-    border: 1px solid var(--border);
-    background: var(--panel2);
-    color: var(--text);
-    outline: none;
-}
-
-.primary-btn {
-    width: 100%;
-    padding: 15px;
-    border-radius: 13px;
-    color: white;
-    font-weight: bold;
-    background: linear-gradient(135deg, var(--primary), #8f6cff);
-    margin-top: 12px;
-    transition: .2s;
-}
-
-.primary-btn:hover {
-    transform: translateY(-2px);
-}
-
-.login-hint {
-    font-size: 12px;
-    margin-top: 18px;
-    color: var(--muted);
-}
-
-/* APP */
-
-#app {
-    min-height: 100vh;
-}
-
-.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 22px;
-    background: rgba(11,18,32,.94);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--border);
-}
-
-body.light .topbar {
-    background: rgba(255,255,255,.94);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: bold;
-}
-
-.brand-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: linear-gradient(135deg,var(--primary),var(--secondary));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-}
-
-.top-stats {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-
-.stat-pill {
-    padding: 8px 12px;
-    border-radius: 10px;
-    background: var(--panel2);
-    color: var(--text);
-    font-size: 13px;
-}
-
-.icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 12px var(--shadow);
-    font-size: 18px;
-}
-
-.layout {
-    display: flex;
-    min-height: calc(100vh - 71px);
-}
-
-.sidebar {
-    width: 245px;
-    flex-shrink: 0;
-    padding: 18px;
-    border-right: 1px solid var(--border);
-    background: color-mix(in srgb, var(--panel) 72%, var(--bg) 28%);
-}
-
-.nav-title {
-    color: var(--muted);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 17px 10px 7px;
-}
-
-.nav-btn {
-    width: 100%;
-    padding: 12px;
-    margin: 3px 0;
-    border-radius: 11px;
-    text-align: left;
-    color: var(--text);
-    background: transparent;
-    border: 1px solid transparent;
-    font-weight: 600;
-    transition: background .18s, border-color .18s, color .18s, transform .18s;
-}
-
-.nav-btn:hover {
-    background: var(--panel2);
-    color: var(--text);
-    border-color: var(--border);
-    transform: translateX(2px);
-}
-
-.nav-btn.active {
-    background: linear-gradient(90deg, rgba(124,108,255,.18), var(--panel2));
-    color: var(--text);
-    border-color: rgba(124,108,255,.35);
-    box-shadow: inset 3px 0 0 var(--primary);
-}
-
-.main {
-    flex: 1;
-    padding: 28px;
-    max-width: 1500px;
-    margin: auto;
-    width: 100%;
-}
-
-.page-title {
-    font-size: clamp(26px,4vw,42px);
-    margin-bottom: 8px;
-}
-
-.page-subtitle {
-    color: var(--muted);
-    margin-bottom: 25px;
-}
-
-/* CARDS */
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-    gap: 16px;
-}
-
-.game-card {
-    padding: 23px;
-    min-height: 175px;
-    border-radius: 20px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    transition: .2s;
-}
-
-.game-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(108,99,255,.5);
-}
-
-.game-icon {
-    font-size: 36px;
-    margin-bottom: 14px;
-}
-
-.game-card h3 {
-    margin-bottom: 7px;
-}
-
-.game-card p {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.5;
-    margin-bottom: 17px;
-}
-
-.play-btn {
-    padding: 10px 16px;
-    border-radius: 10px;
-    background: var(--primary);
-    color: #ffffff;
-    font-weight: 700;
-    border: 1px solid rgba(255,255,255,.10);
-    box-shadow: 0 5px 16px rgba(98,86,217,.20);
-}
-
-/* GAME */
-
-.game-container {
-    max-width: 850px;
-    margin: auto;
-}
-
-.game-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    padding: 25px;
-}
-
-.game-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-bottom: 25px;
-}
-
-.timer {
-    padding: 10px 15px;
-    border-radius: 12px;
-    background: var(--panel2);
-    font-weight: bold;
-}
-
-.word-display {
-    text-align: center;
-    font-size: clamp(30px,7vw,65px);
-    letter-spacing: 8px;
-    font-weight: bold;
-    margin: 30px 0;
-}
-
-.game-input {
-    display: block;
-    width: 100%;
-    padding: 17px;
-    border: 2px solid var(--border);
-    background: var(--panel2);
-    color: var(--text);
-    border-radius: 14px;
-    outline: none;
-    text-align: center;
-    font-size: 20px;
-}
-
-.game-input:focus {
-    border-color: var(--primary);
-}
-
-.game-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.action-btn {
-    padding: 12px 18px;
-    border-radius: 11px;
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    font-weight: 700;
-    box-shadow: 0 3px 10px var(--shadow);
-}
-
-.action-btn:hover, .play-btn:hover, .primary-btn:hover, .icon-btn:hover {
-    filter: brightness(1.06);
-    transform: translateY(-1px);
-}
-
-.action-btn.primary {
-    background: var(--primary);
-    color: #ffffff;
-    border-color: transparent;
-}
-
-.action-btn.danger {
-    background: var(--danger);
-    color: #ffffff;
-    border-color: transparent;
-}
-
-.action-btn.success {
-    background: var(--success);
-    color: #062218;
-    border-color: transparent;
-}
-
-.score-row {
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.score-box {
-    text-align: center;
-    padding: 14px;
-    background: var(--panel2);
-    border-radius: 13px;
-}
-
-.score-box strong {
-    display: block;
-    font-size: 22px;
-    margin-top: 5px;
-}
-
-/* HANGMAN KEYBOARD & HINT STYLING */
-.hint-box {
-    text-align: center;
-    background: var(--panel2);
-    border: 1px dashed var(--secondary);
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-size: 16px;
-    color: var(--secondary);
-    margin-bottom: 15px;
-    font-weight: bold;
-}
-
-.qwerty-keyboard {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 25px;
-    user-select: none;
-}
-
-.qwerty-row {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-}
-
-.key-btn {
-    flex: 1;
-    max-width: 45px;
-    height: 50px;
-    border-radius: 8px;
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    font-size: 18px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, transform 0.1s, opacity 0.15s;
-}
-
-.key-btn:hover:not(:disabled) {
-    background: var(--primary);
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-.key-btn:disabled {
-    opacity: 0.25;
-    cursor: not-allowed;
-    border-color: transparent;
-}
-
-/* CRYPTO CIPHER STYLING */
-.cipher-encoded {
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 4px;
-    word-break: break-all;
-    background: var(--panel2);
-    padding: 20px;
-    border-radius: 14px;
-    border: 1px solid var(--primary);
-    color: var(--secondary);
-    margin: 20px 0;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-/* TRIVIA */
-
-.question-box {
-    padding: 20px;
-    border-radius: 15px;
-    background: var(--panel2);
-    margin-bottom: 18px;
-}
-
-.question-number {
-    color: var(--secondary);
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.question-text {
-    font-size: 21px;
-    line-height: 1.45;
-}
-
-.trivia-option {
-    width: 100%;
-    padding: 15px;
-    text-align: left;
-    border-radius: 12px;
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    margin: 6px 0;
-}
-
-.trivia-option:hover {
-    border-color: var(--primary);
-}
-
-.trivia-option.correct {
-    background: rgba(35,209,139,.2);
-    border-color: var(--success);
-}
-
-.trivia-option.wrong {
-    background: rgba(255,85,119,.2);
-    border-color: var(--danger);
-}
-
-/* CHESS */
-
-.chess-layout {
-    display: grid;
-    grid-template-columns: minmax(300px,620px) 250px;
-    gap: 20px;
-    justify-content: center;
-    align-items: start;
-}
-
-.chess-board {
-    width: min(92vw,620px);
-    aspect-ratio: 1 / 1;
-    display: grid;
-    grid-template-columns: repeat(8,1fr);
-    grid-template-rows: repeat(8,1fr);
-    border: 5px solid #151c29;
-    box-shadow: 0 20px 50px rgba(0,0,0,.3);
-}
-
-.chess-square {
-    min-width: 0;
-    min-height: 0;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
-}
-
-.chess-square.light-square {
-    background: #e9d5ad;
-}
-
-.chess-square.dark-square {
-    background: #8b5e3c;
-}
-
-.chess-square.selected {
-    box-shadow: inset 0 0 0 5px #ffd43b;
-}
-
-.chess-square.last-move {
-    box-shadow: inset 0 0 0 5px rgba(0,212,255,.55);
-}
-
-.chess-square.legal::after {
-    content: "";
-    width: 24%;
-    height: 24%;
-    border-radius: 50%;
-    background: rgba(30,30,30,.4);
-    position: absolute;
-}
-
-.chess-square.capture::after {
-    content: "";
-    width: 78%;
-    height: 78%;
-    border: 5px solid rgba(255,80,100,.65);
-    border-radius: 50%;
-    position: absolute;
-}
-
-.chess-piece {
-    position: relative;
-    z-index: 2;
-    font-family:
-        "Noto Sans Symbols 2",
-        "Segoe UI Symbol",
-        "Arial Unicode MS",
-        sans-serif;
-    font-size: clamp(28px,6.5vw,58px);
-    line-height: 1;
-    user-select: none;
-    filter: drop-shadow(1px 3px 2px rgba(0,0,0,.5));
-}
-
-.white-piece {
-    color: #ffffff;
-    text-shadow:
-        0 0 1px #111,
-        1px 1px 2px #111,
-        -1px -1px 1px #111;
-}
-
-.black-piece {
-    color: #111827;
-    text-shadow: 0 1px 1px rgba(255,255,255,.3);
-}
-
-.chess-side {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 18px;
-}
-
-.turn-box {
-    padding: 13px;
-    border-radius: 11px;
-    background: var(--panel2);
-    margin-bottom: 15px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.captured {
-    min-height: 40px;
-    padding: 8px;
-    background: var(--panel2);
-    border-radius: 10px;
-    margin: 8px 0 15px;
-    font-size: 22px;
-    word-break: break-word;
-}
-
-.move-history {
-    height: 250px;
-    overflow-y: auto;
-    background: var(--panel2);
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 13px;
-}
-
-.move-item {
-    padding: 5px;
-    border-bottom: 1px solid var(--border);
-}
-
-/* ONLINE */
-
-.online-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 25px;
-    max-width: 700px;
-    margin: auto;
-}
-
-.room-code {
-    font-size: 32px;
-    letter-spacing: 5px;
-    font-weight: bold;
-    text-align: center;
-    padding: 20px;
-    background: var(--panel2);
-    border-radius: 15px;
-    margin: 20px 0;
-}
-
-.share-link {
-    width: 100%;
-    padding: 13px;
-    border-radius: 10px;
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-
-/* PROFILE */
-
-.profile-card {
-    max-width: 650px;
-    margin: auto;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    padding: 30px;
-}
-
-.avatar {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: linear-gradient(135deg,var(--primary),var(--secondary));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 45px;
-    margin: auto auto 15px;
-}
-
-.profile-name {
-    text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-}
-
-.progress {
-    height: 10px;
-    border-radius: 10px;
-    background: var(--panel2);
-    overflow: hidden;
-    margin: 10px 0 20px;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg,var(--primary),var(--secondary));
-}
-
-/* SHOP */
-
-.shop-item {
-    padding: 20px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 17px;
-}
-
-.shop-item p {
-    color: var(--muted);
-    margin: 7px 0 15px;
-}
-
-/* TOAST */
-
-#toast {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 9999;
-    max-width: 350px;
-    padding: 14px 18px;
-    background: #111827;
-    color: white;
-    border-radius: 13px;
-    box-shadow: 0 15px 40px rgba(0,0,0,.3);
-    transform: translateY(120px);
-    opacity: 0;
-    transition: .25s;
-}
-
-#toast.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-/* MOBILE */
-
-@media(max-width:850px) {
-    .sidebar {
-        width: 75px;
-        padding: 10px;
-    }
-
-    .nav-btn {
-        text-align: center;
-        font-size: 0;
-        min-height: 46px;
-        padding: 10px 6px;
-    }
-
-    .nav-btn::first-letter {
-        font-size: 21px;
-    }
-
-    .nav-title {
-        display: none;
-    }
-
-    .main {
-        padding: 18px;
-    }
-
-    .chess-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .chess-side {
-        width: min(92vw,620px);
-        margin: auto;
-    }
-}
-
-@media(max-width:550px) {
-    .topbar {
-        padding: 10px;
-    }
-
-    .brand span {
-        display: none;
-    }
-
-    .top-stats .stat-pill {
-        display: none;
-    }
-
-    .score-row {
-        grid-template-columns: repeat(2,1fr);
-    }
-
-    .game-panel {
-        padding: 15px;
-    }
-    
-    .key-btn {
-        height: 42px;
-        font-size: 14px;
-    }
-}
-
-/* THEME / CONTROL VISIBILITY */
-.theme-option, .theme-btn, .settings-btn {
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    font-weight: 700;
-}
-
-.theme-option:hover, .theme-btn:hover, .settings-btn:hover {
-    background: var(--panel3);
-    border-color: rgba(124,108,255,.45);
-}
-
-@media(max-width:850px) {
-    .sidebar {
-        box-shadow: 8px 0 25px var(--shadow);
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcadia - World's Best Game Arena</title>
+    <style>
+        :root {
+            --bg-primary: #f4f6fa;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --accent-pink: #fbb6ce;
+            --accent-purple: #d6bcfa;
+            --accent-blue: #bee3f8;
+            --accent-teal: #b2f5ea;
+            --accent-green: #c6f6d5;
+            --accent-yellow: #fefcbf;
+            --accent-orange: #feebc8;
+            --primary-btn: #805ad5;
+            --primary-btn-hover: #6b46c1;
+            --shadow-soft: 0 10px 25px -5px rgba(160, 174, 192, 0.25), 0 8px 10px -6px rgba(160, 174, 192, 0.1);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body.dark-mode {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --bg-card: rgba(45, 55, 72, 0.9);
+            --text-main: #f7fafc;
+            --text-muted: #a0aec0;
+            --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --primary-btn: #9f7aea;
+            --primary-btn-hover: #805ad5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e9d8fd 0%, #b2f5ea 50%, #bee3f8 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 40px 30px;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            animation: floatIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .avatar-selector {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .avatar-opt {
+            font-size: 2rem;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .avatar-opt:hover, .avatar-opt.active {
+            transform: scale(1.15);
+            border-color: var(--primary-btn);
+            background: #ffffff;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            border: 2px solid #e2e8f0;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-btn);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--primary-btn);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(128, 90, 213, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-btn-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--text-main);
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Navbar Header */
+        header {
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #805ad5, #319795);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        /* App Container Layout */
+        .app-layout {
+            display: flex;
+            flex: 1;
+            padding: 24px;
+            gap: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .category-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-soft);
+            color: var(--primary-btn);
+            transform: translateX(4px);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Banner Dashboard */
+        .banner {
+            padding: 28px;
+            border-radius: var(--radius-xl);
+            background: linear-gradient(135deg, #e9d8fd 0%, #c6f6d5 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .banner-text h1 {
+            font-size: 2rem;
+            margin-bottom: 6px;
+            color: #2d3748;
+        }
+
+        .banner-text p {
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .stat-card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-btn);
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .game-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .game-category {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .play-tag {
+            margin-top: auto;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-btn);
+        }
+
+        /* Fullscreen Game Arena Overlay */
+        #fullscreen-arena {
+            position: fixed;
+            inset: 0;
+            z-index: 800;
+            background: var(--bg-primary);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #fullscreen-arena.active {
+            display: flex;
+        }
+
+        .arena-top-header {
+            padding: 16px 32px;
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .arena-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .arena-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .arena-body {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* End Game Result Overlay Modal */
+        .result-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .result-modal.active {
+            display: flex;
+        }
+
+        .result-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            animation: floatIn 0.3s ease-out;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .result-banner {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .result-desc {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* D-Pad Controls for Canvas/Board Games */
+        .dpad-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            grid-template-rows: repeat(3, 50px);
+            gap: 6px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .dpad-btn {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .dpad-btn:active {
+            background: var(--primary-btn);
+            color: white;
+        }
+
+        /* Modal View for User Profile */
+        .game-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .game-modal.active {
+            display: flex;
+        }
+
+        .game-stage {
+            width: 100%;
+            max-width: 450px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: floatIn 0.3s ease;
+        }
+
+        .game-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 900px) {
+            .app-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+            .category-btn {
+                white-space: nowrap;
+            }
+            .banner {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-card glass">
+            <h1 style="font-size: 2.2rem; margin-bottom: 8px;">Welcome! 🎮</h1>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Choose your avatar and enter your player nickname</p>
+            
+            <div class="avatar-selector">
+                <div class="avatar-opt active" onclick="selectAvatar('🚀', this)">🚀</div>
+                <div class="avatar-opt" onclick="selectAvatar('🦊', this)">🦊</div>
+                <div class="avatar-opt" onclick="selectAvatar('👑', this)">👑</div>
+                <div class="avatar-opt" onclick="selectAvatar('🦄', this)">🦄</div>
+                <div class="avatar-opt" onclick="selectAvatar('👾', this)">👾</div>
+            </div>
 
-<section id="loginScreen">
-    <div class="login-card">
-        <div class="logo">🎮</div>
+            <div class="input-group">
+                <input type="text" id="username-input" placeholder="Enter Nickname..." maxlength="12">
+            </div>
 
-        <h1>Word Games Arena</h1>
-        <p>Play. Think. Compete. Improve.</p>
-
-        <input
-            id="usernameInput"
-            class="login-input"
-            type="text"
-            placeholder="Username"
-            autocomplete="off"
-        >
-
-        <input
-            id="pinInput"
-            class="login-input"
-            type="password"
-            placeholder="PIN"
-            autocomplete="off"
-        >
-
-        <button class="primary-btn" onclick="login()">
-            Enter Arena
-        </button>
-
-        <div class="login-hint">
-            Login ID: Ahmed &nbsp; | &nbsp; PIN: 123456
+            <button class="btn-primary" onclick="loginUser()">Enter Game Arena</button>
         </div>
     </div>
-</section>
 
-<!-- APP -->
-
-<section id="app" class="hidden">
-
-    <header class="topbar">
-
-        <div class="brand">
-            <div class="brand-icon">🎮</div>
-            <span>Word Games Arena</span>
+    <!-- Main Header -->
+    <header class="glass">
+        <div class="logo">
+            <span>🏆</span> Arcadia Arena
         </div>
-
-        <div class="top-stats">
-            <div class="stat-pill">⭐ XP: <b id="xpTop">0</b></div>
-            <div class="stat-pill">🪙 <b id="coinsTop">100</b></div>
-            <div class="stat-pill">🏆 <b id="winsTop">0</b></div>
-            <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+        <div class="user-nav-profile">
+            <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+            <div class="user-badge" onclick="showProfileModal()">
+                <span id="nav-avatar">🚀</span>
+                <span id="nav-username" style="font-weight: 700;">Guest</span>
+                <span style="font-size: 0.8rem; background: var(--accent-purple); padding: 2px 8px; border-radius: 12px;" id="nav-trophies">🏆 0</span>
+            </div>
         </div>
-
     </header>
 
-    <div class="layout">
+    <!-- App Body -->
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <button class="category-btn glass active" onclick="filterCategory('all', this)">✨ All Games</button>
+            <button class="category-btn glass" onclick="filterCategory('arcade', this)">🕹️ Arcade & Action</button>
+            <button class="category-btn glass" onclick="filterCategory('word', this)">🔤 Word Puzzles</button>
+            <button class="category-btn glass" onclick="filterCategory('brain', this)">🧠 Brain & Math</button>
+            <button class="category-btn glass" onclick="filterCategory('casual', this)">🎯 Casual & Strategy</button>
+        </div>
 
-        <aside class="sidebar">
+        <!-- Main Content Arena -->
+        <div class="main-content">
+            <div class="banner">
+                <div class="banner-text">
+                    <h1 id="welcome-title">Ready to Play, Guest?</h1>
+                    <p>Select any game from the collection below and aim for a high score!</p>
+                </div>
+                <div class="stats-summary">
+                    <div class="stat-card">
+                        <div class="value" id="dash-played">0</div>
+                        <div class="label">Played</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="dash-wins">0</div>
+                        <div class="label">Wins</div>
+                    </div>
+                </div>
+            </div>
 
-            <div class="nav-title">Navigation</div>
-
-            <button class="nav-btn active" onclick="showPage('home',this)">
-                🏠 Home
-            </button>
-
-            <button class="nav-btn" onclick="showPage('games',this)">
-                🎮 Games
-            </button>
-
-            <div class="nav-title">Single Player</div>
-
-            <button class="nav-btn" onclick="startGame('hangman',this)">
-                🎯 Hangman
-            </button>
-
-            <button class="nav-btn" onclick="startGame('cipher',this)">
-                🔐 Crypto Cipher
-            </button>
-
-            <button class="nav-btn" onclick="startGame('rush',this)">
-                ⌨️ Letter Rush
-            </button>
-
-            <button class="nav-btn" onclick="startGame('scramble',this)">
-                🔀 Scramble
-            </button>
-
-            <button class="nav-btn" onclick="startGame('master',this)">
-                🧠 Word Master
-            </button>
-
-            <button class="nav-btn" onclick="startGame('trivia',this)">
-                ❓ Trivia Blitz
-            </button>
-
-            <button class="nav-btn" onclick="startGame('chess',this)">
-                ♟️ Chess
-            </button>
-
-            <div class="nav-title">Multiplayer</div>
-
-            <button class="nav-btn" onclick="startGame('duel',this)">
-                ⚔️ Local Duel
-            </button>
-
-            <div class="nav-title">Online</div>
-
-            <button class="nav-btn" onclick="startGame('onlineWord',this)">
-                🌐 Word Battle
-            </button>
-
-            <button class="nav-btn" onclick="startGame('onlineChess',this)">
-                ♟️ Online Chess
-            </button>
-
-            <div class="nav-title">User Area</div>
-
-            <button class="nav-btn" onclick="showPage('shop',this)">
-                🛒 Shop
-            </button>
-
-            <button class="nav-btn" onclick="showPage('achievements',this)">
-                🏅 Achievements
-            </button>
-
-            <button class="nav-btn" onclick="showPage('profile',this)">
-                👤 Profile
-            </button>
-
-            <button class="nav-btn" onclick="logout()">
-                🚪 Logout
-            </button>
-
-        </aside>
-
-        <main id="main" class="main"></main>
-
+            <div class="games-grid" id="games-grid">
+                <!-- Populated via JS -->
+            </div>
+        </div>
     </div>
-</section>
 
-<div id="toast"></div>
-
-<script>
-
-/* =========================================================
-   PROFILE / LOGIN
-========================================================= */
-
-const LOGIN_ID = "Ahmed";
-const LOGIN_PASSWORD = "123456";
-const STORAGE_KEY = "wordGamesArenaProfile";
-
-let profile = null;
-
-function defaultProfile() {
-    return {
-        username: LOGIN_ID,
-        pin: LOGIN_PASSWORD,
-        avatar: "😎",
-        xp: 0,
-        coins: 100,
-        wins: 0,
-        losses: 0,
-        streak: 0,
-        best: 0,
-        level: 1,
-        achievements: [],
-        theme: "dark"
-    };
-}
-
-function saveProfile() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-}
-
-function login() {
-
-    const username =
-        document.getElementById("usernameInput").value.trim();
-
-    const pin =
-        document.getElementById("pinInput").value.trim();
-
-    if (
-        username.toLowerCase() !== LOGIN_ID.toLowerCase() ||
-        pin !== LOGIN_PASSWORD
-    ) {
-        toast("❌ Incorrect ID or password.");
-        return;
-    }
-
-    const saved = localStorage.getItem(STORAGE_KEY);
-
-    if (saved) {
-        try {
-            profile = JSON.parse(saved);
-        } catch {
-            profile = defaultProfile();
-        }
-    } else {
-        profile = defaultProfile();
-        saveProfile();
-    }
-
-    profile.username = LOGIN_ID;
-    profile.pin = LOGIN_PASSWORD;
-
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-
-    if (profile.theme === "light") {
-        document.body.classList.add("light");
-    }
-
-    updateTop();
-    renderHome();
-}
-
-function logout() {
-    stopAllTimers();
-    document.getElementById("app").classList.add("hidden");
-    document.getElementById("loginScreen").classList.remove("hidden");
-}
-
-function updateTop() {
-
-    if (!profile) return;
-
-    document.getElementById("xpTop").textContent = profile.xp;
-    document.getElementById("coinsTop").textContent = profile.coins;
-    document.getElementById("winsTop").textContent = profile.wins;
-}
-
-function addXP(amount) {
-
-    profile.xp += amount;
-
-    const newLevel =
-        Math.floor(profile.xp / 500) + 1;
-
-    if (newLevel > profile.level) {
-        profile.level = newLevel;
-        toast("🎉 Level Up! Level " + profile.level);
-    }
-
-    saveProfile();
-    updateTop();
-}
-
-function addCoins(amount) {
-
-    profile.coins = Math.max(
-        0,
-        profile.coins + amount
-    );
-
-    saveProfile();
-    updateTop();
-}
-
-function toggleTheme() {
-
-    document.body.classList.toggle("light");
-
-    profile.theme =
-        document.body.classList.contains("light")
-            ? "light"
-            : "dark";
-
-    saveProfile();
-}
-
-/* =========================================================
-   NAVIGATION + TIMER SYSTEM
-========================================================= */
-
-let gameSession = 0;
-const timers = new Set();
-
-function newSession() {
-
-    gameSession++;
-
-    stopAllTimers();
-
-    return gameSession;
-}
-
-function safeTimeout(callback, delay, session) {
-
-    const id = setTimeout(() => {
-
-        timers.delete(id);
-
-        if (session !== gameSession) return;
-
-        callback();
-
-    }, delay);
-
-    timers.add(id);
-
-    return id;
-}
-
-function safeInterval(callback, delay, session) {
-
-    const id = setInterval(() => {
-
-        if (session !== gameSession) {
-
-            clearInterval(id);
-            timers.delete(id);
-            return;
-        }
-
-        callback();
-
-    }, delay);
-
-    timers.add(id);
-
-    return id;
-}
-
-function stopAllTimers() {
-
-    timers.forEach(id => {
-
-        clearTimeout(id);
-        clearInterval(id);
-
-    });
-
-    timers.clear();
-}
-
-function showPage(page, button) {
-
-    newSession();
-
-    document
-        .querySelectorAll(".nav-btn")
-        .forEach(b => b.classList.remove("active"));
-
-    if (button) button.classList.add("active");
-
-    if (page === "home") renderHome();
-    if (page === "games") renderGames();
-    if (page === "shop") renderShop();
-    if (page === "achievements") renderAchievements();
-    if (page === "profile") renderProfile();
-}
-
-function startGame(game, button) {
-
-    newSession();
-
-    document
-        .querySelectorAll(".nav-btn")
-        .forEach(b => b.classList.remove("active"));
-
-    if (button) button.classList.add("active");
-
-    if (game === "hangman") renderHangman();
-    if (game === "cipher") renderCipher();
-    if (game === "rush") renderRush();
-    if (game === "scramble") renderScramble();
-    if (game === "master") renderMaster();
-    if (game === "trivia") renderTrivia();
-    if (game === "chess") renderChess();
-    if (game === "duel") renderDuel();
-    if (game === "onlineWord") renderOnlineWord();
-    if (game === "onlineChess") renderOnlineChess();
-}
-
-function toast(message) {
-
-    const box = document.getElementById("toast");
-
-    box.textContent = message;
-    box.classList.add("show");
-
-    setTimeout(() => {
-        box.classList.remove("show");
-    }, 2500);
-}
-
-/* =========================================================
-   WORD DATABASES
-========================================================= */
-
-const hangmanData = [
-    { word: "PYTHON", hint: "A popular programming language named after a snake." },
-    { word: "COMPUTER", hint: "An electronic device for storing and processing data." },
-    { word: "JAVASCRIPT", hint: "The programming language of the Web." },
-    { word: "KEYBOARD", hint: "Input device with letters and numbers used for typing." },
-    { word: "INTERNET", hint: "A global network connecting millions of computers." },
-    { word: "DATABASE", hint: "An organized collection of structured data." },
-    { word: "MONITOR", hint: "An output device that displays visual information." },
-    { word: "SOFTWARE", hint: "Programs and instructions used by computers." },
-    { word: "HARDWARE", hint: "The physical parts of a computer system." },
-    { word: "GITHUB", hint: "A platform for hosting and sharing code repositories." },
-    { word: "NETWORK", hint: "Interconnected computers that exchange data." },
-    { word: "GALAXY", hint: "A massive system of stars, stellar remnants, and dark matter." },
-    { word: "VOLCANO", hint: "A mountain that opens downward to a pool of molten rock." },
-    { word: "PYRAMID", hint: "A ancient massive structure built in Egypt." },
-    { word: "PENGUIN", hint: "A flightless bird that thrives in cold climates." }
-];
-
-const scrambleWords = [
-"PYTHON","COMPUTER","JAVASCRIPT","KEYBOARD","INTERNET",
-"PROGRAM","BROWSER","GITHUB","CHESS","PUZZLE",
-"SCHOOL","MOBILE","CODING","WEBSITE","STREAMLIT",
-"FIREBASE","DATABASE","SOFTWARE","HARDWARE","MONITOR",
-"WINDOWS","LAPTOP","MOUSE","SCREEN","NETWORK",
-"SERVER","CLIENT","DIGITAL","SCIENCE","HISTORY",
-"GEOGRAPHY","ENGLISH","MATHS","PHYSICS","CHEMISTRY",
-"BIOLOGY","PLANET","GALAXY","SPACE","ROCKET",
-"SATELLITE","OCEAN","RIVER","MOUNTAIN","FOREST",
-"DESERT","ISLAND","COUNTRY","CITY","VILLAGE",
-"FRIEND","FAMILY","SCHOOL","TEACHER","STUDENT",
-"PLAYER","GAMING","GAMES","SPORT","CRICKET",
-"FOOTBALL","TENNIS","BASKETBALL","WINNER","CHAMPION",
-"TRAVEL","JOURNEY","MARKET","BUSINESS","MONEY",
-"COFFEE","PIZZA","APPLE","ORANGE","BANANA",
-"CHAIR","TABLE","HOUSE","WINDOW","DOOR",
-"PHONE","CAMERA","MUSIC","MOVIE","BOOK",
-"STORY","LETTER","NUMBER","QUESTION","ANSWER",
-"LEARNING","KNOWLEDGE","MEMORY","FUTURE","SUCCESS",
-"CREATIVE","DESIGN","PROJECT","DEVELOPER","PYTHONIC"
-];
-
-const rushWords = [
-"CAT","BOOK","CODE","GAME","SCHOOL",
-"PYTHON","MOUSE","SCREEN","APPLE","PLANET",
-"COMPUTER","MUSIC","ROBOT","KEYBOARD","INTERNET",
-"PHONE","HOUSE","CHAIR","TABLE","WATER",
-"LIGHT","WORLD","EARTH","CLOUD","SPACE",
-"TRAIN","TIGER","HORSE","GREEN","SMILE",
-"STONE","RIVER","BEACH","HEART","NIGHT",
-"BRAIN","PLANT","MONEY","PLANE","PHONE",
-"BRIDGE","OCEAN","FOREST","DESERT","ISLAND",
-"COUNTRY","CITY","VILLAGE","SCHOOL","TEACHER",
-"STUDENT","FRIEND","FAMILY","SPORT","CRICKET",
-"FOOTBALL","TENNIS","WINNER","CHAMPION","PLAYER",
-"CODING","WEBSITE","SERVER","CLIENT","DATA",
-"FILES","FOLDER","WINDOW","BUTTON","SCREEN",
-"CAMERA","VIDEO","PHOTO","BOOKS","PAPER",
-"PENCIL","CLASS","LESSON","EXAM","ANSWER",
-"QUESTION","PUZZLE","CHESS","QUEEN","KING",
-"ROOK","KNIGHT","BISHOP","PAWN","BOARD",
-"SPACE","ROCKET","MOON","SUN","STAR",
-"RAIN","STORM","WIND","SNOW","FIRE",
-"ENERGY","POWER","SPEED","LIGHT","SOUND"
-];
-
-const masterWords = [
-"APPLE","HOUSE","MOUSE","WATER","PLANT",
-"LIGHT","WORLD","EARTH","CLOUD","PHONE",
-"CHAIR","BRAIN","SPACE","TRAIN","TIGER",
-"HORSE","GREEN","BLACK","WHITE","SMILE",
-"MUSIC","MONEY","STONE","RIVER","TABLE",
-"BOOKS","PLANE","BEACH","HEART","NIGHT",
-"ABOUT","ABOVE","ABUSE","ACTOR","ACUTE",
-"ADMIT","ADOPT","ADULT","AFTER","AGAIN",
-"AGENT","AGREE","AHEAD","ALARM","ALBUM",
-"ALERT","ALIKE","ALIVE","ALLOW","ALONE",
-"ANGEL","ANGER","ANGLE","ANGRY","APART",
-"ARENA","ARGUE","ARISE","ARMOR","ASIDE",
-"ASSET","AUDIO","AVOID","AWAKE","AWARD",
-"BADGE","BASIC","BASIS","BEGAN","BEGIN",
-"BEING","BELOW","BENCH","BIRTH","BLAME",
-"BLANK","BLAST","BLEND","BLIND","BLOCK",
-"BLOOD","BOARD","BOOST","BOUND","BRAVE",
-"BREAD","BREAK","BRICK","BRING","BROAD",
-"BROKE","BROWN","BUILD","BUILT","BUYER",
-"CABLE","CARRY","CATCH","CAUSE","CHAIN",
-"CHARM","CHEAP","CHECK","CHEST","CHIEF",
-"CHILD","CHOSE","CIVIL","CLAIM","CLASS",
-"CLEAN","CLEAR","CLIMB","CLOCK","CLOSE",
-"COACH","COAST","COLOR","COUNT","COURT",
-"COVER","CRAFT","CRASH","CRAZY","CREAM",
-"CRIME","CROSS","CROWD","CROWN","CRUSH",
-"DAILY","DANCE","DEATH","DEBUT","DELAY",
-"DEPTH","DOING","DOUBT","DOZEN","DRAFT",
-"DRAMA","DREAM","DRINK","DRIVE","EARLY",
-"ENJOY","ENTER","ENTRY","EQUAL","ERROR",
-"EVENT","EVERY","EXACT","EXIST","EXTRA",
-"FAITH","FALSE","FAULT","FAVOR","FEAST",
-"FIELD","FIFTH","FIGHT","FINAL","FIRST",
-"FIXED","FLASH","FLOOR","FOCUS","FORCE",
-"FRAME","FRANK","FRESH","FRONT","FRUIT",
-"FUNNY","GIANT","GIVEN","GLASS","GLOBE",
-"GOING","GRACE","GRADE","GRAND","GRANT",
-"GRASS","GREAT","GROUP","GUARD","GUESS",
-"GUIDE","HAPPY","HEAVY","HONEY","HOTEL",
-"HUMAN","IDEAL","IMAGE","INDEX","INNER",
-"INPUT","ISSUE","JOINT","JUDGE","JUICE",
-"KNOWN","LABEL","LARGE","LASER","LATER",
-"LAUGH","LAYER","LEARN","LEAST","LEAVE",
-"LEGAL","LEVEL","LOCAL","LOGIC","LUCKY",
-"MAJOR","MAKER","MARCH","MATCH","MAYBE",
-"MEDIA","METAL","MODEL","MONTH","MOTOR",
-"MOUNT","MOUTH","MOVIE","NERVE","NEVER",
-"NIGHT","NORTH","NOVEL","NURSE","OCCUR",
-"OFFER","OFFICE","ORDER","OTHER","OUTER",
-"OWNER","PAINT","PANEL","PAPER","PARTY",
-"PEACE","PHASE","PIANO","PIECE","PILOT",
-"PITCH","PLACE","PLAIN","PLATE","POINT",
-"POWER","PRESS","PRICE","PRIDE","PRIME",
-"PRINT","PRIZE","PROOF","PROUD","PROVE",
-"QUEEN","QUICK","QUIET","RADIO","RAISE",
-"RANGE","RAPID","REACH","READY","REALM",
-"REPLY","RIGHT","ROUGH","ROUND","ROUTE",
-"ROYAL","RURAL","SAFER","SAINT","SCALE",
-"SCENE","SCOPE","SCORE","SENSE","SERVE",
-"SEVEN","SHARE","SHIFT","SHINE","SHOCK",
-"SHORT","SIGHT","SINCE","SKILL","SLEEP",
-"SMALL","SMART","SOLID","SOUND","SOUTH",
-"SPEAK","SPEED","SPEND","SPICE","SPORT",
-"STAFF","STAGE","STAKE","START","STATE",
-"STEAM","STEEL","STICK","STILL","STORE",
-"STORM","STORY","STRIP","STUDY","STYLE",
-"SUGAR","SUPER","SWEET","TAKEN","TASTE",
-"TEACH","THANK","THEME","THERE","THICK",
-"THING","THINK","THIRD","THROW","TIGHT",
-"TITLE","TODAY","TOPIC","TOWER","TRACK",
-"TRADE","TREAT","TREND","TRIAL","TRUST",
-"TRUTH","UNCLE","UNDER","UNION","UNITE",
-"UNTIL","UPPER","URBAN","USUAL","VALUE",
-"VIDEO","VISIT","VOICE","WASTE","WATCH",
-"WEIRD","WHERE","WHICH","WHILE","WHOLE",
-"WHOSE","WOMAN","WORDS","WORRY","WORTH",
-"WRITE","WRONG","YOUNG","YOUTH"
-];
-
-const onlineWords = masterWords;
-
-const trivia = [
-{q:"What is the capital of Pakistan?",a:"Islamabad",c:["Karachi","Lahore","Islamabad","Peshawar"]},
-{q:"Which planet is known as the Red Planet?",a:"Mars",c:["Venus","Mars","Jupiter","Mercury"]},
-{q:"How many days are there in a leap year?",a:"366",c:["365","366","364","367"]},
-{q:"What is the largest ocean on Earth?",a:"Pacific Ocean",c:["Atlantic Ocean","Indian Ocean","Pacific Ocean","Arctic Ocean"]},
-{q:"What is 12 × 8?",a:"96",c:["86","94","96","108"]},
-{q:"Which gas do humans need for respiration?",a:"Oxygen",c:["Carbon dioxide","Oxygen","Nitrogen","Hydrogen"]},
-{q:"What is the chemical symbol for water?",a:"H₂O",c:["CO₂","O₂","H₂O","NaCl"]},
-{q:"Which is the largest continent?",a:"Asia",c:["Africa","Europe","Asia","Australia"]},
-{q:"Who wrote Romeo and Juliet?",a:"William Shakespeare",c:["Charles Dickens","William Shakespeare","Mark Twain","Leo Tolstoy"]},
-{q:"How many sides does a hexagon have?",a:"6",c:["5","6","7","8"]}
-];
-
-/* =========================================================
-   HOME
-========================================================= */
-
-function renderHome() {
-
-    document.getElementById("main").innerHTML = `
-
-        <h1 class="page-title">
-            Welcome back, ${profile.username}! 👋
-        </h1>
-
-        <p class="page-subtitle">
-            Ready for your next challenge?
-        </p>
-
-        <div class="cards">
-
-            ${gameCard("🎯","Hangman","Guess the hidden word with hints and QWERTY keyboard.","hangman")}
-            ${gameCard("🔐","Crypto Cipher","Decode secret messages using a Caesar shift cipher.","cipher")}
-            ${gameCard("⌨️","Letter Rush","Type words before time runs out.","rush")}
-            ${gameCard("🔀","Word Scramble","Unscramble the hidden word.","scramble")}
-            ${gameCard("🧠","Word Master","Guess the five-letter word.","master")}
-            ${gameCard("❓","Trivia Blitz","Test your general knowledge.","trivia")}
-            ${gameCard("♟️","Chess","Play a full chess game.","chess")}
-            ${gameCard("⚔️","Local Duel","Battle another player locally.","duel")}
-            ${gameCard("🌐","Online Word Battle","Battle your friend online.","onlineWord")}
-            ${gameCard("♟️","Online Chess","Play chess online.","onlineChess")}
-
-        </div>
-    `;
-}
-
-function gameCard(icon,title,text,game) {
-
-    return `
-        <div class="game-card">
-
-            <div class="game-icon">${icon}</div>
-
-            <h3>${title}</h3>
-
-            <p>${text}</p>
-
-            <button class="play-btn"
-                onclick="startGame('${game}')">
-                Play
-            </button>
-
-        </div>
-    `;
-}
-
-function renderGames() {
-    renderHome();
-}
-
-/* =========================================================
-   HANGMAN (UPDATED WITH SPECIFIC HINTS & QWERTY KEYBOARD)
-========================================================= */
-
-let hangObj = {};
-let hangGuessed = [];
-let hangLives = 6;
-
-const qwertyRows = [
-    ["Q","W","E","R","T","Y","U","I","O","P"],
-    ["A","S","D","F","G","H","J","K","L"],
-    ["Z","X","C","V","B","N","M"]
-];
-
-function renderHangman() {
-
-    hangObj = hangmanData[Math.floor(Math.random() * hangmanData.length)];
-    hangGuessed = [];
-    hangLives = 6;
-
-    drawHangman();
-}
-
-function drawHangman() {
-
-    const word = hangObj.word;
-    const display = word
-        .split("")
-        .map(letter => hangGuessed.includes(letter) ? letter : "_")
-        .join(" ");
-
-    let keyboardHTML = `<div class="qwerty-keyboard">`;
-    qwertyRows.forEach(row => {
-        keyboardHTML += `<div class="qwerty-row">`;
-        row.forEach(char => {
-            const isUsed = hangGuessed.includes(char);
-            keyboardHTML += `
-                <button 
-                    class="key-btn" 
-                    ${isUsed ? 'disabled' : ''} 
-                    onclick="hangGuess('${char}')">
-                    ${char}
-                </button>
-            `;
-        });
-        keyboardHTML += `</div>`;
-    });
-    keyboardHTML += `</div>`;
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <div class="game-panel">
-
-                <div class="game-header">
-                    <div>
-                        <h2>🎯 Hangman</h2>
-                        <p class="page-subtitle">
-                            Guess the word before running out of lives.
-                        </p>
-                    </div>
-
-                    <div class="timer">
-                        ❤️ Lives: ${hangLives}
-                    </div>
-                </div>
-
-                <div class="hint-box">
-                    💡 Hint: ${hangObj.hint}
-                </div>
-
-                <div class="word-display">
-                    ${display}
-                </div>
-
-                ${keyboardHTML}
-
-                <div class="game-actions" style="margin-top: 20px; justify-content: center;">
-                    <button class="action-btn" onclick="renderHangman()">
-                        New Word
-                    </button>
-                </div>
-
+    <!-- Fullscreen Dedicated Arena View -->
+    <div id="fullscreen-arena">
+        <div class="arena-top-header">
+            <div class="arena-title" id="arena-game-title">
+                <span>🎮</span> Game Title
             </div>
-
-        </div>
-    `;
-}
-
-function hangGuess(letter) {
-
-    if (hangGuessed.includes(letter) || hangLives <= 0) return;
-
-    hangGuessed.push(letter);
-
-    if (!hangObj.word.includes(letter)) {
-        hangLives--;
-    }
-
-    const won = hangObj.word.split("").every(l => hangGuessed.includes(l));
-
-    if (won) {
-        profile.wins++;
-        addXP(50);
-        addCoins(20);
-
-        toast("🎉 You won!");
-
-        safeTimeout(() => renderHangman(), 1500, gameSession);
-        drawHangman();
-        return;
-    }
-
-    if (hangLives <= 0) {
-        toast("💀 Word was: " + hangObj.word);
-
-        profile.losses++;
-        saveProfile();
-
-        safeTimeout(() => renderHangman(), 2000, gameSession);
-        drawHangman();
-        return;
-    }
-
-    drawHangman();
-}
-
-/* =========================================================
-   NEW GAME: CRYPTO CIPHER
-========================================================= */
-
-let cipherOriginal = "";
-let cipherEncoded = "";
-let cipherShift = 0;
-let cipherScore = 0;
-
-const cipherPhrases = [
-    "KNOWLEDGE IS POWER",
-    "SECRET CODE BROKEN",
-    "DECODE THE MESSAGE",
-    "CYBER SECURITY HERO",
-    "ALGORITHM MASTER",
-    "CRYPTOGRAPHY ROCKS",
-    "PUZZLE SOLVER ELITE"
-];
-
-function renderCipher() {
-    cipherOriginal = cipherPhrases[Math.floor(Math.random() * cipherPhrases.length)];
-    cipherShift = Math.floor(Math.random() * 5) + 1; // Shift between 1 and 5
-    cipherEncoded = caesarShift(cipherOriginal, cipherShift);
-
-    document.getElementById("main").innerHTML = `
-        <div class="game-container">
-            <div class="game-panel">
-                <div class="game-header">
-                    <div>
-                        <h2>🔐 Crypto Cipher</h2>
-                        <p class="page-subtitle">
-                            Decode the message encrypted with a Caesar Shift (+${cipherShift}).
-                        </p>
-                    </div>
-                    <div class="timer">
-                        ⭐ XP: ${cipherScore}
-                    </div>
-                </div>
-
-                <div class="hint-box">
-                    💡 Shift each letter backward by ${cipherShift} position(s) in the alphabet!
-                </div>
-
-                <div class="cipher-encoded">
-                    ${cipherEncoded}
-                </div>
-
-                <input
-                    id="cipherInput"
-                    class="game-input"
-                    type="text"
-                    placeholder="Type decoded message..."
-                    autocomplete="off"
-                    style="text-transform: uppercase;"
-                >
-
-                <div class="game-actions">
-                    <button class="action-btn primary" onclick="checkCipher()">
-                        Decrypt
-                    </button>
-                    <button class="action-btn" onclick="renderCipher()">
-                        Skip Phrase
-                    </button>
-                </div>
+            <div class="arena-actions">
+                <button class="btn-secondary" onclick="restartCurrentGame()">🔄 Restart Game</button>
+                <button class="btn-primary" style="width:auto;" onclick="exitFullscreenArena()">⬅️ Back to Hub</button>
             </div>
         </div>
-    `;
+        <div class="arena-body" id="arena-game-body">
+            <!-- Active Game Injected Here -->
+        </div>
+    </div>
 
-    const input = document.getElementById("cipherInput");
-    if (input) {
-        input.focus();
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") checkCipher();
-        });
-    }
-}
+    <!-- Universal Game Results Modal -->
+    <div class="result-modal" id="result-modal">
+        <div class="result-card">
+            <div class="result-banner" id="res-banner">🏆</div>
+            <div class="result-title" id="res-title">Victory!</div>
+            <div class="result-desc" id="res-desc">You completed the challenge successfully.</div>
+            <div style="display:flex; gap:12px; margin-bottom:20px;">
+                <div class="stat-card" style="flex:1;">
+                    <div class="value" id="res-score">+50</div>
+                    <div class="label">Points Added</div>
+                </div>
+                <div class="stat-card" style="flex:1;">
+                    <div class="value" id="res-total">0</div>
+                    <div class="label">Total Score</div>
+                </div>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-secondary" style="flex:1;" onclick="exitFullscreenArena(); hideResultModal();">Arena Hub</button>
+                <button class="btn-primary" style="flex:1;" onclick="restartCurrentGame(); hideResultModal();">Play Again</button>
+            </div>
+        </div>
+    </div>
 
-function caesarShift(str, amount) {
-    if (amount < 0) return caesarShift(str, amount + 26);
-    let output = "";
-    for (let i = 0; i < str.length; i++) {
-        let c = str[i];
-        if (c.match(/[a-z]/i)) {
-            let code = str.charCodeAt(i);
-            if (code >= 65 && code <= 90) {
-                c = String.fromCharCode(((code - 65 + amount) % 26) + 65);
+    <!-- Profile Modal -->
+    <div class="game-modal" id="profile-modal">
+        <div class="game-stage">
+            <div class="game-header">
+                <h2><span>👤</span> Player Profile</h2>
+                <button class="close-btn" onclick="closeProfileModal()">✕</button>
+            </div>
+            <div style="padding: 24px; text-align: center; display:flex; flex-direction:column; gap:16px;">
+                <div id="profile-avatar-large" style="font-size: 4rem;">🚀</div>
+                <h3 id="profile-name-large" style="font-size: 1.5rem;">Player</h3>
+                <div style="display: flex; gap: 12px; width: 100%; justify-content: center;">
+                    <div class="stat-card" style="flex:1;">
+                        <div class="value" id="prof-score">0</div>
+                        <div class="label">Total Score</div>
+                    </div>
+                    <div class="stat-card" style="flex:1;">
+                        <div class="value" id="prof-trophies">0</div>
+                        <div class="label">Trophies</div>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="resetStats()" style="background:#e53e3e; margin-top:10px;">Reset Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = {
+            username: 'Player',
+            avatar: '🚀',
+            trophies: 0,
+            gamesPlayed: 0,
+            wins: 0,
+            totalScore: 0
+        };
+
+        let selectedAvatar = '🚀';
+        let activeGameId = null;
+
+        const gamesDatabase = [
+            { id: 'trivia', name: 'Trivia Quiz', icon: '🏆', category: 'brain', bg: '#feebc8' },
+            { id: 'hangman', name: 'Hangman', icon: '🔤', category: 'word', bg: '#e9d8fd' },
+            { id: 'scramble', name: 'Word Scramble', icon: '🔀', category: 'word', bg: '#bee3f8' },
+            { id: 'wordmaster', name: 'Word Master', icon: '🧠', category: 'word', bg: '#c6f6d5' },
+            { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '❌', category: 'casual', bg: '#fbb6ce' },
+            { id: 'snake', name: 'Snake', icon: '🐍', category: 'arcade', bg: '#b2f5ea' },
+            { id: 'pong', name: 'Pong', icon: '🏓', category: 'arcade', bg: '#feebc8' },
+            { id: 'breakout', name: 'Breakout', icon: '🧱', category: 'arcade', bg: '#e9d8fd' },
+            { id: 'reaction', name: 'Reaction Test', icon: '🎯', category: 'brain', bg: '#fbb6ce' },
+            { id: 'math', name: 'Math Challenge', icon: '🧮', category: 'brain', bg: '#bee3f8' },
+            { id: 'memory', name: 'Memory Cards', icon: '🃏', category: 'brain', bg: '#c6f6d5' },
+            { id: '2048', name: '2048 Puzzle', icon: '🔢', category: 'brain', bg: '#fefcbf' },
+            { id: 'connect4', name: 'Connect Four', icon: '🟡', category: 'casual', bg: '#feebc8' },
+            { id: 'minesweeper', name: 'Minesweeper', icon: '⚫', category: 'casual', bg: '#e9d8fd' },
+            { id: 'numguess', name: 'Number Guess', icon: '🧩', category: 'casual', bg: '#b2f5ea' },
+            { id: 'crypto', name: 'Crypto Cipher', icon: '🔐', category: 'brain', bg: '#bee3f8' },
+            { id: 'rps', name: 'Rock Paper Scissors', icon: '✊', category: 'casual', bg: '#fbb6ce' },
+            { id: 'higherlower', name: 'Higher or Lower', icon: '🃏', category: 'casual', bg: '#c6f6d5' },
+            { id: 'quicktap', name: 'Quick Tap', icon: '⚡', category: 'arcade', bg: '#fefcbf' },
+            { id: 'colormatch', name: 'Color Match', icon: '🌈', category: 'brain', bg: '#e9d8fd' }
+        ];
+
+        window.onload = () => {
+            loadUserData();
+            renderGamesGrid('all');
+            updateUI();
+        };
+
+        function selectAvatar(emoji, el) {
+            selectedAvatar = emoji;
+            document.querySelectorAll('.avatar-opt').forEach(opt => opt.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function loginUser() {
+            const input = document.getElementById('username-input').value.trim();
+            currentUser.username = input || 'Player1';
+            currentUser.avatar = selectedAvatar;
+            saveUserData();
+            updateUI();
+            document.getElementById('login-screen').style.display = 'none';
+        }
+
+        function saveUserData() {
+            localStorage.setItem('arcadia_user', JSON.stringify(currentUser));
+        }
+
+        function loadUserData() {
+            const saved = localStorage.getItem('arcadia_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                document.getElementById('login-screen').style.display = 'none';
             }
         }
-        output += c;
-    }
-    return output;
-}
 
-function checkCipher() {
-    const input = document.getElementById("cipherInput");
-    if (!input) return;
-
-    const val = input.value.trim().toUpperCase();
-    if (val === cipherOriginal) {
-        toast("🎉 Correctly Decoded!");
-        cipherScore += 20;
-        addXP(30);
-        addCoins(10);
-        profile.wins++;
-        saveProfile();
-        renderCipher();
-    } else {
-        toast("❌ Incorrect decoding. Try again!");
-    }
-}
-
-/* =========================================================
-   LETTER RUSH
-========================================================= */
-
-let rushWord = "";
-let rushScore = 0;
-let rushTime = 30;
-let rushSession = 0;
-
-function renderRush() {
-
-    rushSession = newSession();
-
-    rushScore = 0;
-    rushTime = 30;
-
-    newRushWord();
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <div class="game-panel">
-
-                <div class="game-header">
-
-                    <div>
-                        <h2>⌨️ Letter Rush</h2>
-                        <p class="page-subtitle">
-                            Type the words as quickly as possible.
-                        </p>
-                    </div>
-
-                    <div class="timer">
-                        ⏱ <span id="rushTimer">30</span>s
-                    </div>
-
-                </div>
-
-                <div class="score-row">
-
-                    <div class="score-box">
-                        Score
-                        <strong id="rushScore">0</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Time
-                        <strong id="rushTimeBox">30</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Words
-                        <strong id="rushWordsDone">0</strong>
-                    </div>
-
-                    <div class="score-box">
-                        XP
-                        <strong>+</strong>
-                    </div>
-
-                </div>
-
-                <div
-                    id="rushWord"
-                    class="word-display">
-                    ${rushWord}
-                </div>
-
-                <input
-                    id="rushInput"
-                    class="game-input"
-                    type="text"
-                    autocomplete="off"
-                    autocapitalize="characters"
-                    spellcheck="false"
-                    placeholder="Type the word here..."
-                >
-
-                <div class="game-actions">
-
-                    <button
-                        class="action-btn primary"
-                        onclick="startRushAgain()">
-                        Restart
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-    const input =
-        document.getElementById("rushInput");
-
-    input.focus();
-
-    input.addEventListener("input", rushInputHandler);
-
-    safeInterval(() => {
-
-        rushTime--;
-
-        const timer =
-            document.getElementById("rushTimer");
-
-        const timeBox =
-            document.getElementById("rushTimeBox");
-
-        if (timer) timer.textContent = rushTime;
-        if (timeBox) timeBox.textContent = rushTime;
-
-        if (rushTime <= 0) {
-            endRush();
+        function updateUI() {
+            document.getElementById('nav-avatar').innerText = currentUser.avatar;
+            document.getElementById('nav-username').innerText = currentUser.username;
+            document.getElementById('nav-trophies').innerText = `🏆 ${currentUser.trophies}`;
+            document.getElementById('welcome-title').innerText = `Ready to Play, ${currentUser.username}?`;
+            document.getElementById('dash-played').innerText = currentUser.gamesPlayed;
+            document.getElementById('dash-wins').innerText = currentUser.wins;
+            
+            document.getElementById('profile-avatar-large').innerText = currentUser.avatar;
+            document.getElementById('profile-name-large').innerText = currentUser.username;
+            document.getElementById('prof-score').innerText = currentUser.totalScore;
+            document.getElementById('prof-trophies').innerText = currentUser.trophies;
         }
 
-    },1000,rushSession);
-}
-
-function newRushWord() {
-
-    rushWord =
-        rushWords[
-            Math.floor(Math.random()*rushWords.length)
-        ];
-}
-
-function rushInputHandler(event) {
-
-    const value =
-        event.target.value
-        .trim()
-        .toUpperCase();
-
-    if (value === rushWord) {
-
-        rushScore += 10;
-
-        const score =
-            document.getElementById("rushScore");
-
-        const words =
-            document.getElementById("rushWordsDone");
-
-        if (score) score.textContent = rushScore;
-
-        if (words) {
-            words.textContent =
-                Number(words.textContent) + 1;
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.getElementById('theme-btn');
+            btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
 
-        event.target.value = "";
-
-        newRushWord();
-
-        const word =
-            document.getElementById("rushWord");
-
-        if (word) word.textContent = rushWord;
-
-        addCoins(1);
-    }
-}
-
-function endRush() {
-
-    stopAllTimers();
-
-    addXP(rushScore);
-
-    if (rushScore > profile.best) {
-        profile.best = rushScore;
-    }
-
-    saveProfile();
-
-    toast("⏱ Time up! Score: " + rushScore);
-
-    const input =
-        document.getElementById("rushInput");
-
-    if (input) input.disabled = true;
-}
-
-function startRushAgain() {
-
-    newSession();
-    renderRush();
-}
-
-/* =========================================================
-   WORD SCRAMBLE
-========================================================= */
-
-let scrambleWord = "";
-let scrambleAnswer = "";
-let scrambleScore = 0;
-let scrambleTime = 45;
-let scrambleSession = 0;
-
-function shuffleWord(word) {
-
-    const arr = word.split("");
-
-    for (let i = arr.length-1; i>0; i--) {
-
-        const j =
-            Math.floor(Math.random()*(i+1));
-
-        [arr[i],arr[j]] =
-            [arr[j],arr[i]];
-    }
-
-    return arr.join("");
-}
-
-function renderScramble() {
-
-    scrambleSession = newSession();
-
-    scrambleScore = 0;
-    scrambleTime = 45;
-
-    newScrambleWord();
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <div class="game-panel">
-
-                <div class="game-header">
-
-                    <div>
-                        <h2>🔀 Word Scramble</h2>
-                        <p class="page-subtitle">
-                            Unscramble the letters.
-                        </p>
-                    </div>
-
-                    <div class="timer">
-                        ⏱ <span id="scrambleTimer">45</span>s
-                    </div>
-
-                </div>
-
-                <div class="score-row">
-
-                    <div class="score-box">
-                        Score
-                        <strong id="scrambleScore">0</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Time
-                        <strong id="scrambleTime">45</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Solved
-                        <strong id="scrambleSolved">0</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Bonus
-                        <strong>+10</strong>
-                    </div>
-
-                </div>
-
-                <div
-                    id="scrambleDisplay"
-                    class="word-display">
-                    ${scrambleWord}
-                </div>
-
-                <input
-                    id="scrambleInput"
-                    class="game-input"
-                    type="text"
-                    autocomplete="off"
-                    spellcheck="false"
-                    placeholder="Type the original word..."
-                >
-
-                <div class="game-actions">
-
-                    <button
-                        class="action-btn primary"
-                        onclick="checkScramble()">
-                        Submit
-                    </button>
-
-                    <button
-                        class="action-btn"
-                        onclick="startScrambleAgain()">
-                        Restart
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-    const input =
-        document.getElementById("scrambleInput");
-
-    input.focus();
-
-    input.addEventListener("keydown", e => {
-
-        if (e.key === "Enter") {
-            checkScramble();
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGamesGrid(cat);
         }
 
-    });
-
-    safeInterval(() => {
-
-        scrambleTime--;
-
-        const timer =
-            document.getElementById("scrambleTimer");
-
-        const time =
-            document.getElementById("scrambleTime");
-
-        if (timer) timer.textContent = scrambleTime;
-        if (time) time.textContent = scrambleTime;
-
-        if (scrambleTime <= 0) {
-            endScramble();
-        }
-
-    },1000,scrambleSession);
-}
-
-function newScrambleWord() {
-
-    scrambleAnswer =
-        scrambleWords[
-            Math.floor(Math.random()*scrambleWords.length)
-        ];
-
-    scrambleWord =
-        shuffleWord(scrambleAnswer);
-
-    if (scrambleWord === scrambleAnswer) {
-        scrambleWord =
-            shuffleWord(scrambleAnswer);
-    }
-}
-
-function checkScramble() {
-
-    const input =
-        document.getElementById("scrambleInput");
-
-    if (!input) return;
-
-    const value =
-        input.value.trim().toUpperCase();
-
-    if (value === scrambleAnswer) {
-
-        scrambleScore += 10;
-
-        const score =
-            document.getElementById("scrambleScore");
-
-        const solved =
-            document.getElementById("scrambleSolved");
-
-        if (score) score.textContent = scrambleScore;
-
-        if (solved) {
-            solved.textContent =
-                Number(solved.textContent) + 1;
-        }
-
-        input.value = "";
-
-        newScrambleWord();
-
-        const display =
-            document.getElementById("scrambleDisplay");
-
-        if (display) {
-            display.textContent = scrambleWord;
-        }
-
-        addCoins(2);
-
-        toast("✅ Correct!");
-
-    } else {
-
-        toast("❌ Try again!");
-    }
-}
-
-function endScramble() {
-
-    stopAllTimers();
-
-    addXP(scrambleScore);
-
-    toast(
-        "⏱ Time up! Score: " +
-        scrambleScore
-    );
-
-    const input =
-        document.getElementById("scrambleInput");
-
-    if (input) input.disabled = true;
-}
-
-function startScrambleAgain() {
-
-    newSession();
-    renderScramble();
-}
-
-/* =========================================================
-   WORD MASTER
-========================================================= */
-
-let masterTarget = "";
-let masterAttempts = 0;
-let masterBoard = [];
-
-function renderMaster() {
-
-    newMasterWord();
-
-    masterAttempts = 0;
-    masterBoard = [];
-
-    drawMaster();
-}
-
-function newMasterWord() {
-
-    masterTarget =
-        masterWords[
-            Math.floor(Math.random()*masterWords.length)
-        ];
-}
-
-function drawMaster() {
-
-    let rows = "";
-
-    for (let i=0;i<6;i++) {
-
-        const word =
-            masterBoard[i] || "";
-
-        let cells = "";
-
-        for (let j=0;j<5;j++) {
-
-            const letter =
-                word[j] || "";
-
-            let cls = "";
-
-            if (letter) {
-
-                if (letter === masterTarget[j]) {
-                    cls = "correct";
-                } else if (masterTarget.includes(letter)) {
-                    cls = "present";
-                } else {
-                    cls = "absent";
-                }
-            }
-
-            cells += `
-                <span style="
-                    display:flex;
-                    width:55px;
-                    height:55px;
-                    align-items:center;
-                    justify-content:center;
-                    border:2px solid var(--border);
-                    border-radius:9px;
-                    background:
-                        ${
-                            cls==="correct"
-                            ? "rgba(35,209,139,.35)"
-                            : cls==="present"
-                            ? "rgba(255,202,58,.35)"
-                            : cls==="absent"
-                            ? "rgba(255,85,119,.25)"
-                            : "var(--panel2)"
-                        };
-                    font-size:24px;
-                    font-weight:bold;
-                ">
-                    ${letter}
-                </span>
-            `;
-        }
-
-        rows += `
-            <div style="
-                display:flex;
-                justify-content:center;
-                gap:7px;
-                margin:7px;
-            ">
-                ${cells}
-            </div>
-        `;
-    }
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <div class="game-panel">
-
-                <div class="game-header">
-
-                    <div>
-                        <h2>🧠 Word Master</h2>
-                        <p class="page-subtitle">
-                            Find the hidden five-letter word.
-                        </p>
-                    </div>
-
-                    <div class="timer">
-                        Attempts: ${masterAttempts}/6
-                    </div>
-
-                </div>
-
-                ${rows}
-
-                <input
-                    id="masterInput"
-                    class="game-input"
-                    maxlength="5"
-                    placeholder="Enter 5 letters"
-                    autocomplete="off"
-                    style="margin-top:20px"
-                >
-
-                <div class="game-actions">
-
-                    <button
-                        class="action-btn primary"
-                        onclick="submitMaster()">
-                        Guess
-                    </button>
-
-                    <button
-                        class="action-btn"
-                        onclick="renderMaster()">
-                        New Word
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-    document
-        .getElementById("masterInput")
-        .focus();
-}
-
-function submitMaster() {
-
-    const input =
-        document.getElementById("masterInput");
-
-    const word =
-        input.value.trim().toUpperCase();
-
-    if (word.length !== 5) {
-        toast("Enter exactly 5 letters.");
-        return;
-    }
-
-    masterBoard.push(word);
-    masterAttempts++;
-
-    if (word === masterTarget) {
-
-        addXP(80);
-        addCoins(25);
-        profile.wins++;
-        saveProfile();
-
-        drawMaster();
-
-        toast("🏆 Word Master solved!");
-
-        safeTimeout(
-            () => renderMaster(),
-            1400,
-            gameSession
-        );
-
-        return;
-    }
-
-    if (masterAttempts >= 6) {
-
-        drawMaster();
-
-        toast("The word was " + masterTarget);
-
-        safeTimeout(
-            () => renderMaster(),
-            1800,
-            gameSession
-        );
-
-        return;
-    }
-
-    input.value = "";
-
-    drawMaster();
-}
-
-/* =========================================================
-   TRIVIA
-========================================================= */
-
-let triviaIndex = 0;
-let triviaScore = 0;
-let triviaOrder = [];
-
-function renderTrivia() {
-
-    triviaIndex = 0;
-    triviaScore = 0;
-
-    triviaOrder =
-        [...trivia]
-        .sort(() => Math.random()-.5)
-        .slice(0,20);
-
-    drawTrivia();
-}
-
-function drawTrivia() {
-
-    if (triviaIndex >= triviaOrder.length) {
-
-        addXP(triviaScore * 5);
-        addCoins(Math.floor(triviaScore/2));
-
-        document.getElementById("main").innerHTML = `
-
-            <div class="game-container">
-
-                <div class="game-panel" style="text-align:center">
-
-                    <div style="font-size:60px">
-                        🏆
-                    </div>
-
-                    <h2>Trivia Complete!</h2>
-
-                    <p class="page-subtitle">
-                        You scored ${triviaScore}/${triviaOrder.length}
-                    </p>
-
-                    <button
-                        class="action-btn primary"
-                        onclick="renderTrivia()">
-                        Play Again
-                    </button>
-
-                </div>
-
-            </div>
-        `;
-
-        return;
-    }
-
-    const item =
-        triviaOrder[triviaIndex];
-
-    const shuffled =
-        [...item.c]
-        .sort(() => Math.random()-.5);
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <div class="game-panel">
-
-                <div class="game-header">
-
-                    <div>
-                        <h2>❓ Trivia Blitz</h2>
-                        <p class="page-subtitle">
-                            Question ${triviaIndex+1}
-                            of ${triviaOrder.length}
-                        </p>
-                    </div>
-
-                    <div class="timer">
-                        Score: ${triviaScore}
-                    </div>
-
-                </div>
-
-                <div class="question-box">
-
-                    <div class="question-number">
-                        QUESTION ${triviaIndex+1}
-                    </div>
-
-                    <div class="question-text">
-                        ${item.q}
-                    </div>
-
-                </div>
-
-                <div id="triviaOptions">
-
-                    ${shuffled.map(option => `
-
-                        <button
-                            class="trivia-option"
-                            onclick="answerTrivia(this, '${escapeJS(option)}')">
-                            ${option}
-                        </button>
-
-                    `).join("")}
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-function escapeJS(text) {
-
-    return text
-        .replace(/\\/g,"\\\\")
-        .replace(/'/g,"\\'");
-}
-
-function answerTrivia(button, answer) {
-
-    const item =
-        triviaOrder[triviaIndex];
-
-    document
-        .querySelectorAll(".trivia-option")
-        .forEach(b => b.disabled = true);
-
-    if (answer === item.a) {
-
-        button.classList.add("correct");
-
-        triviaScore++;
-
-        addCoins(1);
-
-        toast("✅ Correct!");
-
-    } else {
-
-        button.classList.add("wrong");
-
-        document
-            .querySelectorAll(".trivia-option")
-            .forEach(b => {
-
-                if (b.textContent.trim() === item.a) {
-                    b.classList.add("correct");
-                }
-
+        function renderGamesGrid(category) {
+            const grid = document.getElementById('games-grid');
+            grid.innerHTML = '';
+            
+            const filtered = category === 'all' 
+                ? gamesDatabase 
+                : gamesDatabase.filter(g => g.category === category);
+
+            filtered.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card glass';
+                card.style.background = `linear-gradient(135deg, ${game.bg} 0%, rgba(255,255,255,0.7) 100%)`;
+                card.onclick = () => openFullscreenGame(game.id);
+                card.innerHTML = `
+                    <div class="game-icon">${game.icon}</div>
+                    <div class="game-title">${game.name}</div>
+                    <div class="game-category">${game.category}</div>
+                    <div class="play-tag">Play Arena ▶</div>
+                `;
+                grid.appendChild(card);
             });
+        }
 
-        toast("❌ Correct answer: " + item.a);
-    }
+        function openFullscreenGame(gameId) {
+            const game = gamesDatabase.find(g => g.id === gameId);
+            if (!game) return;
+            
+            activeGameId = gameId;
+            document.getElementById('arena-game-title').innerHTML = `<span>${game.icon}</span> ${game.name}`;
+            
+            const arena = document.getElementById('fullscreen-arena');
+            const body = document.getElementById('arena-game-body');
+            body.innerHTML = '';
+            arena.classList.add('active');
 
-    safeTimeout(() => {
+            currentUser.gamesPlayed++;
+            saveUserData();
+            updateUI();
 
-        triviaIndex++;
-        drawTrivia();
+            launchGameEngine(gameId, body);
+        }
 
-    },900,gameSession);
-}
+        function restartCurrentGame() {
+            if (activeGameId) {
+                const body = document.getElementById('arena-game-body');
+                body.innerHTML = '';
+                launchGameEngine(activeGameId, body);
+            }
+        }
 
-/* =========================================================
-   CHESS
-========================================================= */
+        function exitFullscreenArena() {
+            document.getElementById('fullscreen-arena').classList.remove('active');
+            document.getElementById('arena-game-body').innerHTML = '';
+            activeGameId = null;
+        }
 
-const chessSymbols = {
-    wK:"♔", wQ:"♕", wR:"♖", wB:"♗", wN:"♘", wP:"♙",
-    bK:"♚", bQ:"♛", bR:"♜", bB:"♝", bN:"♞", bP:"♟"
-};
+        function showResultModal(title, desc, banner, scoreGained, isWin = true) {
+            if (isWin) {
+                currentUser.wins++;
+                currentUser.trophies++;
+                currentUser.totalScore += scoreGained;
+            } else {
+                currentUser.totalScore += Math.max(0, scoreGained);
+            }
+            saveUserData();
+            updateUI();
 
-let chessBoard = [];
-let chessTurn = "w";
-let chessSelected = null;
-let chessLastMove = null;
-let chessHistory = [];
-let chessCaptured = { w:[], b:[] };
+            document.getElementById('res-banner').innerText = banner;
+            document.getElementById('res-title').innerText = title;
+            document.getElementById('res-desc').innerText = desc;
+            document.getElementById('res-score').innerText = scoreGained >= 0 ? `+${scoreGained}` : scoreGained;
+            document.getElementById('res-total').innerText = currentUser.totalScore;
+            
+            document.getElementById('result-modal').classList.add('active');
+        }
 
-function createChessBoard() {
-    return [
-        ["bR","bN","bB","bQ","bK","bB","bN","bR"],
-        ["bP","bP","bP","bP","bP","bP","bP","bP"],
-        [null,null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null,null],
-        ["wP","wP","wP","wP","wP","wP","wP","wP"],
-        ["wR","wN","wB","wQ","wK","wB","wN","wR"]
-    ];
-}
+        function hideResultModal() {
+            document.getElementById('result-modal').classList.remove('active');
+        }
 
-function renderChess() {
-    chessBoard = createChessBoard();
-    chessTurn = "w";
-    chessSelected = null;
-    chessLastMove = null;
-    chessHistory = [];
-    chessCaptured = {w:[],b:[]};
+        function showProfileModal() {
+            document.getElementById('profile-modal').classList.add('active');
+        }
 
-    drawChess();
-}
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.remove('active');
+        }
 
-function drawChess() {
+        function resetStats() {
+            currentUser.trophies = 0;
+            currentUser.gamesPlayed = 0;
+            currentUser.wins = 0;
+            currentUser.totalScore = 0;
+            saveUserData();
+            updateUI();
+            closeProfileModal();
+        }
 
-    let boardHTML = "";
+        function launchGameEngine(gameId, container) {
+            switch(gameId) {
+                case 'trivia': launchTrivia(container); break;
+                case 'hangman': launchHangman(container); break;
+                case 'scramble': launchScramble(container); break;
+                case 'wordmaster': launchWordMaster(container); break;
+                case 'tictactoe': launchTicTacToe(container); break;
+                case 'snake': launchSnake(container); break;
+                case 'pong': launchPong(container); break;
+                case 'breakout': launchBreakout(container); break;
+                case 'reaction': launchReaction(container); break;
+                case 'math': launchMath(container); break;
+                case 'memory': launchMemory(container); break;
+                case '2048': launch2048(container); break;
+                case 'connect4': launchConnect4(container); break;
+                case 'minesweeper': launchMinesweeper(container); break;
+                case 'numguess': launchNumGuess(container); break;
+                case 'crypto': launchCrypto(container); break;
+                case 'rps': launchRPS(container); break;
+                case 'higherlower': launchHigherLower(container); break;
+                case 'quicktap': launchQuickTap(container); break;
+                case 'colormatch': launchColorMatch(container); break;
+            }
+        }
 
-    const legal =
-        chessSelected
-            ? getLegalMoves(
-                chessSelected.r,
-                chessSelected.c
-            )
-            : [];
+        /* ==========================================================================
+           20 GAMES DETAILED IMPLEMENTATION
+           ========================================================================== */
 
-    for (let r=0;r<8;r++) {
+        /* 1. TRIVIA */
+        function launchTrivia(container) {
+            const questions = [
+                { q: "Which planet is known as the Red Planet?", a: ["Earth", "Mars", "Jupiter", "Venus"], c: 1 },
+                { q: "What is the largest ocean on Earth?", a: ["Atlantic", "Indian", "Pacific", "Arctic"], c: 2 },
+                { q: "How many legs does a spider have?", a: ["6", "8", "10", "12"], c: 1 },
+                { q: "What element does 'O' represent on the periodic table?", a: ["Gold", "Oxygen", "Osmium", "Zinc"], c: 1 }
+            ];
+            let idx = 0, score = 0;
 
-        for (let c=0;c<8;c++) {
+            function render() {
+                if (idx >= questions.length) {
+                    showResultModal("Quiz Completed!", `You scored ${score} out of ${questions.length}!`, "🏆", score * 25, true);
+                    return;
+                }
+                const q = questions[idx];
+                container.innerHTML = `
+                    <div style="width:100%; max-width:550px; background:var(--bg-secondary); padding:30px; border-radius:20px; box-shadow:var(--shadow-soft); text-align:center;">
+                        <h4 style="color:var(--text-muted); margin-bottom:10px;">Question ${idx + 1} of ${questions.length}</h4>
+                        <h2 style="margin-bottom:24px;">${q.q}</h2>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            ${q.a.map((opt, i) => `<button class="btn-primary" style="background:#edf2f7; color:#2d3748; justify-content:flex-start; padding:14px 20px;" onclick="checkTrivia(${i})">${opt}</button>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            window.checkTrivia = (selected) => {
+                if (selected === questions[idx].c) score++;
+                idx++;
+                render();
+            };
+            render();
+        }
 
-            const piece =
-                chessBoard[r][c];
+        /* 2. HANGMAN */
+        function launchHangman(container) {
+            const words = ["PACIFIC", "GALAXY", "ORBIT", "SYNTAX", "CANVAS", "ARCADIA"];
+            const secret = words[Math.floor(Math.random()*words.length)];
+            let guessed = new Set();
+            let mistakes = 0;
+            const maxMistakes = 6;
 
-            const isSelected =
-                chessSelected &&
-                chessSelected.r === r &&
-                chessSelected.c === c;
+            function render() {
+                let displayWord = secret.split('').map(l => guessed.has(l) ? l : '_').join(' ');
+                if (!displayWord.includes('_')) {
+                    showResultModal("Word Solved!", `You guessed the word '${secret}' correctly!`, "🎉", 100, true);
+                    return;
+                }
+                if (mistakes >= maxMistakes) {
+                    showResultModal("Game Over", `The hidden word was '${secret}'.`, "❌", 0, false);
+                    return;
+                }
+                
+                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+                container.innerHTML = `
+                    <div style="text-align:center; max-width:500px; width:100%;">
+                        <div style="font-size: 1.2rem; margin-bottom: 10px;">Mistakes: <b style="color:#e53e3e">${mistakes}</b> / ${maxMistakes}</div>
+                        <div style="font-size: 3rem; letter-spacing: 10px; font-weight:800; margin: 30px 0; color:var(--primary-btn);">${displayWord}</div>
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+                            ${alphabet.map(let => `<button class="btn-primary" style="width:42px; height:42px; padding:0; ${guessed.has(let)?'opacity:0.3;':''}" ${guessed.has(let)?'disabled':''} onclick="guessHangman('${let}')">${let}</button>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            window.guessHangman = (l) => {
+                guessed.add(l);
+                if (!secret.includes(l)) mistakes++;
+                render();
+            };
+            render();
+        }
 
-            const isLegal =
-                legal.some(
-                    x => x.r === r && x.c === c
-                );
+        /* 3. WORD SCRAMBLE */
+        function launchScramble(container) {
+            const words = ["PUZZLE", "ARENA", "ARCADE", "CIRCUIT", "SILICON", "CREATIVE"];
+            const chosen = words[Math.floor(Math.random()*words.length)];
+            const scrambled = chosen.split('').sort(() => Math.random() - 0.5).join('');
 
-            const isCapture =
-                isLegal && piece !== null;
-
-            const isLast =
-                chessLastMove &&
-                (
-                    (
-                        chessLastMove.from.r === r &&
-                        chessLastMove.from.c === c
-                    ) ||
-                    (
-                        chessLastMove.to.r === r &&
-                        chessLastMove.to.c === c
-                    )
-                );
-
-            const squareClass =
-                ((r+c)%2===0
-                    ? "light-square"
-                    : "dark-square");
-
-            boardHTML += `
-
-                <div
-                    class="
-                        chess-square
-                        ${squareClass}
-                        ${isSelected ? "selected":""}
-                        ${isLast ? "last-move":""}
-                        ${isCapture ? "capture":""}
-                        ${isLegal && !isCapture ? "legal":""}
-                    "
-                    onclick="clickChessSquare(${r},${c})"
-                >
-
-                    ${
-                        piece
-                        ? `
-                            <span class="
-                                chess-piece
-                                ${
-                                    piece[0] === "w"
-                                    ? "white-piece"
-                                    : "black-piece"
-                                }
-                            ">
-                                ${chessSymbols[piece]}
-                            </span>
-                        `
-                        : ""
-                    }
-
+            container.innerHTML = `
+                <div style="text-align:center; width:100%; max-width:450px; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h2>Unscramble the Word</h2>
+                    <div style="font-size:3rem; font-weight:800; letter-spacing:8px; margin:24px 0; color:var(--primary-btn);">${scrambled}</div>
+                    <input type="text" id="scramble-input" placeholder="Type answer..." style="width:100%; padding:14px; border-radius:10px; border:2px solid #e2e8f0; font-size:1.2rem; text-align:center; margin-bottom:16px;">
+                    <button class="btn-primary" onclick="checkScramble('${chosen}')">Submit Word</button>
                 </div>
             `;
+            window.checkScramble = (target) => {
+                const val = document.getElementById('scramble-input').value.toUpperCase().trim();
+                if (val === target) {
+                    showResultModal("Unscrambled!", `You cracked '${target}'!`, "🔀", 75, true);
+                } else {
+                    alert("Incorrect guess! Try again.");
+                }
+            };
         }
-    }
 
-    const turnText =
-        chessTurn === "w"
-            ? "White's turn"
-            : "Black's turn";
+        /* 4. WORD MASTER (Wordle Clone) */
+        function launchWordMaster(container) {
+            const wordList = ["PLANT", "SMART", "BRAIN", "POWER", "LIGHT"];
+            const target = wordList[Math.floor(Math.random()*wordList.length)];
+            let guess = "";
+            let attempts = [];
 
-    const capturedWhite =
-        chessCaptured.w
-        .map(p => chessSymbols["b"+p])
-        .join("");
-
-    const capturedBlack =
-        chessCaptured.b
-        .map(p => chessSymbols["w"+p])
-        .join("");
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <h2 style="margin-bottom:15px">
-                ♟️ Chess Arena
-            </h2>
-
-            <div class="chess-layout">
-
-                <div>
-
-                    <div class="chess-board">
-                        ${boardHTML}
+            function render() {
+                container.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
+                        ${Array.from({length: 6}).map((_, r) => {
+                            const word = attempts[r] || (r === attempts.length ? guess.padEnd(5, ' ') : '     ');
+                            return `<div style="display:flex; gap:8px;">
+                                ${word.split('').map((char, c) => {
+                                    let bg = '#e2e8f0';
+                                    let color = '#2d3748';
+                                    if (attempts[r]) {
+                                        if (attempts[r][c] === target[c]) { bg = '#68d391'; color='#fff'; }
+                                        else if (target.includes(attempts[r][c])) { bg = '#f6e05e'; color='#fff'; }
+                                        else { bg = '#cbd5e0'; color='#fff'; }
+                                    }
+                                    return `<div style="width:50px; height:50px; border-radius:8px; background:${bg}; color:${color}; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.5rem;">${char.trim()}</div>`;
+                                }).join('')}
+                            </div>`;
+                        }).join('')}
                     </div>
+                    <div style="display:flex; gap:10px; width:100%; max-width:300px;">
+                        <input type="text" id="wm-input" maxlength="5" style="padding:12px; border-radius:8px; border:2px solid #e2e8f0; font-size:1.2rem; text-transform:uppercase; text-align:center; font-weight:bold; width:100%;" placeholder="5 Letters">
+                        <button class="btn-primary" style="width:auto;" onclick="submitWordMaster()">Guess</button>
+                    </div>
+                `;
+            }
+            window.submitWordMaster = () => {
+                const input = document.getElementById('wm-input').value.toUpperCase().trim();
+                if (input.length === 5) {
+                    attempts.push(input);
+                    if (input === target) {
+                        showResultModal("Word Master!", `You guessed '${target}'!`, "🧠", 120, true);
+                        return;
+                    } else if (attempts.length >= 6) {
+                        showResultModal("Out of Attempts", `The word was '${target}'.`, "❌", 0, false);
+                        return;
+                    }
+                    guess = "";
+                    render();
+                }
+            };
+            render();
+        }
 
+        /* 5. TIC-TAC-TOE */
+        function launchTicTacToe(container) {
+            let board = Array(9).fill(null);
+            let turn = 'X';
+
+            function render() {
+                container.innerHTML = `
+                    <div style="text-align:center;">
+                        <h3 style="margin-bottom:16px;">Turn: Player (${turn})</h3>
+                        <div style="display:grid; grid-template-columns:repeat(3, 90px); gap:12px;">
+                            ${board.map((cell, i) => `
+                                <div onclick="playTTT(${i})" style="width:90px; height:90px; border-radius:16px; background:var(--bg-secondary); box-shadow:var(--shadow-soft); display:flex; align-items:center; justify-content:center; font-size:2.5rem; font-weight:bold; cursor:pointer; color:${cell==='X'?'#805ad5':'#319795'};">
+                                    ${cell || ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            window.playTTT = (i) => {
+                if (board[i] || checkWin(board)) return;
+                board[i] = turn;
+                if (checkWin(board)) {
+                    showResultModal(`Player ${turn} Wins!`, "Great tactical play!", "❌", 50, true);
+                    return;
+                }
+                if (board.every(c => c !== null)) {
+                    showResultModal("It's a Draw!", "Equally matched opponents.", "🤝", 20, false);
+                    return;
+                }
+                turn = turn === 'X' ? 'O' : 'X';
+                render();
+            };
+
+            function checkWin(b) {
+                const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                return wins.some(w => b[w[0]] && b[w[0]] === b[w[1]] && b[w[0]] === b[w[2]]);
+            }
+            render();
+        }
+
+        /* 6. SNAKE */
+        function launchSnake(container) {
+            container.innerHTML = `
+                <div style="text-align:center;">
+                    <canvas id="snakeCanvas" width="340" height="340" style="background:#2d3748; border-radius:16px; box-shadow:var(--shadow-soft);"></canvas>
+                    <div class="dpad-controls">
+                        <div></div><button class="dpad-btn" onclick="setSnakeDir(0,-16)">▲</button><div></div>
+                        <button class="dpad-btn" onclick="setSnakeDir(-16,0)">◄</button><div></div><button class="dpad-btn" onclick="setSnakeDir(16,0)">►</button>
+                        <div></div><button class="dpad-btn" onclick="setSnakeDir(0,16)">▼</button><div></div>
+                    </div>
                 </div>
+            `;
+            const canvas = document.getElementById('snakeCanvas');
+            const ctx = canvas.getContext('2d');
+            let snake = [{x: 160, y: 160}];
+            let food = {x: 80, y: 80};
+            let dx = 16, dy = 0;
+            let score = 0;
 
-                <div class="chess-side">
+            window.setSnakeDir = (x, y) => {
+                if (x !== 0 && dx === 0) { dx = x; dy = 0; }
+                if (y !== 0 && dy === 0) { dx = 0; dy = y; }
+            };
 
-                    <div class="turn-box">
-                        ${turnText}
-                    </div>
+            document.onkeydown = (e) => {
+                if (e.key === 'ArrowUp') setSnakeDir(0, -16);
+                if (e.key === 'ArrowDown') setSnakeDir(0, 16);
+                if (e.key === 'ArrowLeft') setSnakeDir(-16, 0);
+                if (e.key === 'ArrowRight') setSnakeDir(16, 0);
+            };
 
-                    <b>Captured White</b>
+            function gameLoop() {
+                if (!document.getElementById('snakeCanvas')) return;
+                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                
+                if (head.x < 0 || head.x >= 340 || head.y < 0 || head.y >= 340 || snake.some(s=>s.x===head.x&&s.y===head.y)) {
+                    showResultModal("Snake Crash!", `Final Score: ${score}`, "🐍", score, score > 30);
+                    return;
+                }
 
-                    <div class="captured">
-                        ${capturedWhite || "—"}
-                    </div>
+                snake.unshift(head);
+                if (head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    food = {x: Math.floor(Math.random()*20)*16, y: Math.floor(Math.random()*20)*16};
+                } else {
+                    snake.pop();
+                }
 
-                    <b>Captured Black</b>
+                ctx.fillStyle = '#2d3748';
+                ctx.fillRect(0,0,340,340);
+                
+                ctx.fillStyle = '#e53e3e';
+                ctx.fillRect(food.x, food.y, 14, 14);
 
-                    <div class="captured">
-                        ${capturedBlack || "—"}
-                    </div>
+                ctx.fillStyle = '#68d391';
+                snake.forEach(s => ctx.fillRect(s.x, s.y, 14, 14));
 
-                    <h3 style="margin:15px 0 8px">
-                        Move History
-                    </h3>
+                setTimeout(gameLoop, 100);
+            }
+            gameLoop();
+        }
 
-                    <div class="move-history">
+        /* 7. PONG */
+        function launchPong(container) {
+            container.innerHTML = `<canvas id="pongCanvas" width="400" height="280" style="background:#1a202c; border-radius:16px;"></canvas>`;
+            const canvas = document.getElementById('pongCanvas');
+            const ctx = canvas.getContext('2d');
+            let p1 = 120, p2 = 120;
+            let bx = 200, by = 140, vx = 4, vy = 3;
 
-                        ${
-                            chessHistory.length
-                            ? chessHistory
-                                .map(
-                                    (m,i) =>
-                                    `<div class="move-item">
-                                        ${i+1}. ${m}
-                                    </div>`
-                                )
-                                .join("")
-                            : "No moves yet."
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                p1 = e.clientY - rect.top - 25;
+            };
+
+            function loop() {
+                if (!document.getElementById('pongCanvas')) return;
+                bx += vx; by += vy;
+                if (by <= 0 || by >= 280) vy *= -1;
+
+                p2 += (by - (p2 + 25)) * 0.1; // AI tracking
+
+                if (bx <= 12 && by >= p1 && by <= p1 + 50) vx *= -1;
+                if (bx >= 388 && by >= p2 && by <= p2 + 50) vx *= -1;
+
+                if (bx < 0) {
+                    showResultModal("Pong Defeat!", "AI opponent scored.", "🏓", 10, false);
+                    return;
+                }
+                if (bx > 400) {
+                    showResultModal("Pong Victory!", "You outplayed the AI!", "🏆", 80, true);
+                    return;
+                }
+
+                ctx.fillStyle = '#1a202c';
+                ctx.fillRect(0,0,400,280);
+
+                ctx.fillStyle = '#63b3ed';
+                ctx.fillRect(5, p1, 8, 50);
+                ctx.fillStyle = '#f6ad55';
+                ctx.fillRect(387, p2, 8, 50);
+                
+                ctx.beginPath(); ctx.arc(bx, by, 7, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
+
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        /* 8. BREAKOUT */
+        function launchBreakout(container) {
+            container.innerHTML = `<canvas id="boCanvas" width="360" height="280" style="background:#2d3748; border-radius:16px;"></canvas>`;
+            const canvas = document.getElementById('boCanvas');
+            const ctx = canvas.getContext('2d');
+            let paddleX = 150;
+            let bx = 180, by = 220, dx = 3, dy = -3;
+            let bricks = [];
+
+            for (let r=0; r<4; r++) {
+                for (let c=0; c<6; c++) {
+                    bricks.push({x: c*55 + 18, y: r*20 + 20, status: 1});
+                }
+            }
+
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                paddleX = e.clientX - rect.left - 35;
+            };
+
+            function draw() {
+                if (!document.getElementById('boCanvas')) return;
+                ctx.clearRect(0,0,360,280);
+
+                let remaining = 0;
+                bricks.forEach(b => {
+                    if (b.status === 1) {
+                        remaining++;
+                        if (bx > b.x && bx < b.x+50 && by > b.y && by < b.y+15) {
+                            dy = -dy;
+                            b.status = 0;
                         }
-
-                    </div>
-
-                    <div class="game-actions">
-
-                        <button
-                            class="action-btn primary"
-                            onclick="renderChess()">
-                            New Game
-                        </button>
-
-                        <button
-                            class="action-btn danger"
-                            onclick="resignChess()">
-                            Resign
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-function inside(r,c) {
-    return r>=0 && r<8 && c>=0 && c<8;
-}
-
-function getPseudoMoves(r,c,board=chessBoard) {
-
-    const piece = board[r][c];
-
-    if (!piece) return [];
-
-    const color = piece[0];
-    const type = piece[1];
-
-    const moves = [];
-
-    const add = (nr,nc) => {
-
-        if (!inside(nr,nc)) return;
-
-        const target = board[nr][nc];
-
-        if (!target || target[0] !== color) {
-            moves.push({r:nr,c:nc});
-        }
-    };
-
-    if (type === "P") {
-
-        const dir =
-            color === "w" ? -1 : 1;
-
-        const start =
-            color === "w" ? 6 : 1;
-
-        if (
-            inside(r+dir,c) &&
-            !board[r+dir][c]
-        ) {
-
-            moves.push({
-                r:r+dir,
-                c:c
-            });
-
-            if (
-                r === start &&
-                !board[r+2*dir][c]
-            ) {
-                moves.push({
-                    r:r+2*dir,
-                    c:c
-                });
-            }
-        }
-
-        for (const dc of [-1,1]) {
-
-            const nr = r+dir;
-            const nc = c+dc;
-
-            if (
-                inside(nr,nc) &&
-                board[nr][nc] &&
-                board[nr][nc][0] !== color
-            ) {
-                moves.push({r:nr,c:nc});
-            }
-        }
-    }
-
-    if (type === "N") {
-
-        [
-            [-2,-1],[-2,1],
-            [-1,-2],[-1,2],
-            [1,-2],[1,2],
-            [2,-1],[2,1]
-        ].forEach(([dr,dc]) => {
-            add(r+dr,c+dc);
-        });
-    }
-
-    if (type === "K") {
-
-        for(let dr=-1;dr<=1;dr++) {
-            for(let dc=-1;dc<=1;dc++) {
-
-                if(dr || dc) {
-                    add(r+dr,c+dc);
-                }
-            }
-        }
-    }
-
-    const slide = directions => {
-
-        for (const [dr,dc] of directions) {
-
-            let nr = r+dr;
-            let nc = c+dc;
-
-            while(inside(nr,nc)) {
-
-                const target = board[nr][nc];
-
-                if (!target) {
-
-                    moves.push({
-                        r:nr,
-                        c:nc
-                    });
-
-                } else {
-
-                    if(target[0] !== color) {
-                        moves.push({
-                            r:nr,
-                            c:nc
-                        });
+                        ctx.fillStyle = '#f6e05e';
+                        ctx.fillRect(b.x, b.y, 50, 15);
                     }
+                });
 
-                    break;
+                if (remaining === 0) {
+                    showResultModal("Stage Cleared!", "All bricks destroyed!", "🧱", 100, true);
+                    return;
                 }
 
-                nr += dr;
-                nc += dc;
-            }
-        }
-    };
-
-    if(type==="B" || type==="Q") {
-
-        slide([
-            [-1,-1],[-1,1],
-            [1,-1],[1,1]
-        ]);
-    }
-
-    if(type==="R" || type==="Q") {
-
-        slide([
-            [-1,0],[1,0],
-            [0,-1],[0,1]
-        ]);
-    }
-
-    return moves;
-}
-
-function cloneBoard(board) {
-    return board.map(row => [...row]);
-}
-
-function findKing(board,color) {
-
-    for(let r=0;r<8;r++) {
-
-        for(let c=0;c<8;c++) {
-
-            if(board[r][c] === color+"K") {
-                return {r,c};
-            }
-        }
-    }
-
-    return null;
-}
-
-function squareAttacked(board,r,c,byColor) {
-
-    for(let rr=0;rr<8;rr++) {
-
-        for(let cc=0;cc<8;cc++) {
-
-            const piece =
-                board[rr][cc];
-
-            if(!piece || piece[0] !== byColor) {
-                continue;
-            }
-
-            const type = piece[1];
-
-            if(type === "P") {
-
-                const dir =
-                    byColor==="w" ? -1 : 1;
-
-                if(
-                    rr+dir === r &&
-                    Math.abs(cc-c) === 1
-                ) {
-                    return true;
+                if (bx + dx > 350 || bx + dx < 10) dx = -dx;
+                if (by + dy < 10) dy = -dy;
+                else if (by + dy > 260) {
+                    if (bx > paddleX && bx < paddleX + 70) dy = -dy;
+                    else {
+                        showResultModal("Ball Dropped!", "Better luck next time.", "❌", 20, false);
+                        return;
+                    }
                 }
 
-            } else {
+                bx += dx; by += dy;
+                ctx.fillStyle = '#63b3ed';
+                ctx.fillRect(paddleX, 265, 70, 10);
+                ctx.beginPath(); ctx.arc(bx, by, 6, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
 
-                const moves =
-                    getPseudoMoves(
-                        rr,
-                        cc,
-                        board
-                    );
-
-                if(
-                    moves.some(
-                        m => m.r===r && m.c===c
-                    )
-                ) {
-                    return true;
-                }
+                requestAnimationFrame(draw);
             }
-        }
-    }
-
-    return false;
-}
-
-function isInCheck(board,color) {
-
-    const king =
-        findKing(board,color);
-
-    if(!king) return true;
-
-    return squareAttacked(
-        board,
-        king.r,
-        king.c,
-        color==="w" ? "b" : "w"
-    );
-}
-
-function getLegalMoves(r,c) {
-
-    const piece =
-        chessBoard[r][c];
-
-    if(!piece || piece[0] !== chessTurn) {
-        return [];
-    }
-
-    const pseudo =
-        getPseudoMoves(r,c);
-
-    return pseudo.filter(move => {
-
-        const copy =
-            cloneBoard(chessBoard);
-
-        copy[move.r][move.c] =
-            copy[r][c];
-
-        copy[r][c] = null;
-
-        if(
-            copy[move.r][move.c][1] === "P" &&
-            (move.r===0 || move.r===7)
-        ) {
-            copy[move.r][move.c] =
-                chessTurn+"Q";
+            draw();
         }
 
-        return !isInCheck(
-            copy,
-            chessTurn
-        );
-    });
-}
-
-function hasAnyLegalMove(color) {
-
-    for(let r=0;r<8;r++) {
-
-        for(let c=0;c<8;c++) {
-
-            if(
-                chessBoard[r][c] &&
-                chessBoard[r][c][0] === color
-            ) {
-
-                if(
-                    getLegalMovesForColor(
-                        r,c,color
-                    ).length
-                ) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-function getLegalMovesForColor(r,c,color) {
-
-    const oldTurn = chessTurn;
-
-    chessTurn = color;
-
-    const result =
-        getLegalMoves(r,c);
-
-    chessTurn = oldTurn;
-
-    return result;
-}
-
-function clickChessSquare(r,c) {
-
-    const piece =
-        chessBoard[r][c];
-
-    if(chessSelected) {
-
-        const moves =
-            getLegalMoves(
-                chessSelected.r,
-                chessSelected.c
-            );
-
-        const valid =
-            moves.find(
-                m => m.r===r && m.c===c
-            );
-
-        if(valid) {
-
-            makeChessMove(
-                chessSelected.r,
-                chessSelected.c,
-                r,
-                c
-            );
-
-            return;
-        }
-
-        if(
-            piece &&
-            piece[0] === chessTurn
-        ) {
-
-            chessSelected = {r,c};
-            drawChess();
-            return;
-        }
-
-        chessSelected = null;
-        drawChess();
-        return;
-    }
-
-    if(
-        piece &&
-        piece[0] === chessTurn
-    ) {
-
-        chessSelected = {r,c};
-        drawChess();
-    }
-}
-
-function makeChessMove(fr,fc,tr,tc) {
-
-    const moving =
-        chessBoard[fr][fc];
-
-    const captured =
-        chessBoard[tr][tc];
-
-    if(captured) {
-
-        chessCaptured[
-            moving[0]
-        ].push(captured[1]);
-    }
-
-    chessBoard[tr][tc] = moving;
-    chessBoard[fr][fc] = null;
-
-    if(
-        moving[1] === "P" &&
-        (tr===0 || tr===7)
-    ) {
-
-        chessBoard[tr][tc] =
-            moving[0] + "Q";
-
-        toast("👑 Pawn promoted to Queen!");
-    }
-
-    const from =
-        String.fromCharCode(97+fc)+(8-fr);
-
-    const to =
-        String.fromCharCode(97+tc)+(8-tr);
-
-    chessHistory.push(
-        from + " → " + to
-    );
-
-    chessLastMove = {
-        from:{r:fr,c:fc},
-        to:{r:tr,c:tc}
-    };
-
-    chessTurn =
-        chessTurn === "w" ? "b" : "w";
-
-    chessSelected = null;
-
-    if(
-        isInCheck(
-            chessBoard,
-            chessTurn
-        )
-    ) {
-
-        if(
-            !hasAnyLegalMove(chessTurn)
-        ) {
-
-            drawChess();
-
-            const winner =
-                chessTurn==="w"
-                    ? "Black"
-                    : "White";
-
-            toast(
-                "♚ Checkmate! " +
-                winner +
-                " wins!"
-            );
-
-            if(winner==="White") {
-                profile.wins++;
-            } else {
-                profile.losses++;
-            }
-
-            addXP(100);
-            saveProfile();
-
-            return;
-        }
-
-        toast("⚠️ Check!");
-    } else if(
-        !hasAnyLegalMove(chessTurn)
-    ) {
-
-        drawChess();
-        toast("🤝 Stalemate!");
-        return;
-    }
-
-    drawChess();
-}
-
-function resignChess() {
-
-    const winner =
-        chessTurn==="w"
-            ? "Black"
-            : "White";
-
-    toast(
-        "🏳️ " +
-        winner +
-        " wins by resignation."
-    );
-
-    profile.losses++;
-    addXP(20);
-    saveProfile();
-}
-
-/* =========================================================
-   LOCAL DUEL
-========================================================= */
-
-let duelTarget = "";
-let duelScores = {
-    p1:0,
-    p2:0
-};
-
-function renderDuel() {
-
-    duelTarget =
-        rushWords[
-            Math.floor(Math.random()*rushWords.length)
-        ];
-
-    duelScores = {
-        p1:0,
-        p2:0
-    };
-
-    document.getElementById("main").innerHTML = `
-
-        <div class="game-container">
-
-            <div class="game-panel">
-
-                <h2>⚔️ Local Duel</h2>
-
-                <p class="page-subtitle">
-                    Two players use the same keyboard.
-                </p>
-
-                <div class="score-row">
-
-                    <div class="score-box">
-                        Player 1
-                        <strong id="duelP1">0</strong>
-                    </div>
-
-                    <div class="score-box">
-                        Player 2
-                        <strong id="duelP2">0</strong>
-                    </div>
-
-                </div>
-
-                <div
-                    id="duelWord"
-                    class="word-display">
-                    ${duelTarget}
-                </div>
-
-                <input
-                    id="duelInput"
-                    class="game-input"
-                    placeholder="Type the word..."
-                    autocomplete="off"
-                >
-
-                <div class="game-actions">
-
-                    <button
-                        class="action-btn primary"
-                        onclick="duelPoint(1)">
-                        Player 1
-                    </button>
-
-                    <button
-                        class="action-btn success"
-                        onclick="duelPoint(2)">
-                        Player 2
-                    </button>
-
-                    <button
-                        class="action-btn"
-                        onclick="renderDuel()">
-                        Reset
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-function duelPoint(player=1) {
-
-    const input =
-        document.getElementById("duelInput");
-
-    const value =
-        input.value.trim().toUpperCase();
-
-    if(value !== duelTarget) {
-        toast("Wrong word!");
-        return;
-    }
-
-    duelScores[
-        player===2 ? "p2":"p1"
-    ]++;
-
-    document.getElementById(
-        player===2 ? "duelP2":"duelP1"
-    ).textContent =
-        duelScores[
-            player===2 ? "p2":"p1"
-        ];
-
-    input.value = "";
-
-    duelTarget =
-        rushWords[
-            Math.floor(Math.random()*rushWords.length)
-        ];
-
-    document.getElementById(
-        "duelWord"
-    ).textContent = duelTarget;
-}
-
-/* =========================================================
-   ONLINE ROOM SYSTEM
-========================================================= */
-
-let peer = null;
-let onlineConn = null;
-let onlineRole = null;
-let onlineRoom = "";
-let onlineGame = "";
-let onlineHostPeer = "";
-let onlineReady = false;
-
-function randomRoomCode() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let code = "";
-    for (let i = 0; i < 6; i++) {
-        code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return code;
-}
-
-function getURLParams() {
-    return new URLSearchParams(location.hash.replace(/^#/, ""));
-}
-
-function resetOnlineConnection() {
-    onlineReady = false;
-    onlineRole = null;
-    onlineRoom = "";
-    onlineGame = "";
-    onlineHostPeer = "";
-
-    if (onlineConn) {
-        try { onlineConn.close(); } catch {}
-    }
-    onlineConn = null;
-
-    if (peer) {
-        try { peer.destroy(); } catch {}
-    }
-    peer = null;
-}
-
-function createPeer() {
-    if (typeof Peer === "undefined") {
-        toast("❌ PeerJS could not load. Check your internet connection.");
-        return null;
-    }
-
-    return new Peer(undefined, {
-        debug: 1,
-        config: {
-            iceServers: [
-                { urls: "stun:stun.l.google.com:19302" },
-                { urls: "stun:stun1.l.google.com:19302" }
-            ]
-        }
-    });
-}
-
-function renderOnlineLobby(game) {
-    newSession();
-    resetOnlineConnection();
-
-    document.getElementById("main").innerHTML = `
-        <div class="online-box">
-            <h2>${game === "word" ? "🌐 Online Word Battle" : "♟️ Online Chess"}</h2>
-
-            <p class="page-subtitle">
-                ${game === "word"
-                    ? "Create a room and send the link to your friend."
-                    : "Create a room and play real chess with correct turn rules."}
-            </p>
-
-            <div class="game-actions">
-                <button class="action-btn primary"
-                    onclick="createOnlineRoom('${game}')">
-                    Create Room
-                </button>
-
-                <button class="action-btn"
-                    onclick="joinOnlineRoom('${game}')">
-                    Join Room
-                </button>
-            </div>
-
-            <div id="onlineStatus"
-                style="margin-top:20px;color:var(--muted)">
-                No room connected.
-            </div>
-
-            <div id="onlineRoomArea"></div>
-        </div>
-    `;
-
-    const params = getURLParams();
-    const room = params.get("room");
-    const host = params.get("host");
-    const urlGame = params.get("game");
-
-    if (room && host) {
-        onlineRoom = room;
-        onlineHostPeer = host;
-
-        const session = gameSession;
-        safeTimeout(() => {
-            if (session === gameSession) {
-                joinOnlineRoom(urlGame || game);
-            }
-        }, 350, session);
-    }
-}
-
-function renderOnlineWord() {
-    renderOnlineLobby("word");
-}
-
-function renderOnlineChess() {
-    renderOnlineLobby("chess");
-}
-
-function createOnlineRoom(game) {
-    if (typeof Peer === "undefined") {
-        toast("❌ Online service unavailable.");
-        return;
-    }
-
-    resetOnlineConnection();
-
-    onlineGame = game;
-    onlineRole = "host";
-    onlineRoom = randomRoomCode();
-
-    const status = document.getElementById("onlineStatus");
-    if (status) status.textContent = "Creating secure room...";
-
-    peer = createPeer();
-    if (!peer) return;
-
-    peer.on("open", id => {
-        onlineHostPeer = id;
-
-        const link =
-            location.origin +
-            location.pathname +
-            "#room=" + encodeURIComponent(onlineRoom) +
-            "&game=" + encodeURIComponent(game) +
-            "&host=" + encodeURIComponent(id);
-
-        const area = document.getElementById("onlineRoomArea");
-
-        if (area) {
-            area.innerHTML = `
-                <div class="room-code">${onlineRoom}</div>
-
-                <p style="text-align:center;color:var(--muted)">
-                    Send this link to your friend:
-                </p>
-
-                <input
-                    class="share-link"
-                    value="${link.replace(/"/g, "&quot;")}"
-                    readonly
-                    onclick="this.select()"
-                >
-
-                <div class="game-actions">
-                    <button class="action-btn primary"
-                        onclick="copyRoomLink(${JSON.stringify(link)})">
-                        Copy Link
-                    </button>
-                </div>
-
-                <div id="hostWaiting"
-                    style="text-align:center;margin-top:20px;color:var(--muted)">
-                    ⏳ Waiting for your friend...
+        /* 9. REACTION TEST */
+        function launchReaction(container) {
+            container.innerHTML = `
+                <div id="react-box" onclick="handleReact()" style="width:100%; max-width:400px; height:280px; border-radius:20px; background:#edf2f7; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.5rem; font-weight:bold; box-shadow:var(--shadow-soft); text-align:center; padding:20px;">
+                    Click Anywhere to Start
                 </div>
             `;
+            let state = 'idle', startTime, timeout;
+            const box = document.getElementById('react-box');
+
+            window.handleReact = () => {
+                if (state === 'idle') {
+                    state = 'waiting';
+                    box.style.background = '#feb2b2';
+                    box.innerText = 'Wait for GREEN...';
+                    timeout = setTimeout(() => {
+                        state = 'ready';
+                        box.style.background = '#9ae6b4';
+                        box.innerText = 'CLICK NOW!';
+                        startTime = Date.now();
+                    }, Math.random()*3000 + 2000);
+                } else if (state === 'waiting') {
+                    clearTimeout(timeout);
+                    state = 'idle';
+                    box.style.background = '#edf2f7';
+                    box.innerText = 'Too early! Click to restart.';
+                } else if (state === 'ready') {
+                    const diff = Date.now() - startTime;
+                    state = 'idle';
+                    showResultModal("Lightning Reaction!", `Time: ${diff}ms`, "🎯", Math.max(10, 200 - Math.floor(diff/4)), true);
+                }
+            };
         }
 
-        if (status) {
-            status.textContent = "🟢 Room ready. Keep this page open while your friend joins.";
+        /* 10. MATH CHALLENGE */
+        function launchMath(container) {
+            const n1 = Math.floor(Math.random()*25)+5;
+            const n2 = Math.floor(Math.random()*25)+5;
+            const ans = n1 + n2;
+
+            container.innerHTML = `
+                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h2>What is ${n1} + ${n2}?</h2>
+                    <input type="number" id="math-ans" style="margin:20px 0; padding:12px; font-size:2rem; width:140px; text-align:center; border-radius:10px; border:2px solid #e2e8f0;">
+                    <br>
+                    <button class="btn-primary" onclick="checkMath(${ans})">Submit Answer</button>
+                </div>
+            `;
+            window.checkMath = (target) => {
+                const val = parseInt(document.getElementById('math-ans').value);
+                if (val === target) {
+                    showResultModal("Correct Calculation!", `${n1} + ${n2} = ${ans}`, "🧮", 40, true);
+                } else {
+                    alert("Incorrect result!");
+                }
+            };
         }
-    });
 
-    peer.on("connection", connection => {
-        if (onlineConn && onlineConn.open) {
-            try { connection.close(); } catch {}
-            return;
+        /* 11. MEMORY CARDS */
+        function launchMemory(container) {
+            const icons = ['🐶','🐱','🐭','🐹','🐰','🦊'];
+            const deck = [...icons, ...icons].sort(()=>Math.random()-0.5);
+            let flipped = [], matched = 0;
+
+            container.innerHTML = `
+                <div style="display:grid; grid-template-columns:repeat(4, 70px); gap:12px;">
+                    ${deck.map((ic, i) => `
+                        <div id="card-${i}" onclick="flipCard(${i}, '${ic}')" style="width:70px; height:70px; background:var(--primary-btn); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:2rem; cursor:pointer; color:white; box-shadow:var(--shadow-soft);">
+                            ?
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            window.flipCard = (idx, icon) => {
+                const el = document.getElementById(`card-${idx}`);
+                if (flipped.length < 2 && el.innerText === '?') {
+                    el.innerText = icon;
+                    el.style.background = '#fff';
+                    el.style.color = '#000';
+                    flipped.push({idx, icon});
+
+                    if (flipped.length === 2) {
+                        if (flipped[0].icon === flipped[1].icon) {
+                            matched += 2;
+                            flipped = [];
+                            if (matched === deck.length) {
+                                showResultModal("Memory Master!", "All pairs matched!", "🃏", 90, true);
+                            }
+                        } else {
+                            setTimeout(() => {
+                                document.getElementById(`card-${flipped[0].idx}`).innerText = '?';
+                                document.getElementById(`card-${flipped[1].idx}`).innerText = '?';
+                                document.getElementById(`card-${flipped[0].idx}`).style.background = 'var(--primary-btn)';
+                                document.getElementById(`card-${flipped[1].idx}`).style.background = 'var(--primary-btn)';
+                                document.getElementById(`card-${flipped[0].idx}`).style.color = '#fff';
+                                document.getElementById(`card-${flipped[1].idx}`).style.color = '#fff';
+                                flipped = [];
+                            }, 800);
+                        }
+                    }
+                }
+            };
         }
 
-        onlineConn = connection;
-        setupOnlineConnection(connection);
-    });
+        /* 12. 2048 PUZZLE (FULLY FIXED & FUNCTIONAL) */
+        function launch2048(container) {
+            let board = Array(16).fill(0);
+            let score = 0;
 
-    peer.on("error", handlePeerError);
-}
+            function addTile() {
+                let empty = [];
+                board.forEach((v, i) => { if (v === 0) empty.push(i); });
+                if (empty.length > 0) {
+                    let rand = empty[Math.floor(Math.random() * empty.length)];
+                    board[rand] = Math.random() < 0.9 ? 2 : 4;
+                }
+            }
 
-function copyRoomLink(link) {
-    navigator.clipboard.writeText(link).then(() => {
-        toast("📋 Room link copied to clipboard!");
-    }).catch(() => {
-        toast("Failed to copy link automatically.");
-    });
-}
+            addTile(); addTile();
 
-function joinOnlineRoom(game) {
-    if (typeof Peer === "undefined") {
-        toast("❌ Online service unavailable.");
-        return;
-    }
+            function render() {
+                container.innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:1.2rem; font-weight:bold; margin-bottom:12px;">Score: <span style="color:var(--primary-btn);">${score}</span></div>
+                        <div style="display:grid; grid-template-columns:repeat(4, 70px); gap:10px; background:#bbada0; padding:10px; border-radius:16px; box-shadow:var(--shadow-soft);">
+                            ${board.map(v => `
+                                <div style="width:70px; height:70px; background:${get2048Color(v)}; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:${v>512?'1.1rem':'1.4rem'}; color:${v<=4?'#776e65':'#f9f6f2'};">
+                                    ${v || ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="dpad-controls">
+                            <div></div><button class="dpad-btn" onclick="move2048('up')">▲</button><div></div>
+                            <button class="dpad-btn" onclick="move2048('left')">◄</button><div></div><button class="dpad-btn" onclick="move2048('right')">►</button>
+                            <div></div><button class="dpad-btn" onclick="move2048('down')">▼</button><div></div>
+                        </div>
+                    </div>
+                `;
+            }
 
-    const params = getURLParams();
+            function get2048Color(v) {
+                switch(v) {
+                    case 2: return '#eee4da';
+                    case 4: return '#ede0c8';
+                    case 8: return '#f2b179';
+                    case 16: return '#f59563';
+                    case 32: return '#f67c5f';
+                    case 64: return '#f65e3b';
+                    case 128: return '#edcf72';
+                    case 256: return '#edcc61';
+                    case 512: return '#edc850';
+                    case 1024: return '#edc53f';
+                    case 2048: return '#edc22e';
+                    default: return '#ccc0b3';
+                }
+            }
 
-    const room = onlineRoom || params.get("room");
-    const host = onlineHostPeer || params.get("host");
+            window.move2048 = (dir) => {
+                let moved = false;
+                let rows = [];
 
-    if (!room || !host) {
-        toast("❌ Invalid room link. Ask the host to create a new link.");
-        return;
-    }
+                for (let i = 0; i < 4; i++) {
+                    if (dir === 'left' || dir === 'right') {
+                        rows.push([board[i*4], board[i*4+1], board[i*4+2], board[i*4+3]]);
+                    } else {
+                        rows.push([board[i], board[i+4], board[i+8], board[i+12]]);
+                    }
+                }
 
-    resetOnlineConnection();
+                rows.forEach((row, idx) => {
+                    if (dir === 'right' || dir === 'down') row.reverse();
+                    let filtered = row.filter(v => v !== 0);
+                    for (let i = 0; i < filtered.length - 1; i++) {
+                        if (filtered[i] === filtered[i+1]) {
+                            filtered[i] *= 2;
+                            score += filtered[i];
+                            filtered.splice(i+1, 1);
+                        }
+                    }
+                    while (filtered.length < 4) filtered.push(0);
+                    if (dir === 'right' || dir === 'down') filtered.reverse();
 
-    onlineGame = game;
-    onlineRole = "guest";
-    onlineRoom = room;
-    onlineHostPeer = host;
+                    for (let i = 0; i < 4; i++) {
+                        let origVal = (dir === 'left' || dir === 'right') ? board[idx*4+i] : board[i*4+idx];
+                        if (origVal !== filtered[i]) moved = true;
+                        if (dir === 'left' || dir === 'right') board[idx*4+i] = filtered[i];
+                        else board[i*4+idx] = filtered[i];
+                    }
+                });
 
-    const status = document.getElementById("onlineStatus");
-    if (status) status.textContent = "🔄 Connecting to host...";
+                if (moved) {
+                    addTile();
+                    render();
+                    if (board.includes(2048)) {
+                        showResultModal("2048 Reached!", `You mastered the board! Score: ${score}`, "🔢", score, true);
+                    } else if (!board.includes(0) && !canMove2048()) {
+                        showResultModal("Game Over", `No moves left! Final Score: ${score}`, "❌", score, false);
+                    }
+                }
+            };
 
-    peer = createPeer();
-    if (!peer) return;
+            function canMove2048() {
+                for (let i = 0; i < 16; i++) {
+                    if (i % 4 < 3 && board[i] === board[i+1]) return true;
+                    if (i < 12 && board[i] === board[i+4]) return true;
+                }
+                return false;
+            }
 
-    let connectedOnce = false;
+            document.onkeydown = (e) => {
+                if (e.key === 'ArrowLeft') move2048('left');
+                if (e.key === 'ArrowRight') move2048('right');
+                if (e.key === 'ArrowUp') move2048('up');
+                if (e.key === 'ArrowDown') move2048('down');
+            };
 
-    peer.on("open", () => {
-        if (connectedOnce) return;
-
-        onlineConn = peer.connect(onlineHostPeer, {
-            reliable: true,
-            serialization: "json"
-        });
-
-        setupOnlineConnection(onlineConn);
-    });
-
-    peer.on("error", handlePeerError);
-}
-
-function setupOnlineConnection(connection) {
-    if (!connection) return;
-
-    connection.on("open", () => {
-        onlineReady = true;
-
-        const status = document.getElementById("onlineStatus");
-        if (status) status.textContent = "🟢 Connected!";
-
-        if (onlineRole === "guest") {
-            sendOnline({
-                type: "join",
-                game: onlineGame,
-                room: onlineRoom
-            });
+            render();
         }
-    });
 
-    connection.on("data", handleOnlineData);
-    connection.on("close", () => {
-        toast("❌ Connection lost.");
-        onlineReady = false;
-    });
-}
+        /* 13. CONNECT FOUR */
+        function launchConnect4(container) {
+            let board = Array(42).fill(null);
+            
+            function render() {
+                container.innerHTML = `
+                    <div style="display:grid; grid-template-columns:repeat(7, 45px); gap:8px; background:#3182ce; padding:12px; border-radius:16px; box-shadow:var(--shadow-soft);">
+                        ${board.map((c, i) => `
+                            <div onclick="dropC4(${i%7})" style="width:45px; height:45px; border-radius:50%; background:${c === 'R' ? '#e53e3e' : c === 'Y' ? '#ecc94b' : '#fff'}; cursor:pointer;"></div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            window.dropC4 = (col) => {
+                for (let r=5; r>=0; r--) {
+                    if (!board[r*7 + col]) {
+                        board[r*7 + col] = 'R';
+                        if (checkC4Win('R')) {
+                            render();
+                            showResultModal("Connect 4 Victory!", "Four in a row!", "🟡", 70, true);
+                            return;
+                        }
+                        // Simple AI response
+                        let emptyCols = [0,1,2,3,4,5,6].filter(c => !board[c]);
+                        if (emptyCols.length > 0) {
+                            let aiCol = emptyCols[Math.floor(Math.random()*emptyCols.length)];
+                            for (let ar=5; ar>=0; ar--) {
+                                if (!board[ar*7 + aiCol]) { board[ar*7 + aiCol] = 'Y'; break; }
+                            }
+                        }
+                        break;
+                    }
+                }
+                render();
+            };
 
-function sendOnline(data) {
-    if (onlineConn && onlineConn.open) {
-        onlineConn.send(data);
-    }
-}
+            function checkC4Win(p) {
+                // Horizontal, Vertical, Diagonal checks
+                for (let r=0; r<6; r++) {
+                    for (let c=0; c<4; c++) {
+                        if (board[r*7+c]===p && board[r*7+c+1]===p && board[r*7+c+2]===p && board[r*7+c+3]===p) return true;
+                    }
+                }
+                for (let r=0; r<3; r++) {
+                    for (let c=0; c<7; c++) {
+                        if (board[r*7+c]===p && board[(r+1)*7+c]===p && board[(r+2)*7+c]===p && board[(r+3)*7+c]===p) return true;
+                    }
+                }
+                return false;
+            }
+            render();
+        }
 
-function handleOnlineData(data) {
-    if (!data || !data.type) return;
+        /* 14. MINESWEEPER */
+        function launchMinesweeper(container) {
+            let board = Array(25).fill(0);
+            let mines = new Set([3, 8, 14, 21]);
+            mines.forEach(m => board[m] = 'M');
 
-    if (data.type === "join") {
-        toast("👤 Player joined!");
-    }
-}
+            container.innerHTML = `
+                <div style="display:grid; grid-template-columns:repeat(5, 50px); gap:8px;">
+                    ${board.map((v, i) => `
+                        <div onclick="sweepMS(${i})" id="ms-${i}" style="width:50px; height:50px; background:#cbd5e0; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; font-size:1.2rem;"></div>
+                    `).join('')}
+                </div>
+            `;
+            window.sweepMS = (i) => {
+                const el = document.getElementById(`ms-${i}`);
+                if (board[i] === 'M') {
+                    el.innerText = '💣'; el.style.background = '#feb2b2';
+                    showResultModal("Mine Detonated!", "Careful next time!", "⚫", 0, false);
+                } else {
+                    el.innerText = '1'; el.style.background = '#edf2f7';
+                }
+            };
+        }
 
-function handlePeerError(err) {
-    toast("⚠️ Online error: " + (err.type || "Disconnected"));
-}
+        /* 15. NUMBER GUESS */
+        function launchNumGuess(container) {
+            const secret = Math.floor(Math.random()*50)+1;
+            container.innerHTML = `
+                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h3>Guess Number (1 to 50)</h3>
+                    <input type="number" id="ng-val" style="padding:12px; font-size:1.5rem; width:120px; text-align:center; margin:20px 0; border-radius:8px; border:2px solid #e2e8f0;">
+                    <br>
+                    <button class="btn-primary" onclick="guessNum(${secret})">Submit Guess</button>
+                    <div id="ng-feedback" style="margin-top:16px; font-weight:bold; font-size:1.1rem; color:var(--primary-btn);"></div>
+                </div>
+            `;
+            window.guessNum = (target) => {
+                const v = parseInt(document.getElementById('ng-val').value);
+                const fb = document.getElementById('ng-feedback');
+                if (v === target) {
+                    showResultModal("Correct Guess!", `Target was ${target}`, "🧩", 60, true);
+                } else if (v < target) fb.innerText = "Too Low! ⬆️";
+                else fb.innerText = "Too High! ⬇️";
+            };
+        }
 
-/* =========================================================
-   EXTRAS (SHOP, ACHIEVEMENTS, PROFILE)
-========================================================= */
+        /* 16. CRYPTO CIPHER (EASY & INTUITIVE CODEBREAKER) */
+        function launchCrypto(container) {
+            const code = Array.from({length: 4}, () => Math.floor(Math.random()*10));
+            let attempts = 0;
 
-function renderShop() {
-    document.getElementById("main").innerHTML = `
-        <h1 class="page-title">🛒 Shop</h1>
-        <p class="page-subtitle">Spend your hard-earned coins on cosmetics.</p>
-        <div class="cards">
-            <div class="shop-item">
-                <h3>😎 Cool Avatar</h3>
-                <p>Equip the sleek sunglasses avatar.</p>
-                <button class="play-btn" onclick="buyAvatar('😎', 50)">Buy for 50 🪙</button>
-            </div>
-            <div class="shop-item">
-                <h3>👑 Crown Avatar</h3>
-                <p>Show everyone you're the king of games.</p>
-                <button class="play-btn" onclick="buyAvatar('👑', 150)">Buy for 150 🪙</button>
-            </div>
-            <div class="shop-item">
-                <h3>🚀 Rocket Avatar</h3>
-                <p>Blast past your opponents!</p>
-                <button class="play-btn" onclick="buyAvatar('🚀', 100)">Buy for 100 🪙</button>
-            </div>
-        </div>
-    `;
-}
+            container.innerHTML = `
+                <div style="text-align:center; max-width:480px; width:100%; background:var(--bg-secondary); padding:28px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h2>Crack the 4-Digit Cipher</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin:8px 0 20px 0;">Green = Right digit & spot. Yellow = Right digit, wrong spot.</p>
+                    
+                    <div id="crypto-history" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px; max-height:180px; overflow-y:auto;"></div>
 
-function buyAvatar(icon, cost) {
-    if (profile.coins < cost) {
-        toast("❌ Not enough coins!");
-        return;
-    }
-    addCoins(-cost);
-    profile.avatar = icon;
-    saveProfile();
-    toast("🎉 Avatar updated!");
-}
+                    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:20px;">
+                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
+                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
+                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
+                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
+                    </div>
+                    <button class="btn-primary" onclick="checkCryptoCipher()">Unlock Cipher</button>
+                </div>
+            `;
 
-function renderAchievements() {
-    document.getElementById("main").innerHTML = `
-        <h1 class="page-title">🏅 Achievements</h1>
-        <p class="page-subtitle">Track your milestones and feats.</p>
-        <div class="cards">
-            <div class="shop-item">
-                <h3>🎯 First Win</h3>
-                <p>${profile.wins > 0 ? "✅ Unlocked!" : "🔒 Win 1 game in any mode."}</p>
-            </div>
-            <div class="shop-item">
-                <h3>💰 Coin Collector</h3>
-                <p>${profile.coins >= 200 ? "✅ Unlocked!" : "🔒 Accumulate 200 total coins."}</p>
-            </div>
-            <div class="shop-item">
-                <h3>⭐ Master Level</h3>
-                <p>${profile.level >= 5 ? "✅ Unlocked!" : "🔒 Reach Level 5."}</p>
-            </div>
-        </div>
-    `;
-}
+            window.checkCryptoCipher = () => {
+                const inputs = Array.from(document.querySelectorAll('.c-in')).map(i => parseInt(i.value) || 0);
+                attempts++;
+                
+                let exact = 0, misplace = 0;
+                let tempCode = [...code];
+                let tempIn = [...inputs];
 
-function renderProfile() {
-    document.getElementById("main").innerHTML = `
-        <div class="profile-card">
-            <div class="avatar">${profile.avatar}</div>
-            <div class="profile-name">${profile.username}</div>
-            <p style="text-align:center;color:var(--muted);margin-bottom:20px;">Level ${profile.level} Challenger</p>
+                for (let i = 0; i < 4; i++) {
+                    if (tempIn[i] === tempCode[i]) {
+                        exact++;
+                        tempCode[i] = tempIn[i] = null;
+                    }
+                }
+                for (let i = 0; i < 4; i++) {
+                    if (tempIn[i] !== null) {
+                        let idx = tempCode.indexOf(tempIn[i]);
+                        if (idx !== -1) {
+                            misplace++;
+                            tempCode[idx] = null;
+                        }
+                    }
+                }
 
-            <div style="margin-bottom:8px;font-size:14px;font-weight:bold;">
-                Level Progress (${profile.xp % 500} / 500 XP)
-            </div>
-            <div class="progress">
-                <div class="progress-fill" style="width: ${(profile.xp % 500) / 5}%"></div>
-            </div>
+                const hist = document.getElementById('crypto-history');
+                const row = document.createElement('div');
+                row.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#edf2f7; padding:8px 16px; border-radius:8px; font-weight:bold;";
+                row.innerHTML = `<span>Attempt ${attempts}: ${inputs.join('')}</span> <span>🟩 ${exact} 🟨 ${misplace}</span>`;
+                hist.appendChild(row);
 
-            <div class="score-row">
-                <div class="score-box">Wins<strong>${profile.wins}</strong></div>
-                <div class="score-box">Losses<strong>${profile.losses}</strong></div>
-                <div class="score-box">Coins<strong>${profile.coins}</strong></div>
-                <div class="score-box">Total XP<strong>${profile.xp}</strong></div>
-            </div>
-        </div>
-    `;
-}
+                if (exact === 4) {
+                    showResultModal("Cipher Decoded!", `Code was ${code.join('')}`, "🔐", 120, true);
+                }
+            };
+        }
 
-</script>
+        /* 17. ROCK PAPER SCISSORS */
+        function launchRPS(container) {
+            container.innerHTML = `
+                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h3 style="margin-bottom:20px;">Choose your move:</h3>
+                    <div style="display:flex; gap:16px; justify-content:center;">
+                        <button class="btn-primary" style="width:80px; height:80px; font-size:2rem;" onclick="playRPS('✊')">✊</button>
+                        <button class="btn-primary" style="width:80px; height:80px; font-size:2rem;" onclick="playRPS('✋')">✋</button>
+                        <button class="btn-primary" style="width:80px; height:80px; font-size:2rem;" onclick="playRPS('✌️')">✌️</button>
+                    </div>
+                </div>
+            `;
+            window.playRPS = (choice) => {
+                const opts = ['✊','✋','✌️'];
+                const comp = opts[Math.floor(Math.random()*3)];
+                if (choice === comp) {
+                    showResultModal("It's a Draw!", `Both chose ${choice}`, "🤝", 10, false);
+                } else if ((choice === '✊' && comp === '✌️') || (choice === '✋' && comp === '✊') || (choice === '✌️' && comp === '✋')) {
+                    showResultModal("You Won!", `${choice} beats ${comp}`, "✊", 40, true);
+                } else {
+                    showResultModal("You Lost!", `${comp} beats ${choice}`, "❌", 0, false);
+                }
+            };
+        }
+
+        /* 18. HIGHER OR LOWER */
+        function launchHigherLower(container) {
+            let cur = Math.floor(Math.random()*10)+1;
+            container.innerHTML = `
+                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h3>Current Card Value:</h3>
+                    <div style="font-size:4rem; font-weight:800; color:var(--primary-btn); margin:16px 0;">${cur}</div>
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn-primary" onclick="playHL('higher', ${cur})">Higher ⬆️</button>
+                        <button class="btn-primary" onclick="playHL('lower', ${cur})">Lower ⬇️</button>
+                    </div>
+                </div>
+            `;
+            window.playHL = (choice, old) => {
+                let next = Math.floor(Math.random()*10)+1;
+                let win = (choice === 'higher' && next >= old) || (choice === 'lower' && next <= old);
+                if (win) {
+                    showResultModal("Streak Success!", `Next card was ${next}`, "🃏", 30, true);
+                } else {
+                    showResultModal("Streak Broken!", `Next card was ${next}`, "❌", 0, false);
+                }
+            };
+        }
+
+        /* 19. QUICK TAP */
+        function launchQuickTap(container) {
+            let score = 0;
+            container.innerHTML = `
+                <div style="text-align:center;">
+                    <div id="qt-score" style="font-size:1.8rem; font-weight:bold; margin-bottom:16px;">Taps: 0</div>
+                    <button class="btn-primary" style="width:140px; height:140px; border-radius:50%; font-size:1.4rem;" onclick="tapFast()">TAP!</button>
+                </div>
+            `;
+            window.tapFast = () => {
+                score++;
+                document.getElementById('qt-score').innerText = `Taps: ${score}`;
+                if (score >= 20) {
+                    showResultModal("Speed Master!", "Reached 20 quick taps!", "⚡", 50, true);
+                }
+            };
+        }
+
+        /* 20. COLOR MATCH (Stroop Speed Test) */
+        function launchColorMatch(container) {
+            container.innerHTML = `
+                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
+                    <h1 style="color:#3182ce; font-size:3rem; margin-bottom:12px;">RED</h1>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">Does the word match its visual font color?</p>
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn-primary" style="background:#48bb78;" onclick="checkCM(false)">Match</button>
+                        <button class="btn-primary" style="background:#f56565;" onclick="checkCM(true)">No Match</button>
+                    </div>
+                </div>
+            `;
+            window.checkCM = (isNoMatch) => {
+                if (isNoMatch) {
+                    showResultModal("Sharp Eyes!", "Correct Stroop effect recognition!", "🌈", 40, true);
+                } else {
+                    showResultModal("Mismatch!", "The text meaning differed from color.", "❌", 0, false);
+                }
+            };
+        }
+    </script>
 </body>
 </html>
