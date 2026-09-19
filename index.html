@@ -1,1767 +1,4720 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcadia - World's Best Game Arena</title>
-    <style>
-        :root {
-            --bg-primary: #f4f6fa;
-            --bg-secondary: #ffffff;
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --accent-pink: #fbb6ce;
-            --accent-purple: #d6bcfa;
-            --accent-blue: #bee3f8;
-            --accent-teal: #b2f5ea;
-            --accent-green: #c6f6d5;
-            --accent-yellow: #fefcbf;
-            --accent-orange: #feebc8;
-            --primary-btn: #805ad5;
-            --primary-btn-hover: #6b46c1;
-            --shadow-soft: 0 10px 25px -5px rgba(160, 174, 192, 0.25), 0 8px 10px -6px rgba(160, 174, 192, 0.1);
-            --radius-xl: 24px;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body.dark-mode {
-            --bg-primary: #1a202c;
-            --bg-secondary: #2d3748;
-            --bg-card: rgba(45, 55, 72, 0.9);
-            --text-main: #f7fafc;
-            --text-muted: #a0aec0;
-            --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            --primary-btn: #9f7aea;
-            --primary-btn-hover: #805ad5;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-family);
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            overflow-x: hidden;
-        }
-
-        .glass {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: var(--shadow-soft);
-        }
-
-        /* Login Screen */
-        #login-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #e9d8fd 0%, #b2f5ea 50%, #bee3f8 100%);
-            padding: 20px;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 440px;
-            padding: 40px 30px;
-            border-radius: var(--radius-xl);
-            text-align: center;
-            animation: floatIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes floatIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .avatar-selector {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .avatar-opt {
-            font-size: 2rem;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: transform 0.2s, border-color 0.2s;
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .avatar-opt:hover, .avatar-opt.active {
-            transform: scale(1.15);
-            border-color: var(--primary-btn);
-            background: #ffffff;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            border: 2px solid #e2e8f0;
-            outline: none;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .input-group input:focus {
-            border-color: var(--primary-btn);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px 20px;
-            background-color: var(--primary-btn);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            box-shadow: 0 4px 12px rgba(128, 90, 213, 0.25);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-btn-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary:active {
-            transform: translateY(1px);
-        }
-
-        .btn-secondary {
-            background: #edf2f7;
-            color: var(--text-main);
-            border: none;
-            padding: 10px 18px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        /* Navbar Header */
-        header {
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, #805ad5, #319795);
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .user-nav-profile {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
-            border-radius: 30px;
-            background: var(--bg-secondary);
-            cursor: pointer;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .theme-toggle-btn {
-            background: none;
-            border: none;
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            transition: transform 0.2s;
-        }
-
-        .theme-toggle-btn:hover {
-            transform: rotate(15deg) scale(1.1);
-        }
-
-        /* App Container Layout */
-        .app-layout {
-            display: flex;
-            flex: 1;
-            padding: 24px;
-            gap: 24px;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .sidebar {
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .category-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            border-radius: var(--radius-md);
-            border: none;
-            background: transparent;
-            color: var(--text-main);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-        }
-
-        .category-btn:hover, .category-btn.active {
-            background: var(--bg-secondary);
-            box-shadow: var(--shadow-soft);
-            color: var(--primary-btn);
-            transform: translateX(4px);
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* Banner Dashboard */
-        .banner {
-            padding: 28px;
-            border-radius: var(--radius-xl);
-            background: linear-gradient(135deg, #e9d8fd 0%, #c6f6d5 100%);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .banner-text h1 {
-            font-size: 2rem;
-            margin-bottom: 6px;
-            color: #2d3748;
-        }
-
-        .banner-text p {
-            color: #4a5568;
-            font-size: 1rem;
-        }
-
-        .stats-summary {
-            display: flex;
-            gap: 16px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            text-align: center;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .stat-card .value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-btn);
-        }
-
-        .stat-card .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        /* Games Grid */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .game-card {
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
-        }
-
-        .game-icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            transition: transform 0.2s;
-        }
-
-        .game-card:hover .game-icon {
-            transform: scale(1.15) rotate(5deg);
-        }
-
-        .game-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .game-category {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .play-tag {
-            margin-top: auto;
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.7);
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--primary-btn);
-        }
-
-        /* Fullscreen Game Arena Overlay */
-        #fullscreen-arena {
-            position: fixed;
-            inset: 0;
-            z-index: 800;
-            background: var(--bg-primary);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        #fullscreen-arena.active {
-            display: flex;
-        }
-
-        .arena-top-header {
-            padding: 16px 32px;
-            background: var(--bg-secondary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .arena-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .arena-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .arena-body {
-            flex: 1;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        /* End Game Result Overlay Modal */
-        .result-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .result-modal.active {
-            display: flex;
-        }
-
-        .result-card {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-xl);
-            padding: 32px;
-            max-width: 420px;
-            width: 100%;
-            text-align: center;
-            animation: floatIn 0.3s ease-out;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .result-banner {
-            font-size: 3.5rem;
-            margin-bottom: 12px;
-        }
-
-        .result-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .result-desc {
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        /* D-Pad Controls for Canvas/Board Games */
-        .dpad-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 50px);
-            grid-template-rows: repeat(3, 50px);
-            gap: 6px;
-            margin-top: 16px;
-            justify-content: center;
-        }
-
-        .dpad-btn {
-            background: var(--bg-secondary);
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .dpad-btn:active {
-            background: var(--primary-btn);
-            color: white;
-        }
-
-        /* Modal View for User Profile */
-        .game-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 900;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .game-modal.active {
-            display: flex;
-        }
-
-        .game-stage {
-            width: 100%;
-            max-width: 450px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-xl);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            animation: floatIn 0.3s ease;
-        }
-
-        .game-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-primary);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Responsive tweaks */
-        @media (max-width: 900px) {
-            .app-layout {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                flex-direction: row;
-                overflow-x: auto;
-                padding-bottom: 8px;
-            }
-            .category-btn {
-                white-space: nowrap;
-            }
-            .banner {
-                flex-direction: column;
-                gap: 16px;
-                text-align: center;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcadia Arena — Ultimate Game Hub</title>
+
+<style>
+:root{
+    --bg:#f4f6fa;
+    --panel:#ffffff;
+    --panel2:#edf2f7;
+    --text:#1f2937;
+    --muted:#718096;
+    --primary:#805ad5;
+    --primary2:#6b46c1;
+    --cyan:#319795;
+    --green:#38a169;
+    --red:#e53e3e;
+    --yellow:#d69e2e;
+    --blue:#3182ce;
+    --shadow:0 12px 30px rgba(100,116,139,.16);
+    --radius:18px;
+}
+
+body.dark{
+    --bg:#111827;
+    --panel:#1f2937;
+    --panel2:#374151;
+    --text:#f9fafb;
+    --muted:#a0aec0;
+    --shadow:0 12px 30px rgba(0,0,0,.35);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    transition:.25s;
+}
+
+button,input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.glass{
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow:var(--shadow);
+}
+
+.btn{
+    border:0;
+    padding:11px 18px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+.primary{
+    background:var(--primary);
+    color:white;
+}
+
+.primary:hover{
+    background:var(--primary2);
+}
+
+.secondary{
+    background:var(--panel2);
+    color:var(--text);
+}
+
+.danger{
+    background:var(--red);
+    color:white;
+}
+
+.success{
+    background:var(--green);
+    color:white;
+}
+
+/* LOGIN */
+
+#login{
+    position:fixed;
+    inset:0;
+    z-index:5000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    background:
+        radial-gradient(circle at 20% 20%,#e9d8fd,transparent 35%),
+        radial-gradient(circle at 80% 80%,#b2f5ea,transparent 35%),
+        linear-gradient(135deg,#bee3f8,#fefcbf);
+}
+
+.login-box{
+    width:100%;
+    max-width:470px;
+    padding:40px;
+    border-radius:28px;
+    text-align:center;
+    animation:pop .5s ease;
+}
+
+@keyframes pop{
+    from{opacity:0;transform:scale(.9) translateY(20px)}
+    to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+.logo-big{
+    font-size:3.5rem;
+}
+
+.login-box h1{
+    margin:8px 0;
+    font-size:2.3rem;
+}
+
+.login-box p{
+    color:var(--muted);
+    margin-bottom:20px;
+}
+
+.avatars{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:20px 0;
+    flex-wrap:wrap;
+}
+
+.avatar{
+    width:55px;
+    height:55px;
+    border:3px solid transparent;
+    border-radius:50%;
+    background:white;
+    font-size:1.8rem;
+    cursor:pointer;
+}
+
+.avatar.active{
+    border-color:var(--primary);
+    transform:scale(1.1);
+}
+
+.login-input{
+    width:100%;
+    padding:15px;
+    border:2px solid #e2e8f0;
+    border-radius:12px;
+    margin-bottom:15px;
+    outline:none;
+}
+
+/* HEADER */
+
+header{
+    height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:var(--panel);
+    box-shadow:var(--shadow);
+}
+
+.logo{
+    font-size:1.45rem;
+    font-weight:900;
+    color:var(--primary);
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.icon-btn{
+    border:0;
+    background:var(--panel2);
+    color:var(--text);
+    width:42px;
+    height:42px;
+    border-radius:50%;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--panel2);
+    padding:7px 12px;
+    border-radius:30px;
+    cursor:pointer;
+}
+
+.profile-avatar{
+    font-size:1.5rem;
+}
+
+/* LAYOUT */
+
+.layout{
+    max-width:1600px;
+    margin:auto;
+    display:flex;
+    gap:22px;
+    padding:22px;
+}
+
+.sidebar{
+    width:250px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.nav-btn{
+    border:0;
+    background:transparent;
+    color:var(--text);
+    text-align:left;
+    padding:13px 16px;
+    border-radius:12px;
+    font-weight:700;
+}
+
+.nav-btn:hover,
+.nav-btn.active{
+    background:var(--panel);
+    color:var(--primary);
+    box-shadow:var(--shadow);
+}
+
+.main{
+    flex:1;
+    min-width:0;
+}
+
+.hero{
+    border-radius:24px;
+    padding:28px;
+    margin-bottom:22px;
+    background:linear-gradient(135deg,#e9d8fd,#c6f6d5,#bee3f8);
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    align-items:center;
+}
+
+.hero h1{
+    font-size:2rem;
+    color:#263238;
+}
+
+.hero p{
+    color:#4a5568;
+    margin-top:7px;
+}
+
+.stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.stat{
+    min-width:100px;
+    text-align:center;
+    padding:12px 16px;
+    background:rgba(255,255,255,.8);
+    border-radius:14px;
+}
+
+.stat strong{
+    display:block;
+    font-size:1.4rem;
+    color:var(--primary);
+}
+
+.stat span{
+    font-size:.7rem;
+    text-transform:uppercase;
+    color:#718096;
+}
+
+/* TOOLBAR */
+
+.toolbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+}
+
+.search{
+    flex:1;
+    min-width:200px;
+    padding:13px 16px;
+    border:2px solid transparent;
+    border-radius:12px;
+    background:var(--panel);
+    color:var(--text);
+    outline:none;
+    box-shadow:var(--shadow);
+}
+
+.search:focus{
+    border-color:var(--primary);
+}
+
+.sort{
+    border:0;
+    padding:12px;
+    border-radius:12px;
+    background:var(--panel);
+    color:var(--text);
+}
+
+/* GAMES */
+
+.games{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+    gap:18px;
+}
+
+.game{
+    min-height:220px;
+    padding:22px;
+    border-radius:18px;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    transition:.25s;
+    display:flex;
+    flex-direction:column;
+}
+
+.game:hover{
+    transform:translateY(-7px);
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.game-icon{
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.game h3{
+    margin-bottom:5px;
+}
+
+.game-category{
+    font-size:.75rem;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+.play{
+    margin-top:auto;
+    padding-top:14px;
+}
+
+.play span{
+    background:rgba(255,255,255,.7);
+    padding:7px 12px;
+    border-radius:20px;
+    color:var(--primary);
+    font-weight:800;
+}
+
+.favorite{
+    position:absolute;
+    right:12px;
+    top:12px;
+    border:0;
+    background:rgba(255,255,255,.7);
+    width:35px;
+    height:35px;
+    border-radius:50%;
+}
+
+/* GAME ARENA */
+
+#arena{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    display:none;
+    flex-direction:column;
+    background:var(--bg);
+}
+
+#arena.active{
+    display:flex;
+}
+
+.arena-head{
+    min-height:68px;
+    background:var(--panel);
+    box-shadow:var(--shadow);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 22px;
+}
+
+.arena-title{
+    font-size:1.3rem;
+    font-weight:900;
+}
+
+.arena-actions{
+    display:flex;
+    gap:8px;
+}
+
+.arena-body{
+    flex:1;
+    overflow:auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+}
+
+/* GENERIC GAME UI */
+
+.game-box{
+    width:min(650px,100%);
+    background:var(--panel);
+    border-radius:22px;
+    padding:28px;
+    box-shadow:var(--shadow);
+    text-align:center;
+}
+
+.game-box h2{
+    margin-bottom:10px;
+}
+
+.game-box p{
+    color:var(--muted);
+    margin-bottom:18px;
+}
+
+.game-input{
+    width:100%;
+    padding:13px;
+    border:2px solid #e2e8f0;
+    border-radius:10px;
+    background:var(--panel);
+    color:var(--text);
+    margin-bottom:12px;
+}
+
+.game-buttons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+/* RESULT */
+
+#result{
+    position:fixed;
+    inset:0;
+    z-index:4500;
+    background:rgba(0,0,0,.55);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+#result.active{
+    display:flex;
+}
+
+.result-box{
+    width:min(430px,100%);
+    background:var(--panel);
+    border-radius:25px;
+    padding:35px;
+    text-align:center;
+    animation:pop .3s;
+}
+
+.result-icon{
+    font-size:4rem;
+}
+
+.result-box h2{
+    margin:10px 0;
+}
+
+.result-score{
+    font-size:2rem;
+    color:var(--primary);
+    font-weight:900;
+    margin:15px;
+}
+
+/* PROFILE */
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:4000;
+    background:rgba(0,0,0,.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.modal.active{
+    display:flex;
+}
+
+.modal-box{
+    width:min(500px,100%);
+    background:var(--panel);
+    border-radius:24px;
+    padding:30px;
+    max-height:90vh;
+    overflow:auto;
+}
+
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.close{
+    border:0;
+    background:var(--panel2);
+    color:var(--text);
+    width:36px;
+    height:36px;
+    border-radius:50%;
+}
+
+/* BOARD */
+
+.board{
+    display:grid;
+    gap:5px;
+    justify-content:center;
+}
+
+.cell{
+    background:var(--panel2);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:900;
+    cursor:pointer;
+    border-radius:8px;
+}
+
+.ttt-board{
+    grid-template-columns:repeat(3,90px);
+}
+
+.ttt-cell{
+    width:90px;
+    height:90px;
+    font-size:2.5rem;
+}
+
+.c4-board{
+    grid-template-columns:repeat(7,48px);
+    background:#2563eb;
+    padding:10px;
+    border-radius:15px;
+}
+
+.c4-cell{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:white;
+}
+
+.memory-board{
+    grid-template-columns:repeat(4,75px);
+}
+
+.memory-card{
+    width:75px;
+    height:75px;
+    font-size:2rem;
+}
+
+/* CANVAS */
+
+canvas{
+    max-width:100%;
+    border-radius:16px;
+    box-shadow:var(--shadow);
+}
+
+/* KEYPAD */
+
+.keypad{
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    gap:6px;
+    max-width:650px;
+    margin:auto;
+}
+
+.keypad button{
+    border:0;
+    padding:10px 4px;
+    border-radius:8px;
+    background:var(--panel2);
+    color:var(--text);
+    font-weight:700;
+}
+
+.keypad button:hover{
+    background:var(--primary);
+    color:white;
+}
+
+/* ACHIEVEMENTS */
+
+.achievement-list{
+    display:grid;
+    gap:10px;
+}
+
+.achievement{
+    padding:14px;
+    border-radius:12px;
+    background:var(--panel2);
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+
+.achievement.locked{
+    opacity:.45;
+}
+
+.achievement-icon{
+    font-size:1.8rem;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+    .layout{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        width:100%;
+        flex-direction:row;
+        overflow:auto;
+    }
+
+    .nav-btn{
+        white-space:nowrap;
+    }
+
+    .hero{
+        flex-direction:column;
+        text-align:center;
+    }
+}
+
+@media(max-width:600px){
+    header{
+        padding:0 12px;
+    }
+
+    .logo{
+        font-size:1rem;
+    }
+
+    .profile-name{
+        display:none;
+    }
+
+    .layout{
+        padding:12px;
+    }
+
+    .games{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .game{
+        min-height:190px;
+        padding:16px;
+    }
+
+    .game-icon{
+        font-size:2.3rem;
+    }
+
+    .arena-body{
+        padding:12px;
+    }
+
+    .game-box{
+        padding:20px 14px;
+    }
+
+    .ttt-board{
+        grid-template-columns:repeat(3,75px);
+    }
+
+    .ttt-cell{
+        width:75px;
+        height:75px;
+    }
+
+    .c4-board{
+        grid-template-columns:repeat(7,38px);
+    }
+
+    .c4-cell{
+        width:38px;
+        height:38px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <!-- Login Screen -->
-    <div id="login-screen">
-        <div class="login-card glass">
-            <h1 style="font-size: 2.2rem; margin-bottom: 8px;">Welcome! 🎮</h1>
-            <p style="color: var(--text-muted); margin-bottom: 20px;">Choose your avatar and enter your player nickname</p>
-            
-            <div class="avatar-selector">
-                <div class="avatar-opt active" onclick="selectAvatar('🚀', this)">🚀</div>
-                <div class="avatar-opt" onclick="selectAvatar('🦊', this)">🦊</div>
-                <div class="avatar-opt" onclick="selectAvatar('👑', this)">👑</div>
-                <div class="avatar-opt" onclick="selectAvatar('🦄', this)">🦄</div>
-                <div class="avatar-opt" onclick="selectAvatar('👾', this)">👾</div>
+<!-- LOGIN -->
+<section id="login">
+    <div class="login-box glass">
+        <div class="logo-big">🏆</div>
+        <h1>Arcadia Arena</h1>
+        <p>The Ultimate Browser Game Hub</p>
+
+        <div class="avatars">
+            <button class="avatar active" onclick="chooseAvatar('🚀',this)">🚀</button>
+            <button class="avatar" onclick="chooseAvatar('🦊',this)">🦊</button>
+            <button class="avatar" onclick="chooseAvatar('👑',this)">👑</button>
+            <button class="avatar" onclick="chooseAvatar('🦄',this)">🦄</button>
+            <button class="avatar" onclick="chooseAvatar('👾',this)">👾</button>
+            <button class="avatar" onclick="chooseAvatar('🐉',this)">🐉</button>
+            <button class="avatar" onclick="chooseAvatar('🤖',this)">🤖</button>
+        </div>
+
+        <input id="username" class="login-input" maxlength="15" placeholder="Enter player nickname">
+
+        <button class="btn primary" style="width:100%" onclick="login()">
+            🎮 Enter Game Arena
+        </button>
+    </div>
+</section>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">🏆 Arcadia Arena</div>
+
+    <div class="header-right">
+        <button class="icon-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+
+        <div class="profile" onclick="openProfile()">
+            <span id="navAvatar" class="profile-avatar">🚀</span>
+            <span id="navName" class="profile-name">Player</span>
+            <span>🏆 <b id="navScore">0</b></span>
+        </div>
+    </div>
+</header>
+
+<!-- MAIN -->
+<div class="layout">
+
+    <aside class="sidebar">
+        <button class="nav-btn active" onclick="filterGames('all',this)">✨ All Games</button>
+        <button class="nav-btn" onclick="filterGames('arcade',this)">🕹️ Arcade</button>
+        <button class="nav-btn" onclick="filterGames('word',this)">🔤 Word</button>
+        <button class="nav-btn" onclick="filterGames('brain',this)">🧠 Brain</button>
+        <button class="nav-btn" onclick="filterGames('strategy',this)">♟️ Strategy</button>
+        <button class="nav-btn" onclick="filterGames('sport',this)">🏓 Sports</button>
+        <button class="nav-btn" onclick="filterGames('favorite',this)">❤️ Favorites</button>
+    </aside>
+
+    <main class="main">
+
+        <section class="hero">
+            <div>
+                <h1 id="welcome">Ready to Play?</h1>
+                <p>Choose a game, beat your high score and unlock achievements.</p>
             </div>
 
-            <div class="input-group">
-                <input type="text" id="username-input" placeholder="Enter Nickname..." maxlength="12">
-            </div>
+            <div class="stats">
+                <div class="stat">
+                    <strong id="played">0</strong>
+                    <span>Played</span>
+                </div>
 
-            <button class="btn-primary" onclick="loginUser()">Enter Game Arena</button>
+                <div class="stat">
+                    <strong id="wins">0</strong>
+                    <span>Wins</span>
+                </div>
+
+                <div class="stat">
+                    <strong id="score">0</strong>
+                    <span>Score</span>
+                </div>
+
+                <div class="stat">
+                    <strong id="level">1</strong>
+                    <span>Level</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="toolbar">
+            <input id="search" class="search" placeholder="🔎 Search games..." oninput="renderGames()">
+
+            <select id="sort" class="sort" onchange="renderGames()">
+                <option value="default">Sort: Default</option>
+                <option value="name">Name</option>
+                <option value="score">Highest Score</option>
+                <option value="favorite">Favorites</option>
+            </select>
+        </div>
+
+        <section id="games" class="games"></section>
+
+    </main>
+</div>
+
+<!-- GAME ARENA -->
+<section id="arena">
+
+    <div class="arena-head">
+        <div id="arenaTitle" class="arena-title">🎮 Game</div>
+
+        <div class="arena-actions">
+            <button class="btn secondary" onclick="restartGame()">🔄 Restart</button>
+            <button class="btn primary" onclick="exitGame()">⬅ Hub</button>
         </div>
     </div>
 
-    <!-- Main Header -->
-    <header class="glass">
-        <div class="logo">
-            <span>🏆</span> Arcadia Arena
+    <div id="arenaBody" class="arena-body"></div>
+
+</section>
+
+<!-- RESULT -->
+<section id="result">
+    <div class="result-box">
+        <div id="resultIcon" class="result-icon">🏆</div>
+        <h2 id="resultTitle">Victory!</h2>
+        <p id="resultText">Great game!</p>
+
+        <div class="result-score" id="resultScore">+50</div>
+
+        <div class="game-buttons">
+            <button class="btn secondary" onclick="closeResult()">Close</button>
+            <button class="btn primary" onclick="closeResult();restartGame()">🔄 Play Again</button>
         </div>
-        <div class="user-nav-profile">
-            <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
-            <div class="user-badge" onclick="showProfileModal()">
-                <span id="nav-avatar">🚀</span>
-                <span id="nav-username" style="font-weight: 700;">Guest</span>
-                <span style="font-size: 0.8rem; background: var(--accent-purple); padding: 2px 8px; border-radius: 12px;" id="nav-trophies">🏆 0</span>
+    </div>
+</section>
+
+<!-- PROFILE -->
+<section id="profileModal" class="modal">
+    <div class="modal-box">
+
+        <div class="modal-head">
+            <h2>👤 Player Profile</h2>
+            <button class="close" onclick="closeProfile()">✕</button>
+        </div>
+
+        <div style="text-align:center">
+            <div id="profileAvatar" style="font-size:5rem">🚀</div>
+            <h2 id="profileName">Player</h2>
+
+            <div class="stats" style="justify-content:center;margin:20px 0">
+                <div class="stat">
+                    <strong id="profileScore">0</strong>
+                    <span>Score</span>
+                </div>
+                <div class="stat">
+                    <strong id="profileWins">0</strong>
+                    <span>Wins</span>
+                </div>
+                <div class="stat">
+                    <strong id="profilePlayed">0</strong>
+                    <span>Played</span>
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- App Body -->
-    <div class="app-layout">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <button class="category-btn glass active" onclick="filterCategory('all', this)">✨ All Games</button>
-            <button class="category-btn glass" onclick="filterCategory('arcade', this)">🕹️ Arcade & Action</button>
-            <button class="category-btn glass" onclick="filterCategory('word', this)">🔤 Word Puzzles</button>
-            <button class="category-btn glass" onclick="filterCategory('brain', this)">🧠 Brain & Math</button>
-            <button class="category-btn glass" onclick="filterCategory('casual', this)">🎯 Casual & Strategy</button>
-        </div>
+        <h3 style="margin:20px 0 10px">🏅 Achievements</h3>
 
-        <!-- Main Content Arena -->
-        <div class="main-content">
-            <div class="banner">
-                <div class="banner-text">
-                    <h1 id="welcome-title">Ready to Play, Guest?</h1>
-                    <p>Select any game from the collection below and aim for a high score!</p>
-                </div>
-                <div class="stats-summary">
-                    <div class="stat-card">
-                        <div class="value" id="dash-played">0</div>
-                        <div class="label">Played</div>
+        <div id="achievements" class="achievement-list"></div>
+
+        <button class="btn danger" style="width:100%;margin-top:20px" onclick="resetProgress()">
+            Reset Progress
+        </button>
+
+    </div>
+</section>
+
+<script>
+
+/* ============================================================
+   ARCADIA ARENA
+   ULTIMATE SINGLE FILE GAME ENGINE
+============================================================ */
+
+/* ---------------- PLAYER ---------------- */
+
+let player = {
+    name:"Player",
+    avatar:"🚀",
+    score:0,
+    wins:0,
+    played:0,
+    level:1,
+    sound:true,
+    theme:false,
+    favorites:[],
+    highScores:{}
+};
+
+let selectedAvatar="🚀";
+let currentCategory="all";
+let currentGame=null;
+let cleanupGame=null;
+
+const games=[
+
+{id:"trivia",name:"Trivia Quiz",icon:"🏆",category:"brain",color:"#feebc8"},
+{id:"hangman",name:"Hangman",icon:"🔤",category:"word",color:"#e9d8fd"},
+{id:"scramble",name:"Word Scramble",icon:"🔀",category:"word",color:"#bee3f8"},
+{id:"wordmaster",name:"Word Master",icon:"🧠",category:"word",color:"#c6f6d5"},
+{id:"typing",name:"Typing Speed",icon:"⌨️",category:"word",color:"#fefcbf"},
+{id:"wordsearch",name:"Word Search",icon:"🔎",category:"word",color:"#fed7e2"},
+
+{id:"tictactoe",name:"Tic-Tac-Toe",icon:"❌",category:"strategy",color:"#fbb6ce"},
+{id:"connect4",name:"Connect Four",icon:"🟡",category:"strategy",color:"#feebc8"},
+{id:"sudoku",name:"Mini Sudoku",icon:"🔢",category:"strategy",color:"#bee3f8"},
+{id:"memory",name:"Memory Cards",icon:"🃏",category:"brain",color:"#c6f6d5"},
+{id:"2048",name:"2048",icon:"🔢",category:"brain",color:"#fefcbf"},
+{id:"reaction",name:"Reaction Test",icon:"🎯",category:"brain",color:"#fbb6ce"},
+{id:"math",name:"Math Challenge",icon:"🧮",category:"brain",color:"#bee3f8"},
+{id:"numbermemory",name:"Number Memory",icon:"🔢",category:"brain",color:"#e9d8fd"},
+{id:"simon",name:"Simon Says",icon:"🎵",category:"brain",color:"#c6f6d5"},
+{id:"colormatch",name:"Color Match",icon:"🌈",category:"brain",color:"#e9d8fd"},
+{id:"cipher",name:"Cipher Breaker",icon:"🔐",category:"brain",color:"#bee3f8"},
+
+{id:"snake",name:"Snake",icon:"🐍",category:"arcade",color:"#b2f5ea"},
+{id:"breakout",name:"Breakout",icon:"🧱",category:"arcade",color:"#e9d8fd"},
+{id:"flappy",name:"Flappy Bird",icon:"🐦",category:"arcade",color:"#bee3f8"},
+{id:"space",name:"Space Shooter",icon:"🚀",category:"arcade",color:"#c4b5fd"},
+{id:"dodger",name:"Space Dodger",icon:"🛸",category:"arcade",color:"#bae6fd"},
+{id:"quicktap",name:"Quick Tap",icon:"⚡",category:"arcade",color:"#fefcbf"},
+{id:"reaction",name:"Reaction Test",icon:"🎯",category:"arcade",color:"#fbb6ce"},
+
+{id:"pong",name:"Pong",icon:"🏓",category:"sport",color:"#feebc8"},
+{id:"penalty",name:"Penalty Shootout",icon:"⚽",category:"sport",color:"#c6f6d5"},
+{id:"target",name:"Target Master",icon:"🎯",category:"sport",color:"#fed7d7"},
+
+{id:"rps",name:"Rock Paper Scissors",icon:"✊",category:"strategy",color:"#fbb6ce"},
+{id:"higher",name:"Higher or Lower",icon:"🃏",category:"strategy",color:"#c6f6d5"},
+{id:"numguess",name:"Number Guess",icon:"🧩",category:"casual",color:"#b2f5ea"},
+{id:"dice",name:"Dice Battle",icon:"🎲",category:"casual",color:"#fefcbf"}
+
+];
+
+/* ---------------- INIT ---------------- */
+
+window.addEventListener("load",()=>{
+    loadPlayer();
+    renderGames();
+    updateUI();
+});
+
+/* ---------------- STORAGE ---------------- */
+
+function savePlayer(){
+    localStorage.setItem("arcadia_player",JSON.stringify(player));
+}
+
+function loadPlayer(){
+    const saved=localStorage.getItem("arcadia_player");
+
+    if(saved){
+        try{
+            player={...player,...JSON.parse(saved)};
+            if(player.theme) document.body.classList.add("dark");
+            document.getElementById("login").classList.add("hidden");
+        }catch(e){}
+    }
+}
+
+/* ---------------- LOGIN ---------------- */
+
+function chooseAvatar(a,el){
+    selectedAvatar=a;
+    document.querySelectorAll(".avatar").forEach(x=>x.classList.remove("active"));
+    el.classList.add("active");
+}
+
+function login(){
+    const name=document.getElementById("username").value.trim();
+
+    player.name=name||"Player";
+    player.avatar=selectedAvatar;
+
+    savePlayer();
+    updateUI();
+
+    document.getElementById("login").classList.add("hidden");
+}
+
+/* ---------------- UI ---------------- */
+
+function updateUI(){
+
+    document.getElementById("navAvatar").textContent=player.avatar;
+    document.getElementById("navName").textContent=player.name;
+    document.getElementById("navScore").textContent=player.score;
+
+    document.getElementById("welcome").textContent=
+        `Ready to Play, ${player.name}?`;
+
+    document.getElementById("played").textContent=player.played;
+    document.getElementById("wins").textContent=player.wins;
+    document.getElementById("score").textContent=player.score;
+
+    player.level=Math.max(1,Math.floor(player.score/500)+1);
+
+    document.getElementById("level").textContent=player.level;
+
+    document.getElementById("profileAvatar").textContent=player.avatar;
+    document.getElementById("profileName").textContent=player.name;
+    document.getElementById("profileScore").textContent=player.score;
+    document.getElementById("profileWins").textContent=player.wins;
+    document.getElementById("profilePlayed").textContent=player.played;
+
+    document.getElementById("soundBtn").textContent=
+        player.sound?"🔊":"🔇";
+
+    document.getElementById("themeBtn").textContent=
+        player.theme?"☀️":"🌙";
+
+    renderAchievements();
+}
+
+/* ---------------- THEME ---------------- */
+
+function toggleTheme(){
+
+    player.theme=!player.theme;
+
+    document.body.classList.toggle("dark",player.theme);
+
+    savePlayer();
+    updateUI();
+}
+
+function toggleSound(){
+
+    player.sound=!player.sound;
+
+    if(player.sound) beep(600,80);
+
+    savePlayer();
+    updateUI();
+}
+
+/* ---------------- SOUND ---------------- */
+
+let audioContext=null;
+
+function beep(freq=500,duration=80){
+
+    if(!player.sound)return;
+
+    try{
+        audioContext ||= new (window.AudioContext||window.webkitAudioContext)();
+
+        const oscillator=audioContext.createOscillator();
+        const gain=audioContext.createGain();
+
+        oscillator.frequency.value=freq;
+        oscillator.type="sine";
+
+        gain.gain.value=.04;
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        oscillator.start();
+
+        setTimeout(()=>{
+            oscillator.stop();
+        },duration);
+
+    }catch(e){}
+}
+
+/* ---------------- FILTER ---------------- */
+
+function filterGames(category,button){
+
+    currentCategory=category;
+
+    document.querySelectorAll(".nav-btn")
+        .forEach(x=>x.classList.remove("active"));
+
+    button.classList.add("active");
+
+    renderGames();
+}
+
+/* ---------------- RENDER GAMES ---------------- */
+
+function renderGames(){
+
+    const search=document.getElementById("search").value.toLowerCase();
+    const sort=document.getElementById("sort").value;
+
+    let list=[...games];
+
+    if(currentCategory!=="all"){
+
+        if(currentCategory==="favorite"){
+            list=list.filter(g=>player.favorites.includes(g.id));
+        }else{
+            list=list.filter(g=>g.category===currentCategory);
+        }
+    }
+
+    list=list.filter(g=>
+        g.name.toLowerCase().includes(search) ||
+        g.category.toLowerCase().includes(search)
+    );
+
+    if(sort==="name"){
+        list.sort((a,b)=>a.name.localeCompare(b.name));
+    }
+
+    if(sort==="score"){
+        list.sort((a,b)=>
+            (player.highScores[b.id]||0)-
+            (player.highScores[a.id]||0)
+        );
+    }
+
+    if(sort==="favorite"){
+        list.sort((a,b)=>
+            Number(player.favorites.includes(b.id))-
+            Number(player.favorites.includes(a.id))
+        );
+    }
+
+    const box=document.getElementById("games");
+
+    box.innerHTML="";
+
+    list.forEach(game=>{
+
+        const favorite=player.favorites.includes(game.id);
+
+        const card=document.createElement("article");
+
+        card.className="game glass";
+
+        card.style.background=
+            `linear-gradient(135deg,${game.color},rgba(255,255,255,.65))`;
+
+        card.innerHTML=`
+
+            <button class="favorite"
+                onclick="event.stopPropagation();toggleFavorite('${game.id}')">
+                ${favorite?"❤️":"🤍"}
+            </button>
+
+            <div class="game-icon">${game.icon}</div>
+
+            <h3>${game.name}</h3>
+
+            <div class="game-category">${game.category}</div>
+
+            <div style="margin-top:8px;color:#718096;font-size:.8rem">
+                Best: ${player.highScores[game.id]||0}
+            </div>
+
+            <div class="play">
+                <span>Play ▶</span>
+            </div>
+        `;
+
+        card.onclick=()=>openGame(game.id);
+
+        box.appendChild(card);
+    });
+
+    if(!list.length){
+        box.innerHTML=`
+            <div class="game-box" style="grid-column:1/-1">
+                <h2>🔎 No games found</h2>
+                <p>Try another search or category.</p>
+            </div>
+        `;
+    }
+}
+
+/* ---------------- FAVORITES ---------------- */
+
+function toggleFavorite(id){
+
+    if(player.favorites.includes(id)){
+        player.favorites=
+            player.favorites.filter(x=>x!==id);
+    }else{
+        player.favorites.push(id);
+    }
+
+    savePlayer();
+    renderGames();
+}
+
+/* ---------------- GAME ENGINE ---------------- */
+
+function openGame(id){
+
+    const game=games.find(g=>g.id===id);
+
+    if(!game)return;
+
+    currentGame=id;
+
+    player.played++;
+
+    savePlayer();
+    updateUI();
+
+    document.getElementById("arenaTitle").textContent=
+        `${game.icon} ${game.name}`;
+
+    document.getElementById("arena").classList.add("active");
+
+    launch(id);
+}
+
+function exitGame(){
+
+    stopCurrentGame();
+
+    document.getElementById("arena").classList.remove("active");
+    document.getElementById("arenaBody").innerHTML="";
+
+    currentGame=null;
+}
+
+function restartGame(){
+
+    if(!currentGame)return;
+
+    stopCurrentGame();
+
+    document.getElementById("arenaBody").innerHTML="";
+
+    launch(currentGame);
+}
+
+function stopCurrentGame(){
+
+    if(typeof cleanupGame==="function"){
+        try{
+            cleanupGame();
+        }catch(e){}
+    }
+
+    cleanupGame=null;
+
+    window.onkeydown=null;
+}
+
+/* ---------------- RESULTS ---------------- */
+
+function finishGame(title,text,points,win=true,icon="🏆"){
+
+    points=Math.max(0,Math.floor(points));
+
+    if(win){
+        player.wins++;
+    }
+
+    player.score+=points;
+
+    if(!player.highScores[currentGame] ||
+       points>player.highScores[currentGame]){
+        player.highScores[currentGame]=points;
+    }
+
+    savePlayer();
+    updateUI();
+
+    document.getElementById("resultIcon").textContent=icon;
+    document.getElementById("resultTitle").textContent=title;
+    document.getElementById("resultText").textContent=text;
+    document.getElementById("resultScore").textContent=
+        `+${points} points`;
+
+    document.getElementById("result").classList.add("active");
+
+    beep(win?850:220,120);
+}
+
+function closeResult(){
+    document.getElementById("result").classList.remove("active");
+}
+
+/* ---------------- PROFILE ---------------- */
+
+function openProfile(){
+    document.getElementById("profileModal").classList.add("active");
+}
+
+function closeProfile(){
+    document.getElementById("profileModal").classList.remove("active");
+}
+
+function resetProgress(){
+
+    if(!confirm("Reset all Arcadia progress?"))return;
+
+    player.score=0;
+    player.wins=0;
+    player.played=0;
+    player.level=1;
+    player.highScores={};
+    player.favorites=[];
+
+    savePlayer();
+    updateUI();
+    closeProfile();
+    renderGames();
+}
+
+/* ---------------- ACHIEVEMENTS ---------------- */
+
+function renderAchievements(){
+
+    const achievements=[
+
+        ["🎮","First Game",player.played>=1,"Play your first game"],
+        ["🏆","Winner",player.wins>=1,"Win one game"],
+        ["🔥","Score Hunter",player.score>=500,"Earn 500 points"],
+        ["💎","High Roller",player.score>=2000,"Earn 2,000 points"],
+        ["👑","Arena Legend",player.score>=5000,"Earn 5,000 points"],
+        ["❤️","Collector",player.favorites.length>=5,"Favorite five games"],
+        ["🎯","Veteran",player.played>=25,"Play 25 games"]
+
+    ];
+
+    document.getElementById("achievements").innerHTML=
+        achievements.map(a=>`
+
+            <div class="achievement ${a[2]?"":"locked"}">
+                <div class="achievement-icon">${a[0]}</div>
+                <div>
+                    <b>${a[1]}</b>
+                    <div style="font-size:.8rem;color:var(--muted)">
+                        ${a[3]}
                     </div>
-                    <div class="stat-card">
-                        <div class="value" id="dash-wins">0</div>
-                        <div class="label">Wins</div>
-                    </div>
+                </div>
+                <div style="margin-left:auto">
+                    ${a[2]?"✅":"🔒"}
                 </div>
             </div>
 
-            <div class="games-grid" id="games-grid">
-                <!-- Populated via JS -->
-            </div>
-        </div>
-    </div>
+        `).join("");
+}
 
-    <!-- Fullscreen Dedicated Arena View -->
-    <div id="fullscreen-arena">
-        <div class="arena-top-header">
-            <div class="arena-title" id="arena-game-title">
-                <span>🎮</span> Game Title
-            </div>
-            <div class="arena-actions">
-                <button class="btn-secondary" onclick="restartCurrentGame()">🔄 Restart Game</button>
-                <button class="btn-primary" style="width:auto;" onclick="exitFullscreenArena()">⬅️ Back to Hub</button>
-            </div>
-        </div>
-        <div class="arena-body" id="arena-game-body">
-            <!-- Active Game Injected Here -->
-        </div>
-    </div>
+/* ============================================================
+   GAME 1 — TRIVIA
+============================================================ */
 
-    <!-- Universal Game Results Modal -->
-    <div class="result-modal" id="result-modal">
-        <div class="result-card">
-            <div class="result-banner" id="res-banner">🏆</div>
-            <div class="result-title" id="res-title">Victory!</div>
-            <div class="result-desc" id="res-desc">You completed the challenge successfully.</div>
-            <div style="display:flex; gap:12px; margin-bottom:20px;">
-                <div class="stat-card" style="flex:1;">
-                    <div class="value" id="res-score">+50</div>
-                    <div class="label">Points Added</div>
-                </div>
-                <div class="stat-card" style="flex:1;">
-                    <div class="value" id="res-total">0</div>
-                    <div class="label">Total Score</div>
-                </div>
-            </div>
-            <div style="display:flex; gap:12px;">
-                <button class="btn-secondary" style="flex:1;" onclick="exitFullscreenArena(); hideResultModal();">Arena Hub</button>
-                <button class="btn-primary" style="flex:1;" onclick="restartCurrentGame(); hideResultModal();">Play Again</button>
-            </div>
-        </div>
-    </div>
+function gameTrivia(box){
 
-    <!-- Profile Modal -->
-    <div class="game-modal" id="profile-modal">
-        <div class="game-stage">
-            <div class="game-header">
-                <h2><span>👤</span> Player Profile</h2>
-                <button class="close-btn" onclick="closeProfileModal()">✕</button>
-            </div>
-            <div style="padding: 24px; text-align: center; display:flex; flex-direction:column; gap:16px;">
-                <div id="profile-avatar-large" style="font-size: 4rem;">🚀</div>
-                <h3 id="profile-name-large" style="font-size: 1.5rem;">Player</h3>
-                <div style="display: flex; gap: 12px; width: 100%; justify-content: center;">
-                    <div class="stat-card" style="flex:1;">
-                        <div class="value" id="prof-score">0</div>
-                        <div class="label">Total Score</div>
-                    </div>
-                    <div class="stat-card" style="flex:1;">
-                        <div class="value" id="prof-trophies">0</div>
-                        <div class="label">Trophies</div>
-                    </div>
-                </div>
-                <button class="btn-primary" onclick="resetStats()" style="background:#e53e3e; margin-top:10px;">Reset Progress</button>
-            </div>
-        </div>
-    </div>
+    const questions=[
+        ["Which planet is called the Red Planet?",["Earth","Mars","Venus","Jupiter"],1],
+        ["Largest ocean?",["Atlantic","Pacific","Indian","Arctic"],1],
+        ["How many legs does a spider have?",["6","8","10","12"],1],
+        ["Chemical symbol O?",["Gold","Oxygen","Osmium","Iron"],1],
+        ["Capital of Pakistan?",["Lahore","Islamabad","Karachi","Peshawar"],1],
+        ["How many continents are there?",["5","6","7","8"],2],
+        ["Fastest land animal?",["Lion","Horse","Cheetah","Tiger"],2],
+        ["Which gas do humans breathe in?",["Oxygen","Helium","Hydrogen","Neon"],0]
+    ];
 
-    <script>
-        let currentUser = {
-            username: 'Player',
-            avatar: '🚀',
-            trophies: 0,
-            gamesPlayed: 0,
-            wins: 0,
-            totalScore: 0
-        };
+    let index=0;
+    let score=0;
 
-        let selectedAvatar = '🚀';
-        let activeGameId = null;
+    function render(){
 
-        const gamesDatabase = [
-            { id: 'trivia', name: 'Trivia Quiz', icon: '🏆', category: 'brain', bg: '#feebc8' },
-            { id: 'hangman', name: 'Hangman', icon: '🔤', category: 'word', bg: '#e9d8fd' },
-            { id: 'scramble', name: 'Word Scramble', icon: '🔀', category: 'word', bg: '#bee3f8' },
-            { id: 'wordmaster', name: 'Word Master', icon: '🧠', category: 'word', bg: '#c6f6d5' },
-            { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '❌', category: 'casual', bg: '#fbb6ce' },
-            { id: 'snake', name: 'Snake', icon: '🐍', category: 'arcade', bg: '#b2f5ea' },
-            { id: 'pong', name: 'Pong', icon: '🏓', category: 'arcade', bg: '#feebc8' },
-            { id: 'breakout', name: 'Breakout', icon: '🧱', category: 'arcade', bg: '#e9d8fd' },
-            { id: 'reaction', name: 'Reaction Test', icon: '🎯', category: 'brain', bg: '#fbb6ce' },
-            { id: 'math', name: 'Math Challenge', icon: '🧮', category: 'brain', bg: '#bee3f8' },
-            { id: 'memory', name: 'Memory Cards', icon: '🃏', category: 'brain', bg: '#c6f6d5' },
-            { id: '2048', name: '2048 Puzzle', icon: '🔢', category: 'brain', bg: '#fefcbf' },
-            { id: 'connect4', name: 'Connect Four', icon: '🟡', category: 'casual', bg: '#feebc8' },
-            { id: 'minesweeper', name: 'Minesweeper', icon: '⚫', category: 'casual', bg: '#e9d8fd' },
-            { id: 'numguess', name: 'Number Guess', icon: '🧩', category: 'casual', bg: '#b2f5ea' },
-            { id: 'crypto', name: 'Crypto Cipher', icon: '🔐', category: 'brain', bg: '#bee3f8' },
-            { id: 'rps', name: 'Rock Paper Scissors', icon: '✊', category: 'casual', bg: '#fbb6ce' },
-            { id: 'higherlower', name: 'Higher or Lower', icon: '🃏', category: 'casual', bg: '#c6f6d5' },
-            { id: 'quicktap', name: 'Quick Tap', icon: '⚡', category: 'arcade', bg: '#fefcbf' },
-            { id: 'colormatch', name: 'Color Match', icon: '🌈', category: 'brain', bg: '#e9d8fd' }
-        ];
+        if(index>=questions.length){
 
-        window.onload = () => {
-            loadUserData();
-            renderGamesGrid('all');
-            updateUI();
-        };
+            finishGame(
+                "Trivia Complete!",
+                `You answered ${score}/${questions.length} correctly.`,
+                score*30,
+                score>=4,
+                "🏆"
+            );
 
-        function selectAvatar(emoji, el) {
-            selectedAvatar = emoji;
-            document.querySelectorAll('.avatar-opt').forEach(opt => opt.classList.remove('active'));
-            el.classList.add('active');
+            return;
         }
 
-        function loginUser() {
-            const input = document.getElementById('username-input').value.trim();
-            currentUser.username = input || 'Player1';
-            currentUser.avatar = selectedAvatar;
-            saveUserData();
-            updateUI();
-            document.getElementById('login-screen').style.display = 'none';
+        const q=questions[index];
+
+        box.innerHTML=`
+
+            <div class="game-box">
+                <p>Question ${index+1} / ${questions.length}</p>
+
+                <h2>${q[0]}</h2>
+
+                <div style="display:grid;gap:10px;margin-top:20px">
+                    ${q[1].map((a,i)=>`
+                        <button class="btn secondary"
+                            onclick="window.triviaAnswer(${i})">
+                            ${a}
+                        </button>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+    }
+
+    window.triviaAnswer=(choice)=>{
+
+        if(choice===questions[index][2]){
+            score++;
+            beep(700);
+        }else{
+            beep(200);
         }
 
-        function saveUserData() {
-            localStorage.setItem('arcadia_user', JSON.stringify(currentUser));
+        index++;
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.triviaAnswer;
+    };
+}
+
+/* ============================================================
+   GAME 2 — HANGMAN
+============================================================ */
+
+function gameHangman(box){
+
+    const words=[
+        "COMPUTER","PYTHON","JAVASCRIPT","ARCADE",
+        "GALAXY","ROCKET","PLANET","PUZZLE",
+        "SCHOOL","CODING","KEYBOARD","BROWSER"
+    ];
+
+    const word=words[Math.floor(Math.random()*words.length)];
+
+    let guessed=new Set();
+    let mistakes=0;
+
+    function render(){
+
+        if(word.split("").every(x=>guessed.has(x))){
+
+            finishGame(
+                "Word Solved!",
+                `You discovered ${word}.`,
+                100,
+                true,
+                "🎉"
+            );
+
+            return;
         }
 
-        function loadUserData() {
-            const saved = localStorage.getItem('arcadia_user');
-            if (saved) {
-                currentUser = JSON.parse(saved);
-                document.getElementById('login-screen').style.display = 'none';
+        if(mistakes>=6){
+
+            finishGame(
+                "Game Over",
+                `The word was ${word}.`,
+                0,
+                false,
+                "❌"
+            );
+
+            return;
+        }
+
+        const display=word
+            .split("")
+            .map(x=>guessed.has(x)?x:"_")
+            .join(" ");
+
+        const alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <p>Mistakes: ${mistakes}/6</p>
+
+                <h1 style="letter-spacing:8px;margin:25px 0">
+                    ${display}
+                </h1>
+
+                <div class="keypad">
+                    ${alphabet.split("").map(letter=>`
+                        <button
+                            ${guessed.has(letter)?"disabled":""}
+                            onclick="window.hangGuess('${letter}')">
+                            ${letter}
+                        </button>
+                    `).join("")}
+                </div>
+
+            </div>
+        `;
+    }
+
+    window.hangGuess=(letter)=>{
+
+        if(guessed.has(letter))return;
+
+        guessed.add(letter);
+
+        if(!word.includes(letter)){
+            mistakes++;
+            beep(180);
+        }else{
+            beep(650);
+        }
+
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.hangGuess;
+    };
+}
+
+/* ============================================================
+   GAME 3 — WORD SCRAMBLE
+============================================================ */
+
+function gameScramble(box){
+
+    const words=[
+        "ARCADE","COMPUTER","PYTHON","JAVASCRIPT",
+        "GALAXY","ROCKET","PUZZLE","CREATIVE",
+        "KEYBOARD","MOUSE"
+    ];
+
+    const word=words[Math.floor(Math.random()*words.length)];
+
+    let shuffled=word.split("").sort(()=>Math.random()-.5).join("");
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>Unscramble This</h2>
+
+            <div style="font-size:3rem;font-weight:900;
+                letter-spacing:8px;color:var(--primary);
+                margin:25px">
+                ${shuffled}
+            </div>
+
+            <input id="scrambleAnswer"
+                class="game-input"
+                placeholder="Your answer">
+
+            <button class="btn primary"
+                onclick="window.scrambleCheck()">
+                Check Answer
+            </button>
+
+        </div>
+    `;
+
+    window.scrambleCheck=()=>{
+
+        const answer=document
+            .getElementById("scrambleAnswer")
+            .value.trim()
+            .toUpperCase();
+
+        if(answer===word){
+            finishGame(
+                "Correct!",
+                `You solved ${word}.`,
+                80,
+                true,
+                "🔀"
+            );
+        }else{
+            beep(180);
+            alert("Not correct. Try again!");
+        }
+    };
+
+    cleanupGame=()=>{
+        delete window.scrambleCheck;
+    };
+}
+
+/* ============================================================
+   GAME 4 — WORD MASTER
+============================================================ */
+
+function gameWordMaster(box){
+
+    const words=[
+        "PLANT","SMART","BRAIN","POWER",
+        "LIGHT","MOUSE","HOUSE","WORLD",
+        "SPACE","SNAKE"
+    ];
+
+    const target=words[Math.floor(Math.random()*words.length)];
+
+    let attempts=[];
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>Word Master</h2>
+                <p>Find the 5-letter word in 6 attempts.</p>
+
+                <div style="display:grid;gap:6px;
+                    width:max-content;margin:20px auto">
+
+                    ${Array.from({length:6}).map((_,r)=>{
+
+                        const guess=attempts[r]||"";
+
+                        return `
+                        <div style="display:grid;
+                            grid-template-columns:repeat(5,50px);
+                            gap:5px">
+
+                            ${Array.from({length:5}).map((_,c)=>{
+
+                                const char=guess[c]||"";
+                                let color="var(--panel2)";
+
+                                if(guess){
+                                    if(char===target[c])
+                                        color="#48bb78";
+                                    else if(target.includes(char))
+                                        color="#ecc94b";
+                                    else
+                                        color="#a0aec0";
+                                }
+
+                                return `
+                                <div style="
+                                    width:50px;height:50px;
+                                    background:${color};
+                                    border-radius:7px;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                    font-size:1.3rem;
+                                    font-weight:bold">
+                                    ${char}
+                                </div>`;
+                            }).join("")}
+
+                        </div>`;
+                    }).join("")}
+
+                </div>
+
+                <input id="wmInput"
+                    maxlength="5"
+                    class="game-input"
+                    style="text-transform:uppercase"
+                    placeholder="5-letter word">
+
+                <button class="btn primary"
+                    onclick="window.wmSubmit()">
+                    Guess
+                </button>
+
+            </div>
+        `;
+    }
+
+    window.wmSubmit=()=>{
+
+        const value=document
+            .getElementById("wmInput")
+            .value.trim().toUpperCase();
+
+        if(value.length!==5)return;
+
+        attempts.push(value);
+
+        if(value===target){
+
+            finishGame(
+                "Word Master!",
+                `Solved in ${attempts.length} attempts.`,
+                Math.max(40,150-attempts.length*15),
+                true,
+                "🧠"
+            );
+
+            return;
+        }
+
+        if(attempts.length>=6){
+
+            finishGame(
+                "Out of Attempts",
+                `The word was ${target}.`,
+                0,
+                false,
+                "❌"
+            );
+
+            return;
+        }
+
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.wmSubmit;
+    };
+}
+
+/* ============================================================
+   GAME 5 — TYPING SPEED
+============================================================ */
+
+function gameTyping(box){
+
+    const texts=[
+        "The quick brown fox jumps over the lazy dog.",
+        "Learning programming is an exciting journey.",
+        "Arcadia Arena is a collection of browser games.",
+        "Python JavaScript HTML and CSS are useful skills."
+    ];
+
+    const text=texts[Math.floor(Math.random()*texts.length)];
+
+    let start=null;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>⌨️ Typing Speed Test</h2>
+
+            <p style="font-size:1.1rem">${text}</p>
+
+            <textarea id="typingInput"
+                class="game-input"
+                rows="5"
+                placeholder="Start typing here..."></textarea>
+
+            <div id="typingStatus">
+                Start typing to begin.
+            </div>
+
+        </div>
+    `;
+
+    const input=document.getElementById("typingInput");
+
+    input.oninput=()=>{
+
+        if(!start)start=Date.now();
+
+        if(input.value===text){
+
+            const seconds=(Date.now()-start)/1000;
+            const wpm=Math.round((text.length/5)/(seconds/60));
+
+            finishGame(
+                "Typing Complete!",
+                `Speed: ${wpm} WPM`,
+                Math.min(200,Math.max(20,wpm*3)),
+                true,
+                "⌨️"
+            );
+        }else{
+
+            document.getElementById("typingStatus").textContent=
+                `${input.value.length}/${text.length} characters`;
+        }
+    };
+
+    cleanupGame=()=>{
+        input.oninput=null;
+    };
+}
+
+/* ============================================================
+   GAME 6 — TIC TAC TOE
+============================================================ */
+
+function gameTicTacToe(box){
+
+    let board=Array(9).fill("");
+    let turn="X";
+
+    const wins=[
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+
+    function winner(p){
+        return wins.some(w=>w.every(i=>board[i]===p));
+    }
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>Tic-Tac-Toe</h2>
+                <p>Turn: ${turn}</p>
+
+                <div class="board ttt-board"
+                    style="margin:20px auto">
+
+                    ${board.map((v,i)=>`
+                        <div class="cell ttt-cell"
+                            onclick="window.tttMove(${i})">
+                            ${v}
+                        </div>
+                    `).join("")}
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    window.tttMove=(i)=>{
+
+        if(board[i])return;
+
+        board[i]=turn;
+
+        if(winner(turn)){
+
+            finishGame(
+                `Player ${turn} Wins!`,
+                "Three in a row!",
+                70,
+                true,
+                "❌"
+            );
+
+            return;
+        }
+
+        if(board.every(Boolean)){
+
+            finishGame(
+                "Draw!",
+                "Nobody won this round.",
+                20,
+                false,
+                "🤝"
+            );
+
+            return;
+        }
+
+        turn=turn==="X"?"O":"X";
+
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.tttMove;
+    };
+}
+
+/* ============================================================
+   GAME 7 — CONNECT FOUR
+============================================================ */
+
+function gameConnect4(box){
+
+    let board=Array(42).fill("");
+    let gameOver=false;
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>Connect Four</h2>
+                <p>Get four red pieces in a row.</p>
+
+                <div class="board c4-board">
+
+                    ${board.map((v,i)=>`
+                        <div class="cell c4-cell"
+                            onclick="window.c4Move(${i%7})"
+                            style="background:
+                            ${v==="R"?"#ef4444":
+                              v==="Y"?"#facc15":"white"}">
+                        </div>
+                    `).join("")}
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    function check(p){
+
+        for(let r=0;r<6;r++){
+            for(let c=0;c<7;c++){
+
+                const dirs=[
+                    [0,1],[1,0],[1,1],[1,-1]
+                ];
+
+                for(const [dr,dc] of dirs){
+
+                    let ok=true;
+
+                    for(let k=0;k<4;k++){
+
+                        const rr=r+dr*k;
+                        const cc=c+dc*k;
+
+                        if(
+                            rr<0||rr>=6||
+                            cc<0||cc>=7||
+                            board[rr*7+cc]!==p
+                        ){
+                            ok=false;
+                            break;
+                        }
+                    }
+
+                    if(ok)return true;
+                }
             }
         }
 
-        function updateUI() {
-            document.getElementById('nav-avatar').innerText = currentUser.avatar;
-            document.getElementById('nav-username').innerText = currentUser.username;
-            document.getElementById('nav-trophies').innerText = `🏆 ${currentUser.trophies}`;
-            document.getElementById('welcome-title').innerText = `Ready to Play, ${currentUser.username}?`;
-            document.getElementById('dash-played').innerText = currentUser.gamesPlayed;
-            document.getElementById('dash-wins').innerText = currentUser.wins;
-            
-            document.getElementById('profile-avatar-large').innerText = currentUser.avatar;
-            document.getElementById('profile-name-large').innerText = currentUser.username;
-            document.getElementById('prof-score').innerText = currentUser.totalScore;
-            document.getElementById('prof-trophies').innerText = currentUser.trophies;
+        return false;
+    }
+
+    function drop(col,p){
+
+        for(let r=5;r>=0;r--){
+
+            const index=r*7+col;
+
+            if(!board[index]){
+                board[index]=p;
+                return true;
+            }
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const btn = document.getElementById('theme-btn');
-            btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        return false;
+    }
+
+    window.c4Move=(col)=>{
+
+        if(gameOver)return;
+
+        if(!drop(col,"R"))return;
+
+        if(check("R")){
+
+            gameOver=true;
+
+            finishGame(
+                "Connect Four!",
+                "You connected four pieces.",
+                100,
+                true,
+                "🟡"
+            );
+
+            return;
         }
 
-        function filterCategory(cat, btn) {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderGamesGrid(cat);
+        const available=[];
+
+        for(let c=0;c<7;c++){
+            if(!board[c])available.push(c);
         }
 
-        function renderGamesGrid(category) {
-            const grid = document.getElementById('games-grid');
-            grid.innerHTML = '';
-            
-            const filtered = category === 'all' 
-                ? gamesDatabase 
-                : gamesDatabase.filter(g => g.category === category);
+        if(available.length){
 
-            filtered.forEach(game => {
-                const card = document.createElement('div');
-                card.className = 'game-card glass';
-                card.style.background = `linear-gradient(135deg, ${game.bg} 0%, rgba(255,255,255,0.7) 100%)`;
-                card.onclick = () => openFullscreenGame(game.id);
-                card.innerHTML = `
-                    <div class="game-icon">${game.icon}</div>
-                    <div class="game-title">${game.name}</div>
-                    <div class="game-category">${game.category}</div>
-                    <div class="play-tag">Play Arena ▶</div>
-                `;
-                grid.appendChild(card);
+            const ai=
+                available[Math.floor(Math.random()*available.length)];
+
+            drop(ai,"Y");
+
+            if(check("Y")){
+
+                gameOver=true;
+
+                finishGame(
+                    "AI Wins",
+                    "The computer connected four.",
+                    0,
+                    false,
+                    "❌"
+                );
+
+                return;
+            }
+        }
+
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.c4Move;
+    };
+}
+
+/* ============================================================
+   GAME 8 — MEMORY
+============================================================ */
+
+function gameMemory(box){
+
+    const icons=["🐶","🐱","🦊","🐼","🐸","🐵","🐯","🐨"];
+
+    const deck=[...icons,...icons]
+        .sort(()=>Math.random()-.5);
+
+    let open=[];
+    let matched=0;
+    let locked=false;
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>Memory Cards</h2>
+
+                <div class="board memory-board">
+
+                    ${deck.map((icon,i)=>`
+
+                        <div class="cell memory-card"
+                            id="memory${i}"
+                            onclick="window.memoryFlip(${i})">
+                            ${open.some(x=>x.i===i)||deck[i]==="MATCH"?
+                            icon:"?"}
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    window.memoryFlip=(i)=>{
+
+        if(locked)return;
+
+        if(open.some(x=>x.i===i))return;
+
+        if(deck[i]==="MATCH")return;
+
+        open.push({i,icon:deck[i]});
+
+        render();
+
+        if(open.length===2){
+
+            locked=true;
+
+            if(open[0].icon===open[1].icon){
+
+                deck[open[0].i]="MATCH";
+                deck[open[1].i]="MATCH";
+
+                matched++;
+
+                open=[];
+                locked=false;
+
+                if(matched===icons.length){
+
+                    finishGame(
+                        "Memory Master!",
+                        "Every pair matched!",
+                        120,
+                        true,
+                        "🃏"
+                    );
+
+                    return;
+                }
+
+                render();
+
+            }else{
+
+                setTimeout(()=>{
+
+                    open=[];
+                    locked=false;
+                    render();
+
+                },700);
+            }
+        }
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.memoryFlip;
+    };
+}
+
+/* ============================================================
+   GAME 9 — 2048
+============================================================ */
+
+function game2048(box){
+
+    let board=Array(16).fill(0);
+    let score=0;
+
+    function add(){
+
+        const empty=board
+            .map((v,i)=>v===0?i:-1)
+            .filter(i=>i>=0);
+
+        if(!empty.length)return;
+
+        const i=empty[Math.floor(Math.random()*empty.length)];
+
+        board[i]=Math.random()<.9?2:4;
+    }
+
+    add();
+    add();
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>2048</h2>
+                <p>Score: <b>${score}</b></p>
+
+                <div style="
+                    display:grid;
+                    grid-template-columns:repeat(4,70px);
+                    gap:7px;
+                    background:#bbada0;
+                    padding:8px;
+                    width:max-content;
+                    margin:auto">
+
+                    ${board.map(v=>`
+                        <div style="
+                            width:70px;
+                            height:70px;
+                            background:${tileColor(v)};
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            border-radius:8px;
+                            font-size:1.4rem;
+                            font-weight:900">
+                            ${v||""}
+                        </div>
+                    `).join("")}
+
+                </div>
+
+                <div class="game-buttons" style="margin-top:15px">
+                    <button class="btn secondary" onclick="window.move2048('left')">⬅</button>
+                    <button class="btn secondary" onclick="window.move2048('up')">⬆</button>
+                    <button class="btn secondary" onclick="window.move2048('down')">⬇</button>
+                    <button class="btn secondary" onclick="window.move2048('right')">➡</button>
+                </div>
+
+            </div>
+        `;
+    }
+
+    function tileColor(v){
+
+        const colors={
+            0:"#ccc0b3",
+            2:"#eee4da",
+            4:"#ede0c8",
+            8:"#f2b179",
+            16:"#f59563",
+            32:"#f67c5f",
+            64:"#f65e3b",
+            128:"#edcf72",
+            256:"#edcc61",
+            512:"#edc850",
+            1024:"#edc53f",
+            2048:"#edc22e"
+        };
+
+        return colors[v]||"#3c3a32";
+    }
+
+    function slide(line){
+
+        const filtered=line.filter(Boolean);
+
+        for(let i=0;i<filtered.length-1;i++){
+
+            if(filtered[i]===filtered[i+1]){
+
+                filtered[i]*=2;
+                score+=filtered[i];
+
+                filtered.splice(i+1,1);
+            }
+        }
+
+        while(filtered.length<4)filtered.push(0);
+
+        return filtered;
+    }
+
+    window.move2048=(direction)=>{
+
+        const old=[...board];
+
+        for(let i=0;i<4;i++){
+
+            let line;
+
+            if(direction==="left"||direction==="right"){
+                line=board.slice(i*4,i*4+4);
+            }else{
+                line=[
+                    board[i],
+                    board[i+4],
+                    board[i+8],
+                    board[i+12]
+                ];
+            }
+
+            if(direction==="right"||direction==="down")
+                line.reverse();
+
+            line=slide(line);
+
+            if(direction==="right"||direction==="down")
+                line.reverse();
+
+            for(let j=0;j<4;j++){
+
+                if(direction==="left"||direction==="right"){
+                    board[i*4+j]=line[j];
+                }else{
+                    board[i+j*4]=line[j];
+                }
+            }
+        }
+
+        if(JSON.stringify(old)!==JSON.stringify(board)){
+
+            add();
+            render();
+
+            if(board.includes(2048)){
+
+                finishGame(
+                    "2048!",
+                    "You reached the legendary tile!",
+                    score,
+                    true,
+                    "🔢"
+                );
+
+            }else if(!board.includes(0)){
+
+                let possible=false;
+
+                for(let i=0;i<16;i++){
+
+                    if(
+                        i%4<3&&board[i]===board[i+1] ||
+                        i<12&&board[i]===board[i+4]
+                    ){
+                        possible=true;
+                    }
+                }
+
+                if(!possible){
+
+                    finishGame(
+                        "Game Over",
+                        `Final score: ${score}`,
+                        score,
+                        false,
+                        "❌"
+                    );
+                }
+            }
+        }
+    };
+
+    window.onkeydown=(e)=>{
+
+        const map={
+            ArrowLeft:"left",
+            ArrowRight:"right",
+            ArrowUp:"up",
+            ArrowDown:"down"
+        };
+
+        if(map[e.key]){
+            e.preventDefault();
+            window.move2048(map[e.key]);
+        }
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        window.onkeydown=null;
+        delete window.move2048;
+    };
+}
+
+/* ============================================================
+   GAME 10 — SNAKE
+============================================================ */
+
+function gameSnake(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🐍 Snake</h2>
+            <p>Use arrow keys or buttons.</p>
+
+            <canvas id="snakeCanvas"
+                width="360"
+                height="360"></canvas>
+
+            <div class="game-buttons" style="margin-top:15px">
+                <button class="btn secondary" onclick="window.snakeDir('up')">⬆</button>
+                <button class="btn secondary" onclick="window.snakeDir('left')">⬅</button>
+                <button class="btn secondary" onclick="window.snakeDir('down')">⬇</button>
+                <button class="btn secondary" onclick="window.snakeDir('right')">➡</button>
+            </div>
+
+        </div>
+    `;
+
+    const canvas=document.getElementById("snakeCanvas");
+    const ctx=canvas.getContext("2d");
+
+    const size=18;
+    const cells=20;
+
+    let snake=[
+        {x:10,y:10},
+        {x:9,y:10},
+        {x:8,y:10}
+    ];
+
+    let food=randomFood();
+
+    let dx=1;
+    let dy=0;
+    let score=0;
+    let timer;
+
+    function randomFood(){
+
+        return {
+            x:Math.floor(Math.random()*cells),
+            y:Math.floor(Math.random()*cells)
+        };
+    }
+
+    function draw(){
+
+        ctx.fillStyle="#111827";
+        ctx.fillRect(0,0,360,360);
+
+        ctx.fillStyle="#ef4444";
+        ctx.fillRect(food.x*size,food.y*size,size-2,size-2);
+
+        ctx.fillStyle="#48bb78";
+
+        snake.forEach(s=>{
+            ctx.fillRect(
+                s.x*size,
+                s.y*size,
+                size-2,
+                size-2
+            );
+        });
+    }
+
+    function tick(){
+
+        const head={
+            x:snake[0].x+dx,
+            y:snake[0].y+dy
+        };
+
+        if(
+            head.x<0||head.x>=cells||
+            head.y<0||head.y>=cells||
+            snake.some(s=>s.x===head.x&&s.y===head.y)
+        ){
+
+            clearInterval(timer);
+
+            finishGame(
+                "Snake Over!",
+                `You collected ${score} food.`,
+                score*10,
+                score>=3,
+                "🐍"
+            );
+
+            return;
+        }
+
+        snake.unshift(head);
+
+        if(head.x===food.x&&head.y===food.y){
+
+            score++;
+            food=randomFood();
+            beep(700);
+
+        }else{
+            snake.pop();
+        }
+
+        draw();
+    }
+
+    window.snakeDir=(direction)=>{
+
+        if(direction==="up"&&dy!==1){
+            dx=0;dy=-1;
+        }
+
+        if(direction==="down"&&dy!==-1){
+            dx=0;dy=1;
+        }
+
+        if(direction==="left"&&dx!==1){
+            dx=-1;dy=0;
+        }
+
+        if(direction==="right"&&dx!==-1){
+            dx=1;dy=0;
+        }
+    };
+
+    window.onkeydown=(e)=>{
+
+        const map={
+            ArrowUp:"up",
+            ArrowDown:"down",
+            ArrowLeft:"left",
+            ArrowRight:"right"
+        };
+
+        if(map[e.key]){
+            e.preventDefault();
+            window.snakeDir(map[e.key]);
+        }
+    };
+
+    draw();
+
+    timer=setInterval(tick,110);
+
+    cleanupGame=()=>{
+        clearInterval(timer);
+        window.onkeydown=null;
+        delete window.snakeDir;
+    };
+}
+
+/* ============================================================
+   GAME 11 — PONG
+============================================================ */
+
+function gamePong(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🏓 Pong</h2>
+            <p>Move your mouse over the canvas.</p>
+
+            <canvas id="pongCanvas"
+                width="600"
+                height="350"></canvas>
+
+        </div>
+    `;
+
+    const canvas=document.getElementById("pongCanvas");
+    const ctx=canvas.getContext("2d");
+
+    let playerY=140;
+    let aiY=140;
+
+    let ball={
+        x:300,y:175,
+        vx:5,vy:3
+    };
+
+    let running=true;
+    let raf;
+
+    canvas.onmousemove=e=>{
+
+        const rect=canvas.getBoundingClientRect();
+
+        playerY=
+            (e.clientY-rect.top)*
+            (canvas.height/rect.height)-40;
+    };
+
+    function loop(){
+
+        if(!running)return;
+
+        ball.x+=ball.vx;
+        ball.y+=ball.vy;
+
+        if(ball.y<0||ball.y>350)
+            ball.vy*=-1;
+
+        aiY+=(ball.y-aiY-40)*.08;
+
+        if(
+            ball.x<30 &&
+            ball.y>playerY &&
+            ball.y<playerY+80
+        ){
+            ball.vx=Math.abs(ball.vx);
+        }
+
+        if(
+            ball.x>570 &&
+            ball.y>aiY &&
+            ball.y<aiY+80
+        ){
+            ball.vx=-Math.abs(ball.vx);
+        }
+
+        if(ball.x<0){
+
+            running=false;
+
+            finishGame(
+                "Pong Defeat",
+                "The AI scored.",
+                0,
+                false,
+                "🏓"
+            );
+
+            return;
+        }
+
+        if(ball.x>600){
+
+            running=false;
+
+            finishGame(
+                "Pong Victory!",
+                "You scored against the AI.",
+                100,
+                true,
+                "🏆"
+            );
+
+            return;
+        }
+
+        ctx.fillStyle="#111827";
+        ctx.fillRect(0,0,600,350);
+
+        ctx.fillStyle="#60a5fa";
+        ctx.fillRect(15,playerY,15,80);
+
+        ctx.fillStyle="#f97316";
+        ctx.fillRect(570,aiY,15,80);
+
+        ctx.fillStyle="white";
+        ctx.beginPath();
+        ctx.arc(ball.x,ball.y,9,0,Math.PI*2);
+        ctx.fill();
+
+        raf=requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    cleanupGame=()=>{
+        running=false;
+        cancelAnimationFrame(raf);
+        canvas.onmousemove=null;
+    };
+}
+
+/* ============================================================
+   GAME 12 — BREAKOUT
+============================================================ */
+
+function gameBreakout(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+            <h2>🧱 Breakout</h2>
+            <p>Move the paddle with your mouse.</p>
+            <canvas id="breakCanvas"
+                width="600"
+                height="400"></canvas>
+        </div>
+    `;
+
+    const canvas=document.getElementById("breakCanvas");
+    const ctx=canvas.getContext("2d");
+
+    let paddle=250;
+    let x=300,y=340;
+    let vx=4,vy=-4;
+    let bricks=[];
+
+    for(let r=0;r<5;r++){
+        for(let c=0;c<10;c++){
+            bricks.push({
+                x:20+c*56,
+                y:30+r*25,
+                alive:true
+            });
+        }
+    }
+
+    let running=true;
+    let raf;
+
+    canvas.onmousemove=e=>{
+
+        const rect=canvas.getBoundingClientRect();
+
+        paddle=
+            (e.clientX-rect.left)*
+            (canvas.width/rect.width)-50;
+    };
+
+    function loop(){
+
+        if(!running)return;
+
+        x+=vx;
+        y+=vy;
+
+        if(x<5||x>595)vx*=-1;
+        if(y<5)vy*=-1;
+
+        if(
+            y>350 &&
+            y<380 &&
+            x>paddle &&
+            x<paddle+100
+        ){
+            vy=-Math.abs(vy);
+        }
+
+        for(const b of bricks){
+
+            if(
+                b.alive &&
+                x>b.x &&
+                x<b.x+50 &&
+                y>b.y &&
+                y<b.y+18
+            ){
+                b.alive=false;
+                vy*=-1;
+                break;
+            }
+        }
+
+        if(y>400){
+
+            running=false;
+
+            finishGame(
+                "Breakout Over",
+                "The ball missed the paddle.",
+                0,
+                false,
+                "❌"
+            );
+
+            return;
+        }
+
+        if(bricks.every(b=>!b.alive)){
+
+            running=false;
+
+            finishGame(
+                "Stage Cleared!",
+                "All bricks destroyed.",
+                150,
+                true,
+                "🧱"
+            );
+
+            return;
+        }
+
+        ctx.fillStyle="#111827";
+        ctx.fillRect(0,0,600,400);
+
+        bricks.forEach(b=>{
+
+            if(b.alive){
+
+                ctx.fillStyle="#facc15";
+                ctx.fillRect(b.x,b.y,50,18);
+            }
+        });
+
+        ctx.fillStyle="#60a5fa";
+        ctx.fillRect(paddle,375,100,10);
+
+        ctx.fillStyle="white";
+        ctx.beginPath();
+        ctx.arc(x,y,7,0,Math.PI*2);
+        ctx.fill();
+
+        raf=requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    cleanupGame=()=>{
+        running=false;
+        cancelAnimationFrame(raf);
+        canvas.onmousemove=null;
+    };
+}
+
+/* ============================================================
+   GAME 13 — FLAPPY
+============================================================ */
+
+function gameFlappy(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🐦 Flappy Bird</h2>
+
+            <canvas id="flappyCanvas"
+                width="420"
+                height="600"></canvas>
+
+            <button class="btn primary"
+                style="margin-top:15px"
+                onclick="window.flap()">
+                🪽 FLAP
+            </button>
+
+        </div>
+    `;
+
+    const canvas=document.getElementById("flappyCanvas");
+    const ctx=canvas.getContext("2d");
+
+    let bird={x:90,y:280,vy:0};
+    let pipes=[];
+    let frame=0;
+    let score=0;
+    let running=true;
+    let raf;
+
+    function flap(){
+        bird.vy=-7;
+    }
+
+    window.flap=flap;
+
+    window.onkeydown=e=>{
+        if(e.code==="Space"){
+            e.preventDefault();
+            flap();
+        }
+    };
+
+    function loop(){
+
+        if(!running)return;
+
+        frame++;
+
+        bird.vy+=.35;
+        bird.y+=bird.vy;
+
+        if(frame%100===0){
+
+            const gap=170;
+            const top=80+Math.random()*230;
+
+            pipes.push({
+                x:420,
+                top,
+                bottom:top+gap,
+                passed:false
             });
         }
 
-        function openFullscreenGame(gameId) {
-            const game = gamesDatabase.find(g => g.id === gameId);
-            if (!game) return;
-            
-            activeGameId = gameId;
-            document.getElementById('arena-game-title').innerHTML = `<span>${game.icon}</span> ${game.name}`;
-            
-            const arena = document.getElementById('fullscreen-arena');
-            const body = document.getElementById('arena-game-body');
-            body.innerHTML = '';
-            arena.classList.add('active');
+        pipes.forEach(p=>{
+            p.x-=3;
+        });
 
-            currentUser.gamesPlayed++;
-            saveUserData();
-            updateUI();
+        pipes=pipes.filter(p=>p.x>-70);
 
-            launchGameEngine(gameId, body);
-        }
+        for(const p of pipes){
 
-        function restartCurrentGame() {
-            if (activeGameId) {
-                const body = document.getElementById('arena-game-body');
-                body.innerHTML = '';
-                launchGameEngine(activeGameId, body);
-            }
-        }
-
-        function exitFullscreenArena() {
-            document.getElementById('fullscreen-arena').classList.remove('active');
-            document.getElementById('arena-game-body').innerHTML = '';
-            activeGameId = null;
-        }
-
-        function showResultModal(title, desc, banner, scoreGained, isWin = true) {
-            if (isWin) {
-                currentUser.wins++;
-                currentUser.trophies++;
-                currentUser.totalScore += scoreGained;
-            } else {
-                currentUser.totalScore += Math.max(0, scoreGained);
-            }
-            saveUserData();
-            updateUI();
-
-            document.getElementById('res-banner').innerText = banner;
-            document.getElementById('res-title').innerText = title;
-            document.getElementById('res-desc').innerText = desc;
-            document.getElementById('res-score').innerText = scoreGained >= 0 ? `+${scoreGained}` : scoreGained;
-            document.getElementById('res-total').innerText = currentUser.totalScore;
-            
-            document.getElementById('result-modal').classList.add('active');
-        }
-
-        function hideResultModal() {
-            document.getElementById('result-modal').classList.remove('active');
-        }
-
-        function showProfileModal() {
-            document.getElementById('profile-modal').classList.add('active');
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profile-modal').classList.remove('active');
-        }
-
-        function resetStats() {
-            currentUser.trophies = 0;
-            currentUser.gamesPlayed = 0;
-            currentUser.wins = 0;
-            currentUser.totalScore = 0;
-            saveUserData();
-            updateUI();
-            closeProfileModal();
-        }
-
-        function launchGameEngine(gameId, container) {
-            switch(gameId) {
-                case 'trivia': launchTrivia(container); break;
-                case 'hangman': launchHangman(container); break;
-                case 'scramble': launchScramble(container); break;
-                case 'wordmaster': launchWordMaster(container); break;
-                case 'tictactoe': launchTicTacToe(container); break;
-                case 'snake': launchSnake(container); break;
-                case 'pong': launchPong(container); break;
-                case 'breakout': launchBreakout(container); break;
-                case 'reaction': launchReaction(container); break;
-                case 'math': launchMath(container); break;
-                case 'memory': launchMemory(container); break;
-                case '2048': launch2048(container); break;
-                case 'connect4': launchConnect4(container); break;
-                case 'minesweeper': launchMinesweeper(container); break;
-                case 'numguess': launchNumGuess(container); break;
-                case 'crypto': launchCrypto(container); break;
-                case 'rps': launchRPS(container); break;
-                case 'higherlower': launchHigherLower(container); break;
-                case 'quicktap': launchQuickTap(container); break;
-                case 'colormatch': launchColorMatch(container); break;
-            }
-        }
-
-        /* ==========================================================================
-           20 GAMES DETAILED IMPLEMENTATION
-           ========================================================================== */
-
-        /* 1. TRIVIA */
-        function launchTrivia(container) {
-            const questions = [
-                { q: "Which planet is known as the Red Planet?", a: ["Earth", "Mars", "Jupiter", "Venus"], c: 1 },
-                { q: "What is the largest ocean on Earth?", a: ["Atlantic", "Indian", "Pacific", "Arctic"], c: 2 },
-                { q: "How many legs does a spider have?", a: ["6", "8", "10", "12"], c: 1 },
-                { q: "What element does 'O' represent on the periodic table?", a: ["Gold", "Oxygen", "Osmium", "Zinc"], c: 1 }
-            ];
-            let idx = 0, score = 0;
-
-            function render() {
-                if (idx >= questions.length) {
-                    showResultModal("Quiz Completed!", `You scored ${score} out of ${questions.length}!`, "🏆", score * 25, true);
-                    return;
-                }
-                const q = questions[idx];
-                container.innerHTML = `
-                    <div style="width:100%; max-width:550px; background:var(--bg-secondary); padding:30px; border-radius:20px; box-shadow:var(--shadow-soft); text-align:center;">
-                        <h4 style="color:var(--text-muted); margin-bottom:10px;">Question ${idx + 1} of ${questions.length}</h4>
-                        <h2 style="margin-bottom:24px;">${q.q}</h2>
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            ${q.a.map((opt, i) => `<button class="btn-primary" style="background:#edf2f7; color:#2d3748; justify-content:flex-start; padding:14px 20px;" onclick="checkTrivia(${i})">${opt}</button>`).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            window.checkTrivia = (selected) => {
-                if (selected === questions[idx].c) score++;
-                idx++;
-                render();
-            };
-            render();
-        }
-
-        /* 2. HANGMAN */
-        function launchHangman(container) {
-            const words = ["PACIFIC", "GALAXY", "ORBIT", "SYNTAX", "CANVAS", "ARCADIA"];
-            const secret = words[Math.floor(Math.random()*words.length)];
-            let guessed = new Set();
-            let mistakes = 0;
-            const maxMistakes = 6;
-
-            function render() {
-                let displayWord = secret.split('').map(l => guessed.has(l) ? l : '_').join(' ');
-                if (!displayWord.includes('_')) {
-                    showResultModal("Word Solved!", `You guessed the word '${secret}' correctly!`, "🎉", 100, true);
-                    return;
-                }
-                if (mistakes >= maxMistakes) {
-                    showResultModal("Game Over", `The hidden word was '${secret}'.`, "❌", 0, false);
-                    return;
-                }
-                
-                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
-                container.innerHTML = `
-                    <div style="text-align:center; max-width:500px; width:100%;">
-                        <div style="font-size: 1.2rem; margin-bottom: 10px;">Mistakes: <b style="color:#e53e3e">${mistakes}</b> / ${maxMistakes}</div>
-                        <div style="font-size: 3rem; letter-spacing: 10px; font-weight:800; margin: 30px 0; color:var(--primary-btn);">${displayWord}</div>
-                        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
-                            ${alphabet.map(let => `<button class="btn-primary" style="width:42px; height:42px; padding:0; ${guessed.has(let)?'opacity:0.3;':''}" ${guessed.has(let)?'disabled':''} onclick="guessHangman('${let}')">${let}</button>`).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            window.guessHangman = (l) => {
-                guessed.add(l);
-                if (!secret.includes(l)) mistakes++;
-                render();
-            };
-            render();
-        }
-
-        /* 3. WORD SCRAMBLE */
-        function launchScramble(container) {
-            const words = ["PUZZLE", "ARENA", "ARCADE", "CIRCUIT", "SILICON", "CREATIVE"];
-            const chosen = words[Math.floor(Math.random()*words.length)];
-            const scrambled = chosen.split('').sort(() => Math.random() - 0.5).join('');
-
-            container.innerHTML = `
-                <div style="text-align:center; width:100%; max-width:450px; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h2>Unscramble the Word</h2>
-                    <div style="font-size:3rem; font-weight:800; letter-spacing:8px; margin:24px 0; color:var(--primary-btn);">${scrambled}</div>
-                    <input type="text" id="scramble-input" placeholder="Type answer..." style="width:100%; padding:14px; border-radius:10px; border:2px solid #e2e8f0; font-size:1.2rem; text-align:center; margin-bottom:16px;">
-                    <button class="btn-primary" onclick="checkScramble('${chosen}')">Submit Word</button>
-                </div>
-            `;
-            window.checkScramble = (target) => {
-                const val = document.getElementById('scramble-input').value.toUpperCase().trim();
-                if (val === target) {
-                    showResultModal("Unscrambled!", `You cracked '${target}'!`, "🔀", 75, true);
-                } else {
-                    alert("Incorrect guess! Try again.");
-                }
-            };
-        }
-
-        /* 4. WORD MASTER (Wordle Clone) */
-        function launchWordMaster(container) {
-            const wordList = ["PLANT", "SMART", "BRAIN", "POWER", "LIGHT"];
-            const target = wordList[Math.floor(Math.random()*wordList.length)];
-            let guess = "";
-            let attempts = [];
-
-            function render() {
-                container.innerHTML = `
-                    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
-                        ${Array.from({length: 6}).map((_, r) => {
-                            const word = attempts[r] || (r === attempts.length ? guess.padEnd(5, ' ') : '     ');
-                            return `<div style="display:flex; gap:8px;">
-                                ${word.split('').map((char, c) => {
-                                    let bg = '#e2e8f0';
-                                    let color = '#2d3748';
-                                    if (attempts[r]) {
-                                        if (attempts[r][c] === target[c]) { bg = '#68d391'; color='#fff'; }
-                                        else if (target.includes(attempts[r][c])) { bg = '#f6e05e'; color='#fff'; }
-                                        else { bg = '#cbd5e0'; color='#fff'; }
-                                    }
-                                    return `<div style="width:50px; height:50px; border-radius:8px; background:${bg}; color:${color}; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.5rem;">${char.trim()}</div>`;
-                                }).join('')}
-                            </div>`;
-                        }).join('')}
-                    </div>
-                    <div style="display:flex; gap:10px; width:100%; max-width:300px;">
-                        <input type="text" id="wm-input" maxlength="5" style="padding:12px; border-radius:8px; border:2px solid #e2e8f0; font-size:1.2rem; text-transform:uppercase; text-align:center; font-weight:bold; width:100%;" placeholder="5 Letters">
-                        <button class="btn-primary" style="width:auto;" onclick="submitWordMaster()">Guess</button>
-                    </div>
-                `;
-            }
-            window.submitWordMaster = () => {
-                const input = document.getElementById('wm-input').value.toUpperCase().trim();
-                if (input.length === 5) {
-                    attempts.push(input);
-                    if (input === target) {
-                        showResultModal("Word Master!", `You guessed '${target}'!`, "🧠", 120, true);
-                        return;
-                    } else if (attempts.length >= 6) {
-                        showResultModal("Out of Attempts", `The word was '${target}'.`, "❌", 0, false);
-                        return;
-                    }
-                    guess = "";
-                    render();
-                }
-            };
-            render();
-        }
-
-        /* 5. TIC-TAC-TOE */
-        function launchTicTacToe(container) {
-            let board = Array(9).fill(null);
-            let turn = 'X';
-
-            function render() {
-                container.innerHTML = `
-                    <div style="text-align:center;">
-                        <h3 style="margin-bottom:16px;">Turn: Player (${turn})</h3>
-                        <div style="display:grid; grid-template-columns:repeat(3, 90px); gap:12px;">
-                            ${board.map((cell, i) => `
-                                <div onclick="playTTT(${i})" style="width:90px; height:90px; border-radius:16px; background:var(--bg-secondary); box-shadow:var(--shadow-soft); display:flex; align-items:center; justify-content:center; font-size:2.5rem; font-weight:bold; cursor:pointer; color:${cell==='X'?'#805ad5':'#319795'};">
-                                    ${cell || ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
+            if(
+                bird.x+16>p.x &&
+                bird.x-16<p.x+55 &&
+                (bird.y-16<p.top ||
+                 bird.y+16>p.bottom)
+            ){
+                gameOver();
+                return;
             }
 
-            window.playTTT = (i) => {
-                if (board[i] || checkWin(board)) return;
-                board[i] = turn;
-                if (checkWin(board)) {
-                    showResultModal(`Player ${turn} Wins!`, "Great tactical play!", "❌", 50, true);
-                    return;
-                }
-                if (board.every(c => c !== null)) {
-                    showResultModal("It's a Draw!", "Equally matched opponents.", "🤝", 20, false);
-                    return;
-                }
-                turn = turn === 'X' ? 'O' : 'X';
-                render();
-            };
+            if(!p.passed&&p.x+55<bird.x){
 
-            function checkWin(b) {
-                const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-                return wins.some(w => b[w[0]] && b[w[0]] === b[w[1]] && b[w[0]] === b[w[2]]);
-            }
-            render();
-        }
-
-        /* 6. SNAKE */
-        function launchSnake(container) {
-            container.innerHTML = `
-                <div style="text-align:center;">
-                    <canvas id="snakeCanvas" width="340" height="340" style="background:#2d3748; border-radius:16px; box-shadow:var(--shadow-soft);"></canvas>
-                    <div class="dpad-controls">
-                        <div></div><button class="dpad-btn" onclick="setSnakeDir(0,-16)">▲</button><div></div>
-                        <button class="dpad-btn" onclick="setSnakeDir(-16,0)">◄</button><div></div><button class="dpad-btn" onclick="setSnakeDir(16,0)">►</button>
-                        <div></div><button class="dpad-btn" onclick="setSnakeDir(0,16)">▼</button><div></div>
-                    </div>
-                </div>
-            `;
-            const canvas = document.getElementById('snakeCanvas');
-            const ctx = canvas.getContext('2d');
-            let snake = [{x: 160, y: 160}];
-            let food = {x: 80, y: 80};
-            let dx = 16, dy = 0;
-            let score = 0;
-
-            window.setSnakeDir = (x, y) => {
-                if (x !== 0 && dx === 0) { dx = x; dy = 0; }
-                if (y !== 0 && dy === 0) { dx = 0; dy = y; }
-            };
-
-            document.onkeydown = (e) => {
-                if (e.key === 'ArrowUp') setSnakeDir(0, -16);
-                if (e.key === 'ArrowDown') setSnakeDir(0, 16);
-                if (e.key === 'ArrowLeft') setSnakeDir(-16, 0);
-                if (e.key === 'ArrowRight') setSnakeDir(16, 0);
-            };
-
-            function gameLoop() {
-                if (!document.getElementById('snakeCanvas')) return;
-                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-                
-                if (head.x < 0 || head.x >= 340 || head.y < 0 || head.y >= 340 || snake.some(s=>s.x===head.x&&s.y===head.y)) {
-                    showResultModal("Snake Crash!", `Final Score: ${score}`, "🐍", score, score > 30);
-                    return;
-                }
-
-                snake.unshift(head);
-                if (head.x === food.x && head.y === food.y) {
-                    score += 10;
-                    food = {x: Math.floor(Math.random()*20)*16, y: Math.floor(Math.random()*20)*16};
-                } else {
-                    snake.pop();
-                }
-
-                ctx.fillStyle = '#2d3748';
-                ctx.fillRect(0,0,340,340);
-                
-                ctx.fillStyle = '#e53e3e';
-                ctx.fillRect(food.x, food.y, 14, 14);
-
-                ctx.fillStyle = '#68d391';
-                snake.forEach(s => ctx.fillRect(s.x, s.y, 14, 14));
-
-                setTimeout(gameLoop, 100);
-            }
-            gameLoop();
-        }
-
-        /* 7. PONG */
-        function launchPong(container) {
-            container.innerHTML = `<canvas id="pongCanvas" width="400" height="280" style="background:#1a202c; border-radius:16px;"></canvas>`;
-            const canvas = document.getElementById('pongCanvas');
-            const ctx = canvas.getContext('2d');
-            let p1 = 120, p2 = 120;
-            let bx = 200, by = 140, vx = 4, vy = 3;
-
-            canvas.onmousemove = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                p1 = e.clientY - rect.top - 25;
-            };
-
-            function loop() {
-                if (!document.getElementById('pongCanvas')) return;
-                bx += vx; by += vy;
-                if (by <= 0 || by >= 280) vy *= -1;
-
-                p2 += (by - (p2 + 25)) * 0.1; // AI tracking
-
-                if (bx <= 12 && by >= p1 && by <= p1 + 50) vx *= -1;
-                if (bx >= 388 && by >= p2 && by <= p2 + 50) vx *= -1;
-
-                if (bx < 0) {
-                    showResultModal("Pong Defeat!", "AI opponent scored.", "🏓", 10, false);
-                    return;
-                }
-                if (bx > 400) {
-                    showResultModal("Pong Victory!", "You outplayed the AI!", "🏆", 80, true);
-                    return;
-                }
-
-                ctx.fillStyle = '#1a202c';
-                ctx.fillRect(0,0,400,280);
-
-                ctx.fillStyle = '#63b3ed';
-                ctx.fillRect(5, p1, 8, 50);
-                ctx.fillStyle = '#f6ad55';
-                ctx.fillRect(387, p2, 8, 50);
-                
-                ctx.beginPath(); ctx.arc(bx, by, 7, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
-
-                requestAnimationFrame(loop);
-            }
-            loop();
-        }
-
-        /* 8. BREAKOUT */
-        function launchBreakout(container) {
-            container.innerHTML = `<canvas id="boCanvas" width="360" height="280" style="background:#2d3748; border-radius:16px;"></canvas>`;
-            const canvas = document.getElementById('boCanvas');
-            const ctx = canvas.getContext('2d');
-            let paddleX = 150;
-            let bx = 180, by = 220, dx = 3, dy = -3;
-            let bricks = [];
-
-            for (let r=0; r<4; r++) {
-                for (let c=0; c<6; c++) {
-                    bricks.push({x: c*55 + 18, y: r*20 + 20, status: 1});
-                }
-            }
-
-            canvas.onmousemove = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                paddleX = e.clientX - rect.left - 35;
-            };
-
-            function draw() {
-                if (!document.getElementById('boCanvas')) return;
-                ctx.clearRect(0,0,360,280);
-
-                let remaining = 0;
-                bricks.forEach(b => {
-                    if (b.status === 1) {
-                        remaining++;
-                        if (bx > b.x && bx < b.x+50 && by > b.y && by < b.y+15) {
-                            dy = -dy;
-                            b.status = 0;
-                        }
-                        ctx.fillStyle = '#f6e05e';
-                        ctx.fillRect(b.x, b.y, 50, 15);
-                    }
-                });
-
-                if (remaining === 0) {
-                    showResultModal("Stage Cleared!", "All bricks destroyed!", "🧱", 100, true);
-                    return;
-                }
-
-                if (bx + dx > 350 || bx + dx < 10) dx = -dx;
-                if (by + dy < 10) dy = -dy;
-                else if (by + dy > 260) {
-                    if (bx > paddleX && bx < paddleX + 70) dy = -dy;
-                    else {
-                        showResultModal("Ball Dropped!", "Better luck next time.", "❌", 20, false);
-                        return;
-                    }
-                }
-
-                bx += dx; by += dy;
-                ctx.fillStyle = '#63b3ed';
-                ctx.fillRect(paddleX, 265, 70, 10);
-                ctx.beginPath(); ctx.arc(bx, by, 6, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
-
-                requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        /* 9. REACTION TEST */
-        function launchReaction(container) {
-            container.innerHTML = `
-                <div id="react-box" onclick="handleReact()" style="width:100%; max-width:400px; height:280px; border-radius:20px; background:#edf2f7; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.5rem; font-weight:bold; box-shadow:var(--shadow-soft); text-align:center; padding:20px;">
-                    Click Anywhere to Start
-                </div>
-            `;
-            let state = 'idle', startTime, timeout;
-            const box = document.getElementById('react-box');
-
-            window.handleReact = () => {
-                if (state === 'idle') {
-                    state = 'waiting';
-                    box.style.background = '#feb2b2';
-                    box.innerText = 'Wait for GREEN...';
-                    timeout = setTimeout(() => {
-                        state = 'ready';
-                        box.style.background = '#9ae6b4';
-                        box.innerText = 'CLICK NOW!';
-                        startTime = Date.now();
-                    }, Math.random()*3000 + 2000);
-                } else if (state === 'waiting') {
-                    clearTimeout(timeout);
-                    state = 'idle';
-                    box.style.background = '#edf2f7';
-                    box.innerText = 'Too early! Click to restart.';
-                } else if (state === 'ready') {
-                    const diff = Date.now() - startTime;
-                    state = 'idle';
-                    showResultModal("Lightning Reaction!", `Time: ${diff}ms`, "🎯", Math.max(10, 200 - Math.floor(diff/4)), true);
-                }
-            };
-        }
-
-        /* 10. MATH CHALLENGE */
-        function launchMath(container) {
-            const n1 = Math.floor(Math.random()*25)+5;
-            const n2 = Math.floor(Math.random()*25)+5;
-            const ans = n1 + n2;
-
-            container.innerHTML = `
-                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h2>What is ${n1} + ${n2}?</h2>
-                    <input type="number" id="math-ans" style="margin:20px 0; padding:12px; font-size:2rem; width:140px; text-align:center; border-radius:10px; border:2px solid #e2e8f0;">
-                    <br>
-                    <button class="btn-primary" onclick="checkMath(${ans})">Submit Answer</button>
-                </div>
-            `;
-            window.checkMath = (target) => {
-                const val = parseInt(document.getElementById('math-ans').value);
-                if (val === target) {
-                    showResultModal("Correct Calculation!", `${n1} + ${n2} = ${ans}`, "🧮", 40, true);
-                } else {
-                    alert("Incorrect result!");
-                }
-            };
-        }
-
-        /* 11. MEMORY CARDS */
-        function launchMemory(container) {
-            const icons = ['🐶','🐱','🐭','🐹','🐰','🦊'];
-            const deck = [...icons, ...icons].sort(()=>Math.random()-0.5);
-            let flipped = [], matched = 0;
-
-            container.innerHTML = `
-                <div style="display:grid; grid-template-columns:repeat(4, 70px); gap:12px;">
-                    ${deck.map((ic, i) => `
-                        <div id="card-${i}" onclick="flipCard(${i}, '${ic}')" style="width:70px; height:70px; background:var(--primary-btn); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:2rem; cursor:pointer; color:white; box-shadow:var(--shadow-soft);">
-                            ?
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            window.flipCard = (idx, icon) => {
-                const el = document.getElementById(`card-${idx}`);
-                if (flipped.length < 2 && el.innerText === '?') {
-                    el.innerText = icon;
-                    el.style.background = '#fff';
-                    el.style.color = '#000';
-                    flipped.push({idx, icon});
-
-                    if (flipped.length === 2) {
-                        if (flipped[0].icon === flipped[1].icon) {
-                            matched += 2;
-                            flipped = [];
-                            if (matched === deck.length) {
-                                showResultModal("Memory Master!", "All pairs matched!", "🃏", 90, true);
-                            }
-                        } else {
-                            setTimeout(() => {
-                                document.getElementById(`card-${flipped[0].idx}`).innerText = '?';
-                                document.getElementById(`card-${flipped[1].idx}`).innerText = '?';
-                                document.getElementById(`card-${flipped[0].idx}`).style.background = 'var(--primary-btn)';
-                                document.getElementById(`card-${flipped[1].idx}`).style.background = 'var(--primary-btn)';
-                                document.getElementById(`card-${flipped[0].idx}`).style.color = '#fff';
-                                document.getElementById(`card-${flipped[1].idx}`).style.color = '#fff';
-                                flipped = [];
-                            }, 800);
-                        }
-                    }
-                }
-            };
-        }
-
-        /* 12. 2048 PUZZLE (FULLY FIXED & FUNCTIONAL) */
-        function launch2048(container) {
-            let board = Array(16).fill(0);
-            let score = 0;
-
-            function addTile() {
-                let empty = [];
-                board.forEach((v, i) => { if (v === 0) empty.push(i); });
-                if (empty.length > 0) {
-                    let rand = empty[Math.floor(Math.random() * empty.length)];
-                    board[rand] = Math.random() < 0.9 ? 2 : 4;
-                }
-            }
-
-            addTile(); addTile();
-
-            function render() {
-                container.innerHTML = `
-                    <div style="text-align:center;">
-                        <div style="font-size:1.2rem; font-weight:bold; margin-bottom:12px;">Score: <span style="color:var(--primary-btn);">${score}</span></div>
-                        <div style="display:grid; grid-template-columns:repeat(4, 70px); gap:10px; background:#bbada0; padding:10px; border-radius:16px; box-shadow:var(--shadow-soft);">
-                            ${board.map(v => `
-                                <div style="width:70px; height:70px; background:${get2048Color(v)}; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:${v>512?'1.1rem':'1.4rem'}; color:${v<=4?'#776e65':'#f9f6f2'};">
-                                    ${v || ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="dpad-controls">
-                            <div></div><button class="dpad-btn" onclick="move2048('up')">▲</button><div></div>
-                            <button class="dpad-btn" onclick="move2048('left')">◄</button><div></div><button class="dpad-btn" onclick="move2048('right')">►</button>
-                            <div></div><button class="dpad-btn" onclick="move2048('down')">▼</button><div></div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function get2048Color(v) {
-                switch(v) {
-                    case 2: return '#eee4da';
-                    case 4: return '#ede0c8';
-                    case 8: return '#f2b179';
-                    case 16: return '#f59563';
-                    case 32: return '#f67c5f';
-                    case 64: return '#f65e3b';
-                    case 128: return '#edcf72';
-                    case 256: return '#edcc61';
-                    case 512: return '#edc850';
-                    case 1024: return '#edc53f';
-                    case 2048: return '#edc22e';
-                    default: return '#ccc0b3';
-                }
-            }
-
-            window.move2048 = (dir) => {
-                let moved = false;
-                let rows = [];
-
-                for (let i = 0; i < 4; i++) {
-                    if (dir === 'left' || dir === 'right') {
-                        rows.push([board[i*4], board[i*4+1], board[i*4+2], board[i*4+3]]);
-                    } else {
-                        rows.push([board[i], board[i+4], board[i+8], board[i+12]]);
-                    }
-                }
-
-                rows.forEach((row, idx) => {
-                    if (dir === 'right' || dir === 'down') row.reverse();
-                    let filtered = row.filter(v => v !== 0);
-                    for (let i = 0; i < filtered.length - 1; i++) {
-                        if (filtered[i] === filtered[i+1]) {
-                            filtered[i] *= 2;
-                            score += filtered[i];
-                            filtered.splice(i+1, 1);
-                        }
-                    }
-                    while (filtered.length < 4) filtered.push(0);
-                    if (dir === 'right' || dir === 'down') filtered.reverse();
-
-                    for (let i = 0; i < 4; i++) {
-                        let origVal = (dir === 'left' || dir === 'right') ? board[idx*4+i] : board[i*4+idx];
-                        if (origVal !== filtered[i]) moved = true;
-                        if (dir === 'left' || dir === 'right') board[idx*4+i] = filtered[i];
-                        else board[i*4+idx] = filtered[i];
-                    }
-                });
-
-                if (moved) {
-                    addTile();
-                    render();
-                    if (board.includes(2048)) {
-                        showResultModal("2048 Reached!", `You mastered the board! Score: ${score}`, "🔢", score, true);
-                    } else if (!board.includes(0) && !canMove2048()) {
-                        showResultModal("Game Over", `No moves left! Final Score: ${score}`, "❌", score, false);
-                    }
-                }
-            };
-
-            function canMove2048() {
-                for (let i = 0; i < 16; i++) {
-                    if (i % 4 < 3 && board[i] === board[i+1]) return true;
-                    if (i < 12 && board[i] === board[i+4]) return true;
-                }
-                return false;
-            }
-
-            document.onkeydown = (e) => {
-                if (e.key === 'ArrowLeft') move2048('left');
-                if (e.key === 'ArrowRight') move2048('right');
-                if (e.key === 'ArrowUp') move2048('up');
-                if (e.key === 'ArrowDown') move2048('down');
-            };
-
-            render();
-        }
-
-        /* 13. CONNECT FOUR */
-        function launchConnect4(container) {
-            let board = Array(42).fill(null);
-            
-            function render() {
-                container.innerHTML = `
-                    <div style="display:grid; grid-template-columns:repeat(7, 45px); gap:8px; background:#3182ce; padding:12px; border-radius:16px; box-shadow:var(--shadow-soft);">
-                        ${board.map((c, i) => `
-                            <div onclick="dropC4(${i%7})" style="width:45px; height:45px; border-radius:50%; background:${c === 'R' ? '#e53e3e' : c === 'Y' ? '#ecc94b' : '#fff'}; cursor:pointer;"></div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            window.dropC4 = (col) => {
-                for (let r=5; r>=0; r--) {
-                    if (!board[r*7 + col]) {
-                        board[r*7 + col] = 'R';
-                        if (checkC4Win('R')) {
-                            render();
-                            showResultModal("Connect 4 Victory!", "Four in a row!", "🟡", 70, true);
-                            return;
-                        }
-                        // Simple AI response
-                        let emptyCols = [0,1,2,3,4,5,6].filter(c => !board[c]);
-                        if (emptyCols.length > 0) {
-                            let aiCol = emptyCols[Math.floor(Math.random()*emptyCols.length)];
-                            for (let ar=5; ar>=0; ar--) {
-                                if (!board[ar*7 + aiCol]) { board[ar*7 + aiCol] = 'Y'; break; }
-                            }
-                        }
-                        break;
-                    }
-                }
-                render();
-            };
-
-            function checkC4Win(p) {
-                // Horizontal, Vertical, Diagonal checks
-                for (let r=0; r<6; r++) {
-                    for (let c=0; c<4; c++) {
-                        if (board[r*7+c]===p && board[r*7+c+1]===p && board[r*7+c+2]===p && board[r*7+c+3]===p) return true;
-                    }
-                }
-                for (let r=0; r<3; r++) {
-                    for (let c=0; c<7; c++) {
-                        if (board[r*7+c]===p && board[(r+1)*7+c]===p && board[(r+2)*7+c]===p && board[(r+3)*7+c]===p) return true;
-                    }
-                }
-                return false;
-            }
-            render();
-        }
-
-        /* 14. MINESWEEPER */
-        function launchMinesweeper(container) {
-            let board = Array(25).fill(0);
-            let mines = new Set([3, 8, 14, 21]);
-            mines.forEach(m => board[m] = 'M');
-
-            container.innerHTML = `
-                <div style="display:grid; grid-template-columns:repeat(5, 50px); gap:8px;">
-                    ${board.map((v, i) => `
-                        <div onclick="sweepMS(${i})" id="ms-${i}" style="width:50px; height:50px; background:#cbd5e0; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; font-size:1.2rem;"></div>
-                    `).join('')}
-                </div>
-            `;
-            window.sweepMS = (i) => {
-                const el = document.getElementById(`ms-${i}`);
-                if (board[i] === 'M') {
-                    el.innerText = '💣'; el.style.background = '#feb2b2';
-                    showResultModal("Mine Detonated!", "Careful next time!", "⚫", 0, false);
-                } else {
-                    el.innerText = '1'; el.style.background = '#edf2f7';
-                }
-            };
-        }
-
-        /* 15. NUMBER GUESS */
-        function launchNumGuess(container) {
-            const secret = Math.floor(Math.random()*50)+1;
-            container.innerHTML = `
-                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h3>Guess Number (1 to 50)</h3>
-                    <input type="number" id="ng-val" style="padding:12px; font-size:1.5rem; width:120px; text-align:center; margin:20px 0; border-radius:8px; border:2px solid #e2e8f0;">
-                    <br>
-                    <button class="btn-primary" onclick="guessNum(${secret})">Submit Guess</button>
-                    <div id="ng-feedback" style="margin-top:16px; font-weight:bold; font-size:1.1rem; color:var(--primary-btn);"></div>
-                </div>
-            `;
-            window.guessNum = (target) => {
-                const v = parseInt(document.getElementById('ng-val').value);
-                const fb = document.getElementById('ng-feedback');
-                if (v === target) {
-                    showResultModal("Correct Guess!", `Target was ${target}`, "🧩", 60, true);
-                } else if (v < target) fb.innerText = "Too Low! ⬆️";
-                else fb.innerText = "Too High! ⬇️";
-            };
-        }
-
-        /* 16. CRYPTO CIPHER (EASY & INTUITIVE CODEBREAKER) */
-        function launchCrypto(container) {
-            const code = Array.from({length: 4}, () => Math.floor(Math.random()*10));
-            let attempts = 0;
-
-            container.innerHTML = `
-                <div style="text-align:center; max-width:480px; width:100%; background:var(--bg-secondary); padding:28px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h2>Crack the 4-Digit Cipher</h2>
-                    <p style="color:var(--text-muted); font-size:0.9rem; margin:8px 0 20px 0;">Green = Right digit & spot. Yellow = Right digit, wrong spot.</p>
-                    
-                    <div id="crypto-history" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px; max-height:180px; overflow-y:auto;"></div>
-
-                    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:20px;">
-                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
-                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
-                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
-                        <input type="text" maxlength="1" class="c-in" style="width:45px; height:50px; text-align:center; font-size:1.5rem; font-weight:bold; border-radius:8px; border:2px solid #e2e8f0;">
-                    </div>
-                    <button class="btn-primary" onclick="checkCryptoCipher()">Unlock Cipher</button>
-                </div>
-            `;
-
-            window.checkCryptoCipher = () => {
-                const inputs = Array.from(document.querySelectorAll('.c-in')).map(i => parseInt(i.value) || 0);
-                attempts++;
-                
-                let exact = 0, misplace = 0;
-                let tempCode = [...code];
-                let tempIn = [...inputs];
-
-                for (let i = 0; i < 4; i++) {
-                    if (tempIn[i] === tempCode[i]) {
-                        exact++;
-                        tempCode[i] = tempIn[i] = null;
-                    }
-                }
-                for (let i = 0; i < 4; i++) {
-                    if (tempIn[i] !== null) {
-                        let idx = tempCode.indexOf(tempIn[i]);
-                        if (idx !== -1) {
-                            misplace++;
-                            tempCode[idx] = null;
-                        }
-                    }
-                }
-
-                const hist = document.getElementById('crypto-history');
-                const row = document.createElement('div');
-                row.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#edf2f7; padding:8px 16px; border-radius:8px; font-weight:bold;";
-                row.innerHTML = `<span>Attempt ${attempts}: ${inputs.join('')}</span> <span>🟩 ${exact} 🟨 ${misplace}</span>`;
-                hist.appendChild(row);
-
-                if (exact === 4) {
-                    showResultModal("Cipher Decoded!", `Code was ${code.join('')}`, "🔐", 120, true);
-                }
-            };
-        }
-
-        /* 17. ROCK PAPER SCISSORS */
-        function launchRPS(container) {
-            container.innerHTML = `
-                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h3 style="margin-bottom:20px;">Choose your move:</h3>
-                    <div style="display:flex; gap:16px; justify-content:center;">
-                        <button class="btn-primary" style="width:80px; height:80px; font-size:2rem;" onclick="playRPS('✊')">✊</button>
-                        <button class="btn-primary" style="width:80px; height:80px; font-size:2rem;" onclick="playRPS('✋')">✋</button>
-                        <button class="btn-primary" style="width:80px; height:80px; font-size:2rem;" onclick="playRPS('✌️')">✌️</button>
-                    </div>
-                </div>
-            `;
-            window.playRPS = (choice) => {
-                const opts = ['✊','✋','✌️'];
-                const comp = opts[Math.floor(Math.random()*3)];
-                if (choice === comp) {
-                    showResultModal("It's a Draw!", `Both chose ${choice}`, "🤝", 10, false);
-                } else if ((choice === '✊' && comp === '✌️') || (choice === '✋' && comp === '✊') || (choice === '✌️' && comp === '✋')) {
-                    showResultModal("You Won!", `${choice} beats ${comp}`, "✊", 40, true);
-                } else {
-                    showResultModal("You Lost!", `${comp} beats ${choice}`, "❌", 0, false);
-                }
-            };
-        }
-
-        /* 18. HIGHER OR LOWER */
-        function launchHigherLower(container) {
-            let cur = Math.floor(Math.random()*10)+1;
-            container.innerHTML = `
-                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h3>Current Card Value:</h3>
-                    <div style="font-size:4rem; font-weight:800; color:var(--primary-btn); margin:16px 0;">${cur}</div>
-                    <div style="display:flex; gap:12px;">
-                        <button class="btn-primary" onclick="playHL('higher', ${cur})">Higher ⬆️</button>
-                        <button class="btn-primary" onclick="playHL('lower', ${cur})">Lower ⬇️</button>
-                    </div>
-                </div>
-            `;
-            window.playHL = (choice, old) => {
-                let next = Math.floor(Math.random()*10)+1;
-                let win = (choice === 'higher' && next >= old) || (choice === 'lower' && next <= old);
-                if (win) {
-                    showResultModal("Streak Success!", `Next card was ${next}`, "🃏", 30, true);
-                } else {
-                    showResultModal("Streak Broken!", `Next card was ${next}`, "❌", 0, false);
-                }
-            };
-        }
-
-        /* 19. QUICK TAP */
-        function launchQuickTap(container) {
-            let score = 0;
-            container.innerHTML = `
-                <div style="text-align:center;">
-                    <div id="qt-score" style="font-size:1.8rem; font-weight:bold; margin-bottom:16px;">Taps: 0</div>
-                    <button class="btn-primary" style="width:140px; height:140px; border-radius:50%; font-size:1.4rem;" onclick="tapFast()">TAP!</button>
-                </div>
-            `;
-            window.tapFast = () => {
+                p.passed=true;
                 score++;
-                document.getElementById('qt-score').innerText = `Taps: ${score}`;
-                if (score >= 20) {
-                    showResultModal("Speed Master!", "Reached 20 quick taps!", "⚡", 50, true);
-                }
-            };
+            }
         }
 
-        /* 20. COLOR MATCH (Stroop Speed Test) */
-        function launchColorMatch(container) {
-            container.innerHTML = `
-                <div style="text-align:center; background:var(--bg-secondary); padding:32px; border-radius:20px; box-shadow:var(--shadow-soft);">
-                    <h1 style="color:#3182ce; font-size:3rem; margin-bottom:12px;">RED</h1>
-                    <p style="color:var(--text-muted); margin-bottom:20px;">Does the word match its visual font color?</p>
-                    <div style="display:flex; gap:12px;">
-                        <button class="btn-primary" style="background:#48bb78;" onclick="checkCM(false)">Match</button>
-                        <button class="btn-primary" style="background:#f56565;" onclick="checkCM(true)">No Match</button>
-                    </div>
-                </div>
-            `;
-            window.checkCM = (isNoMatch) => {
-                if (isNoMatch) {
-                    showResultModal("Sharp Eyes!", "Correct Stroop effect recognition!", "🌈", 40, true);
-                } else {
-                    showResultModal("Mismatch!", "The text meaning differed from color.", "❌", 0, false);
-                }
-            };
+        if(bird.y<0||bird.y>600){
+            gameOver();
+            return;
         }
-    </script>
+
+        ctx.fillStyle="#7dd3fc";
+        ctx.fillRect(0,0,420,600);
+
+        ctx.fillStyle="#4ade80";
+
+        pipes.forEach(p=>{
+            ctx.fillRect(p.x,0,55,p.top);
+            ctx.fillRect(p.x,p.bottom,55,600-p.bottom);
+        });
+
+        ctx.fillStyle="#facc15";
+        ctx.beginPath();
+        ctx.arc(bird.x,bird.y,16,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.fillStyle="#111827";
+        ctx.font="24px Arial";
+        ctx.fillText(`Score: ${score}`,15,30);
+
+        raf=requestAnimationFrame(loop);
+    }
+
+    function gameOver(){
+
+        running=false;
+
+        finishGame(
+            "Flappy Over!",
+            `You passed ${score} pipes.`,
+            score*15,
+            score>=3,
+            "🐦"
+        );
+    }
+
+    loop();
+
+    cleanupGame=()=>{
+        running=false;
+        cancelAnimationFrame(raf);
+        window.onkeydown=null;
+        delete window.flap;
+    };
+}
+
+/* ============================================================
+   GAME 14 — SPACE SHOOTER
+============================================================ */
+
+function gameSpace(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🚀 Space Shooter</h2>
+
+            <canvas id="spaceCanvas"
+                width="600"
+                height="450"></canvas>
+
+            <p>Move with ← → and shoot with Space.</p>
+
+        </div>
+    `;
+
+    const canvas=document.getElementById("spaceCanvas");
+    const ctx=canvas.getContext("2d");
+
+    let ship={x:280,y:390};
+    let bullets=[];
+    let enemies=[];
+    let score=0;
+    let keys={};
+    let running=true;
+    let raf;
+
+    window.onkeydown=e=>{
+        keys[e.key]=true;
+
+        if(e.code==="Space"){
+            e.preventDefault();
+
+            bullets.push({
+                x:ship.x+20,
+                y:ship.y
+            });
+        }
+    };
+
+    window.onkeyup=e=>{
+        keys[e.key]=false;
+    };
+
+    function loop(){
+
+        if(!running)return;
+
+        if(keys.ArrowLeft)
+            ship.x-=6;
+
+        if(keys.ArrowRight)
+            ship.x+=6;
+
+        ship.x=Math.max(0,Math.min(560,ship.x));
+
+        bullets.forEach(b=>b.y-=8);
+
+        bullets=bullets.filter(b=>b.y>0);
+
+        if(Math.random()<.025){
+
+            enemies.push({
+                x:Math.random()*560,
+                y:-30
+            });
+        }
+
+        enemies.forEach(e=>e.y+=2);
+
+        for(const bullet of bullets){
+
+            for(const enemy of enemies){
+
+                if(
+                    bullet.x>enemy.x &&
+                    bullet.x<enemy.x+40 &&
+                    bullet.y>enemy.y &&
+                    bullet.y<enemy.y+30
+                ){
+                    enemy.dead=true;
+                    bullet.dead=true;
+                    score++;
+                }
+            }
+        }
+
+        enemies=enemies.filter(e=>!e.dead&&e.y<450);
+        bullets=bullets.filter(b=>!b.dead);
+
+        if(enemies.some(e=>
+            e.y>360&&
+            Math.abs(e.x-ship.x)<45
+        )){
+
+            running=false;
+
+            finishGame(
+                "Ship Destroyed!",
+                `You destroyed ${score} enemies.`,
+                score*10,
+                score>=5,
+                "🚀"
+            );
+
+            return;
+        }
+
+        ctx.fillStyle="#050816";
+        ctx.fillRect(0,0,600,450);
+
+        ctx.fillStyle="#fff";
+
+        for(let i=0;i<50;i++){
+            const sx=(i*97)%600;
+            const sy=(i*53)%450;
+            ctx.fillRect(sx,sy,2,2);
+        }
+
+        ctx.fillStyle="#60a5fa";
+        ctx.fillRect(ship.x,ship.y,40,25);
+
+        ctx.fillStyle="#facc15";
+
+        bullets.forEach(b=>
+            ctx.fillRect(b.x,b.y,4,12)
+        );
+
+        ctx.fillStyle="#ef4444";
+
+        enemies.forEach(e=>
+            ctx.fillRect(e.x,e.y,40,30)
+        );
+
+        ctx.fillStyle="white";
+        ctx.font="20px Arial";
+        ctx.fillText(`Score: ${score}`,15,25);
+
+        raf=requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    cleanupGame=()=>{
+        running=false;
+        cancelAnimationFrame(raf);
+        window.onkeydown=null;
+        window.onkeyup=null;
+    };
+}
+
+/* ============================================================
+   GAME 15 — SPACE DODGER
+============================================================ */
+
+function gameDodger(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🛸 Space Dodger</h2>
+
+            <canvas id="dodgerCanvas"
+                width="500"
+                height="500"></canvas>
+
+            <p>Use ← and → to avoid falling objects.</p>
+
+        </div>
+    `;
+
+    const canvas=document.getElementById("dodgerCanvas");
+    const ctx=canvas.getContext("2d");
+
+    let playerX=230;
+    let objects=[];
+    let score=0;
+    let keys={};
+    let running=true;
+    let raf;
+
+    window.onkeydown=e=>keys[e.key]=true;
+    window.onkeyup=e=>keys[e.key]=false;
+
+    function loop(){
+
+        if(!running)return;
+
+        if(keys.ArrowLeft)playerX-=6;
+        if(keys.ArrowRight)playerX+=6;
+
+        playerX=Math.max(0,Math.min(460,playerX));
+
+        if(Math.random()<.035){
+
+            objects.push({
+                x:Math.random()*460,
+                y:-30,
+                speed:3+Math.random()*3
+            });
+        }
+
+        objects.forEach(o=>o.y+=o.speed);
+
+        objects=objects.filter(o=>{
+            if(o.y>500){
+                score++;
+                return false;
+            }
+
+            return true;
+        });
+
+        if(objects.some(o=>
+            o.y>450 &&
+            o.x<playerX+40 &&
+            o.x+30>playerX
+        )){
+
+            running=false;
+
+            finishGame(
+                "Dodger Over!",
+                `You survived ${score} objects.`,
+                score*5,
+                score>=10,
+                "🛸"
+            );
+
+            return;
+        }
+
+        ctx.fillStyle="#111827";
+        ctx.fillRect(0,0,500,500);
+
+        ctx.fillStyle="#60a5fa";
+        ctx.fillRect(playerX,450,40,25);
+
+        ctx.fillStyle="#ef4444";
+
+        objects.forEach(o=>
+            ctx.fillRect(o.x,o.y,30,30)
+        );
+
+        ctx.fillStyle="white";
+        ctx.font="20px Arial";
+        ctx.fillText(`Score: ${score}`,15,25);
+
+        raf=requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    cleanupGame=()=>{
+        running=false;
+        cancelAnimationFrame(raf);
+        window.onkeydown=null;
+        window.onkeyup=null;
+    };
+}
+
+/* ============================================================
+   GAME 16 — QUICK TAP
+============================================================ */
+
+function gameQuickTap(box){
+
+    let taps=0;
+    let time=10;
+    let timer=null;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>⚡ Quick Tap</h2>
+
+            <div style="font-size:2rem;margin:20px">
+                <span id="tapCount">0</span> taps
+            </div>
+
+            <div id="tapTime">10</div>
+
+            <button id="tapButton"
+                class="btn primary"
+                style="width:180px;height:180px;
+                border-radius:50%;font-size:1.8rem">
+                TAP!
+            </button>
+
+        </div>
+    `;
+
+    const button=document.getElementById("tapButton");
+
+    button.onclick=()=>{
+
+        taps++;
+
+        document.getElementById("tapCount").textContent=taps;
+        beep(400,20);
+    };
+
+    timer=setInterval(()=>{
+
+        time--;
+
+        document.getElementById("tapTime").textContent=time;
+
+        if(time<=0){
+
+            clearInterval(timer);
+
+            finishGame(
+                "Tap Challenge Complete!",
+                `You made ${taps} taps.`,
+                taps*2,
+                taps>=15,
+                "⚡"
+            );
+        }
+
+    },1000);
+
+    cleanupGame=()=>{
+        clearInterval(timer);
+        button.onclick=null;
+    };
+}
+
+/* ============================================================
+   GAME 17 — REACTION
+============================================================ */
+
+function gameReaction(box){
+
+    let state="idle";
+    let start=0;
+    let timeout;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <div id="reactionBox"
+                style="
+                height:280px;
+                border-radius:20px;
+                background:#e2e8f0;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:1.5rem;
+                font-weight:900;
+                cursor:pointer">
+                Click to Start
+            </div>
+
+        </div>
+    `;
+
+    const el=document.getElementById("reactionBox");
+
+    el.onclick=()=>{
+
+        if(state==="idle"){
+
+            state="waiting";
+            el.style.background="#f87171";
+            el.textContent="WAIT...";
+
+            timeout=setTimeout(()=>{
+
+                state="ready";
+                start=Date.now();
+
+                el.style.background="#4ade80";
+                el.textContent="CLICK NOW!";
+
+            },1500+Math.random()*3000);
+
+        }else if(state==="waiting"){
+
+            clearTimeout(timeout);
+
+            state="idle";
+            el.style.background="#fbbf24";
+            el.textContent="Too Early! Click Again.";
+
+        }else{
+
+            const ms=Date.now()-start;
+
+            finishGame(
+                "Reaction Complete!",
+                `Your reaction time was ${ms} ms.`,
+                Math.max(10,250-Math.floor(ms/2)),
+                ms<700,
+                "🎯"
+            );
+
+            state="idle";
+        }
+    };
+
+    cleanupGame=()=>{
+        clearTimeout(timeout);
+        el.onclick=null;
+    };
+}
+
+/* ============================================================
+   GAME 18 — MATH
+============================================================ */
+
+function gameMath(box){
+
+    const operations=["+","-","×"];
+
+    let score=0;
+    let round=0;
+
+    function render(){
+
+        if(round>=5){
+
+            finishGame(
+                "Math Challenge Complete!",
+                `You solved ${score}/5 correctly.`,
+                score*40,
+                score>=3,
+                "🧮"
+            );
+
+            return;
+        }
+
+        const op=
+            operations[Math.floor(Math.random()*operations.length)];
+
+        const a=Math.floor(Math.random()*20)+5;
+        const b=Math.floor(Math.random()*12)+2;
+
+        let answer;
+
+        if(op==="+")answer=a+b;
+        if(op==="-")answer=a-b;
+        if(op==="×")answer=a*b;
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <p>Round ${round+1}/5</p>
+
+                <h1 style="font-size:3rem">
+                    ${a} ${op} ${b}
+                </h1>
+
+                <input id="mathInput"
+                    class="game-input"
+                    type="number"
+                    placeholder="Answer">
+
+                <button class="btn primary"
+                    onclick="window.mathAnswer(${answer})">
+                    Submit
+                </button>
+
+            </div>
+        `;
+
+        window.mathAnswer=(value)=>{
+
+            const input=Number(
+                document.getElementById("mathInput").value
+            );
+
+            if(input===value){
+                score++;
+                beep(700);
+            }else{
+                beep(200);
+            }
+
+            round++;
+            render();
+        };
+    }
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.mathAnswer;
+    };
+}
+
+/* ============================================================
+   GAME 19 — NUMBER MEMORY
+============================================================ */
+
+function gameNumberMemory(box){
+
+    let length=3;
+    let sequence="";
+    let round=0;
+
+    function next(){
+
+        sequence="";
+
+        for(let i=0;i<length;i++){
+            sequence+=Math.floor(Math.random()*10);
+        }
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>🔢 Number Memory</h2>
+
+                <p>Memorize the number.</p>
+
+                <div style="
+                    font-size:3rem;
+                    font-weight:900;
+                    margin:30px">
+                    ${sequence}
+                </div>
+
+            </div>
+        `;
+
+        setTimeout(input,1200);
+    }
+
+    function input(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>What was the number?</h2>
+
+                <input id="memoryNumber"
+                    class="game-input"
+                    type="number"
+                    placeholder="Enter number">
+
+                <button class="btn primary"
+                    onclick="window.numberMemoryCheck()">
+                    Check
+                </button>
+
+            </div>
+        `;
+    }
+
+    window.numberMemoryCheck=()=>{
+
+        const answer=
+            document.getElementById("memoryNumber").value;
+
+        if(answer===sequence){
+
+            round++;
+            length++;
+
+            if(round>=5){
+
+                finishGame(
+                    "Memory Champion!",
+                    "You completed five rounds.",
+                    150,
+                    true,
+                    "🧠"
+                );
+
+                return;
+            }
+
+            next();
+
+        }else{
+
+            finishGame(
+                "Memory Failed",
+                `The number was ${sequence}.`,
+                round*20,
+                false,
+                "❌"
+            );
+        }
+    };
+
+    next();
+
+    cleanupGame=()=>{
+        delete window.numberMemoryCheck;
+    };
+}
+
+/* ============================================================
+   GAME 20 — SIMON
+============================================================ */
+
+function gameSimon(box){
+
+    const colors=[
+        ["red","#ef4444"],
+        ["blue","#3b82f6"],
+        ["green","#22c55e"],
+        ["yellow","#eab308"]
+    ];
+
+    let sequence=[];
+    let playerIndex=0;
+    let round=0;
+    let accepting=false;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🎵 Simon Says</h2>
+
+            <p id="simonStatus">Watch the sequence.</p>
+
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(2,120px);
+                gap:12px;
+                justify-content:center">
+
+                ${colors.map((c,i)=>`
+
+                    <button id="simon${i}"
+                        onclick="window.simonClick(${i})"
+                        style="
+                        width:120px;
+                        height:120px;
+                        border:0;
+                        border-radius:20px;
+                        background:${c[1]}">
+                    </button>
+
+                `).join("")}
+
+            </div>
+        </div>
+    `;
+
+    function addRound(){
+
+        playerIndex=0;
+        accepting=false;
+
+        sequence.push(
+            Math.floor(Math.random()*4)
+        );
+
+        showSequence(0);
+    }
+
+    function flash(i){
+
+        const el=document.getElementById(`simon${i}`);
+
+        el.style.filter="brightness(2)";
+
+        setTimeout(()=>{
+            el.style.filter="";
+        },250);
+    }
+
+    function showSequence(i){
+
+        if(i>=sequence.length){
+
+            accepting=true;
+
+            document.getElementById("simonStatus")
+                .textContent="Your turn!";
+
+            return;
+        }
+
+        flash(sequence[i]);
+
+        setTimeout(
+            ()=>showSequence(i+1),
+            500
+        );
+    }
+
+    window.simonClick=(i)=>{
+
+        if(!accepting)return;
+
+        flash(i);
+
+        if(i!==sequence[playerIndex]){
+
+            finishGame(
+                "Simon Over!",
+                `You reached round ${round}.`,
+                round*25,
+                false,
+                "🎵"
+            );
+
+            return;
+        }
+
+        playerIndex++;
+
+        if(playerIndex===sequence.length){
+
+            round++;
+
+            if(round>=6){
+
+                finishGame(
+                    "Simon Master!",
+                    "You completed six rounds.",
+                    180,
+                    true,
+                    "🎵"
+                );
+
+                return;
+            }
+
+            accepting=false;
+
+            setTimeout(addRound,600);
+        }
+    };
+
+    addRound();
+
+    cleanupGame=()=>{
+        delete window.simonClick;
+    };
+}
+
+/* ============================================================
+   GAME 21 — COLOR MATCH
+============================================================ */
+
+function gameColorMatch(box){
+
+    let round=0;
+    let score=0;
+
+    const colors=[
+        ["RED","#ef4444"],
+        ["BLUE","#3b82f6"],
+        ["GREEN","#22c55e"],
+        ["YELLOW","#eab308"]
+    ];
+
+    function render(){
+
+        if(round>=7){
+
+            finishGame(
+                "Color Match Complete!",
+                `You got ${score}/7.`,
+                score*30,
+                score>=4,
+                "🌈"
+            );
+
+            return;
+        }
+
+        const word=
+            colors[Math.floor(Math.random()*colors.length)];
+
+        const visual=
+            colors[Math.floor(Math.random()*colors.length)];
+
+        const matches=word[0]===visual[0];
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>🌈 Color Match</h2>
+
+                <div style="
+                    font-size:4rem;
+                    font-weight:900;
+                    color:${visual[1]};
+                    margin:30px">
+                    ${word[0]}
+                </div>
+
+                <p>Does the word match its displayed color?</p>
+
+                <div class="game-buttons">
+
+                    <button class="btn success"
+                        onclick="window.colorAnswer(true,${matches})">
+                        MATCH
+                    </button>
+
+                    <button class="btn danger"
+                        onclick="window.colorAnswer(false,${matches})">
+                        NO MATCH
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    window.colorAnswer=(answer,correct)=>{
+
+        if(answer===correct)score++;
+
+        round++;
+
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.colorAnswer;
+    };
+}
+
+/* ============================================================
+   GAME 22 — CIPHER
+============================================================ */
+
+function gameCipher(box){
+
+    const code=
+        Array.from({length:4},
+        ()=>Math.floor(Math.random()*10)).join("");
+
+    let attempts=0;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🔐 Cipher Breaker</h2>
+
+            <p>Guess the 4-digit code.</p>
+
+            <input id="cipherInput"
+                class="game-input"
+                maxlength="4"
+                inputmode="numeric"
+                placeholder="0000">
+
+            <button class="btn primary"
+                onclick="window.cipherGuess()">
+                Unlock
+            </button>
+
+            <div id="cipherHistory"
+                style="margin-top:15px"></div>
+
+        </div>
+    `;
+
+    window.cipherGuess=()=>{
+
+        const input=document
+            .getElementById("cipherInput")
+            .value;
+
+        if(!/^\d{4}$/.test(input))return;
+
+        attempts++;
+
+        let exact=0;
+
+        for(let i=0;i<4;i++){
+
+            if(input[i]===code[i])exact++;
+        }
+
+        const row=document.createElement("div");
+
+        row.style.padding="8px";
+        row.style.margin="5px";
+        row.style.borderRadius="8px";
+        row.style.background="var(--panel2)";
+
+        row.textContent=
+            `${input} — ${exact}/4 exact`;
+
+        document
+            .getElementById("cipherHistory")
+            .appendChild(row);
+
+        if(exact===4){
+
+            finishGame(
+                "Cipher Cracked!",
+                `Solved in ${attempts} attempts.`,
+                Math.max(30,150-attempts*10),
+                true,
+                "🔐"
+            );
+        }
+    };
+
+    cleanupGame=()=>{
+        delete window.cipherGuess;
+    };
+}
+
+/* ============================================================
+   GAME 23 — ROCK PAPER SCISSORS
+============================================================ */
+
+function gameRPS(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>✊ Rock Paper Scissors</h2>
+
+            <div class="game-buttons">
+
+                <button class="btn primary"
+                    style="font-size:2.5rem"
+                    onclick="window.rps('rock')">
+                    ✊
+                </button>
+
+                <button class="btn primary"
+                    style="font-size:2.5rem"
+                    onclick="window.rps('paper')">
+                    ✋
+                </button>
+
+                <button class="btn primary"
+                    style="font-size:2.5rem"
+                    onclick="window.rps('scissors')">
+                    ✌️
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+    window.rps=(choice)=>{
+
+        const options=["rock","paper","scissors"];
+
+        const computer=
+            options[Math.floor(Math.random()*3)];
+
+        if(choice===computer){
+
+            finishGame(
+                "Draw!",
+                `Both chose ${computer}.`,
+                10,
+                false,
+                "🤝"
+            );
+
+            return;
+        }
+
+        const win=
+            choice==="rock"&&computer==="scissors"||
+            choice==="paper"&&computer==="rock"||
+            choice==="scissors"&&computer==="paper";
+
+        finishGame(
+            win?"You Win!":"You Lose!",
+            `You chose ${choice}; computer chose ${computer}.`,
+            win?40:0,
+            win,
+            win?"🏆":"❌"
+        );
+    };
+
+    cleanupGame=()=>{
+        delete window.rps;
+    };
+}
+
+/* ============================================================
+   GAME 24 — HIGHER LOWER
+============================================================ */
+
+function gameHigher(box){
+
+    let current=Math.floor(Math.random()*13)+1;
+    let streak=0;
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>🃏 Higher or Lower</h2>
+
+                <div style="
+                    font-size:5rem;
+                    font-weight:900;
+                    color:var(--primary)">
+                    ${current}
+                </div>
+
+                <p>Will the next card be higher or lower?</p>
+
+                <div class="game-buttons">
+
+                    <button class="btn success"
+                        onclick="window.higher('higher')">
+                        ⬆ Higher
+                    </button>
+
+                    <button class="btn primary"
+                        onclick="window.higher('lower')">
+                        ⬇ Lower
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    window.higher=(choice)=>{
+
+        const next=Math.floor(Math.random()*13)+1;
+
+        const correct=
+            choice==="higher"
+            ?next>current
+            :next<current;
+
+        if(!correct){
+
+            finishGame(
+                "Streak Broken!",
+                `Next card was ${next}.`,
+                streak*20,
+                false,
+                "❌"
+            );
+
+            return;
+        }
+
+        streak++;
+        current=next;
+
+        if(streak>=5){
+
+            finishGame(
+                "Perfect Streak!",
+                "Five correct predictions.",
+                120,
+                true,
+                "🃏"
+            );
+
+            return;
+        }
+
+        render();
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.higher;
+    };
+}
+
+/* ============================================================
+   GAME 25 — NUMBER GUESS
+============================================================ */
+
+function gameNumberGuess(box){
+
+    const secret=Math.floor(Math.random()*100)+1;
+
+    let attempts=0;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🧩 Number Guess</h2>
+
+            <p>Guess a number from 1 to 100.</p>
+
+            <input id="guessInput"
+                type="number"
+                class="game-input"
+                placeholder="Your guess">
+
+            <button class="btn primary"
+                onclick="window.numberGuess()">
+                Guess
+            </button>
+
+            <div id="guessFeedback"
+                style="margin-top:15px;font-weight:bold">
+            </div>
+
+        </div>
+    `;
+
+    window.numberGuess=()=>{
+
+        const value=Number(
+            document.getElementById("guessInput").value
+        );
+
+        attempts++;
+
+        if(value===secret){
+
+            finishGame(
+                "Correct Guess!",
+                `Solved in ${attempts} attempts.`,
+                Math.max(20,120-attempts*8),
+                true,
+                "🎯"
+            );
+
+        }else if(value<secret){
+
+            document.getElementById("guessFeedback")
+                .textContent="Too low ⬆️";
+
+        }else{
+
+            document.getElementById("guessFeedback")
+                .textContent="Too high ⬇️";
+        }
+    };
+
+    cleanupGame=()=>{
+        delete window.numberGuess;
+    };
+}
+
+/* ============================================================
+   GAME 26 — DICE BATTLE
+============================================================ */
+
+function gameDice(box){
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🎲 Dice Battle</h2>
+
+            <p>Roll higher than the computer.</p>
+
+            <button class="btn primary"
+                style="font-size:2rem"
+                onclick="window.rollDice()">
+                🎲 Roll Dice
+            </button>
+
+            <div id="diceResult"
+                style="font-size:3rem;margin:25px">
+            </div>
+
+        </div>
+    `;
+
+    window.rollDice=()=>{
+
+        const playerRoll=
+            Math.floor(Math.random()*6)+1;
+
+        const aiRoll=
+            Math.floor(Math.random()*6)+1;
+
+        const result=document.getElementById("diceResult");
+
+        result.innerHTML=`
+            You: 🎲 ${playerRoll}
+            <br>
+            Computer: 🎲 ${aiRoll}
+        `;
+
+        if(playerRoll>aiRoll){
+
+            setTimeout(()=>finishGame(
+                "You Won!",
+                `${playerRoll} beats ${aiRoll}.`,
+                40,
+                true,
+                "🎲"
+            ),400);
+
+        }else if(playerRoll<aiRoll){
+
+            setTimeout(()=>finishGame(
+                "Computer Won",
+                `${aiRoll} beats ${playerRoll}.`,
+                0,
+                false,
+                "❌"
+            ),400);
+
+        }else{
+
+            setTimeout(()=>finishGame(
+                "Draw!",
+                "Same dice value.",
+                10,
+                false,
+                "🤝"
+            ),400);
+        }
+    };
+
+    cleanupGame=()=>{
+        delete window.rollDice;
+    };
+}
+
+/* ============================================================
+   GAME 27 — PENALTY SHOOTOUT
+============================================================ */
+
+function gamePenalty(box){
+
+    let shots=0;
+    let goals=0;
+
+    const directions=["left","center","right"];
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>⚽ Penalty Shootout</h2>
+
+            <p>Choose where to shoot.</p>
+
+            <div style="
+                width:300px;
+                height:180px;
+                margin:20px auto;
+                background:#48bb78;
+                border:5px solid white;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                font-size:4rem">
+                🥅
+            </div>
+
+            <div class="game-buttons">
+
+                ${directions.map(d=>`
+                    <button class="btn primary"
+                        onclick="window.penalty('${d}')">
+                        ${d.toUpperCase()}
+                    </button>
+                `).join("")}
+
+            </div>
+
+            <p id="penaltyStatus">Goals: 0 / 5</p>
+
+        </div>
+    `;
+
+    window.penalty=(choice)=>{
+
+        if(shots>=5)return;
+
+        shots++;
+
+        const keeper=
+            directions[Math.floor(Math.random()*3)];
+
+        if(choice!==keeper){
+            goals++;
+            beep(800);
+        }else{
+            beep(200);
+        }
+
+        document.getElementById("penaltyStatus")
+            .textContent=`Goals: ${goals} / ${shots}`;
+
+        if(shots>=5){
+
+            setTimeout(()=>finishGame(
+                "Penalty Shootout!",
+                `You scored ${goals} out of 5.`,
+                goals*30,
+                goals>=3,
+                "⚽"
+            ),300);
+        }
+    };
+
+    cleanupGame=()=>{
+        delete window.penalty;
+    };
+}
+
+/* ============================================================
+   GAME 28 — TARGET MASTER
+============================================================ */
+
+function gameTarget(box){
+
+    let score=0;
+    let shots=0;
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🎯 Target Master</h2>
+
+            <div id="targetArea"
+                style="
+                position:relative;
+                width:min(500px,100%);
+                height:350px;
+                margin:auto;
+                background:#dbeafe;
+                border-radius:18px;
+                overflow:hidden">
+
+                <button id="target"
+                    style="
+                    position:absolute;
+                    width:60px;
+                    height:60px;
+                    border:0;
+                    border-radius:50%;
+                    background:#ef4444;
+                    color:white;
+                    font-size:1.5rem">
+                    🎯
+                </button>
+
+            </div>
+
+            <p>
+                Score: <b id="targetScore">0</b>
+                |
+                Shots: <b id="targetShots">0</b>/10
+            </p>
+
+        </div>
+    `;
+
+    const target=document.getElementById("target");
+    const area=document.getElementById("targetArea");
+
+    function move(){
+
+        const x=Math.random()*(area.clientWidth-60);
+        const y=Math.random()*(area.clientHeight-60);
+
+        target.style.left=x+"px";
+        target.style.top=y+"px";
+    }
+
+    target.onclick=()=>{
+
+        score++;
+        shots++;
+
+        document.getElementById("targetScore").textContent=score;
+        document.getElementById("targetShots").textContent=shots;
+
+        move();
+
+        if(shots>=10){
+
+            finishGame(
+                "Target Master!",
+                `You hit ${score}/10 targets.`,
+                score*15,
+                score>=6,
+                "🎯"
+            );
+        }
+    };
+
+    move();
+
+    cleanupGame=()=>{
+        target.onclick=null;
+    };
+}
+
+/* ============================================================
+   GAME 29 — SUDOKU MINI
+============================================================ */
+
+function gameSudoku(box){
+
+    const solution=[
+        5,3,4,6,
+        2,7,6,1,
+        3,1,2,4,
+        4,6,1,3
+    ];
+
+    const puzzle=[
+        5,0,4,0,
+        0,7,0,1,
+        3,0,2,0,
+        0,6,0,3
+    ];
+
+    function render(){
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>🔢 Mini Sudoku</h2>
+
+                <p>Complete the 4×4 puzzle.</p>
+
+                <div style="
+                    display:grid;
+                    grid-template-columns:repeat(4,60px);
+                    gap:3px;
+                    width:max-content;
+                    margin:20px auto">
+
+                    ${puzzle.map((v,i)=>`
+
+                        <input
+                            ${v?"value="+v+" disabled":""}
+                            data-sudoku="${i}"
+                            maxlength="1"
+                            inputmode="numeric"
+                            style="
+                            width:60px;
+                            height:60px;
+                            text-align:center;
+                            font-size:1.5rem;
+                            font-weight:bold;
+                            border:1px solid #94a3b8;
+                            background:${v?"#cbd5e1":"var(--panel)"};
+                            color:var(--text)"
+                        >
+
+                    `).join("")}
+
+                </div>
+
+                <button class="btn primary"
+                    onclick="window.checkSudoku()">
+                    Check Puzzle
+                </button>
+
+            </div>
+        `;
+    }
+
+    window.checkSudoku=()=>{
+
+        const inputs=
+            [...document.querySelectorAll("[data-sudoku]")];
+
+        let correct=true;
+
+        inputs.forEach((input,i)=>{
+
+            const value=
+                Number(input.value||0);
+
+            if(value!==solution[i]){
+                correct=false;
+            }
+        });
+
+        if(correct){
+
+            finishGame(
+                "Sudoku Solved!",
+                "You completed the puzzle.",
+                150,
+                true,
+                "🔢"
+            );
+
+        }else{
+
+            alert("Some cells are incorrect.");
+        }
+    };
+
+    render();
+
+    cleanupGame=()=>{
+        delete window.checkSudoku;
+    };
+}
+
+/* ============================================================
+   GAME 30 — WORD SEARCH
+============================================================ */
+
+function gameWordSearch(box){
+
+    const words=[
+        "CODE",
+        "GAME",
+        "PYTHON",
+        "WEB"
+    ];
+
+    const letters=[
+        "C","O","D","E",
+        "A","G","A","M",
+        "P","Y","T","H",
+        "W","E","B","X"
+    ];
+
+    let found=[];
+
+    box.innerHTML=`
+
+        <div class="game-box">
+
+            <h2>🔎 Word Search</h2>
+
+            <p>Find: ${words.join(", ")}</p>
+
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(4,60px);
+                gap:4px;
+                width:max-content;
+                margin:20px auto">
+
+                ${letters.map((l,i)=>`
+
+                    <button
+                        id="ws${i}"
+                        onclick="window.wordCell(${i})"
+                        style="
+                        width:60px;
+                        height:60px;
+                        border:0;
+                        border-radius:7px;
+                        background:var(--panel2);
+                        color:var(--text);
+                        font-weight:900;
+                        font-size:1.2rem">
+                        ${l}
+                    </button>
+
+                `).join("")}
+
+            </div>
+
+            <div id="wordSearchStatus">
+                Found: 0/${words.length}
+            </div>
+
+        </div>
+    `;
+
+    window.wordCell=(i)=>{
+
+        if(found.includes(i))return;
+
+        found.push(i);
+
+        document.getElementById(`ws${i}`)
+            .style.background="#48bb78";
+
+        document.getElementById("wordSearchStatus")
+            .textContent=`Found: ${found.length}/${words.length}`;
+
+        if(found.length>=words.length){
+
+            finishGame(
+                "Word Search Complete!",
+                "You found all target words.",
+                100,
+                true,
+                "🔎"
+            );
+        }
+    };
+
+    cleanupGame=()=>{
+        delete window.wordCell;
+    };
+}
+
+/* ============================================================
+   GAME DISPATCHER
+============================================================ */
+
+function launch(id){
+
+    const box=document.getElementById("arenaBody");
+
+    const engines={
+
+        trivia:gameTrivia,
+        hangman:gameHangman,
+        scramble:gameScramble,
+        wordmaster:gameWordMaster,
+        typing:gameTyping,
+        tictactoe:gameTicTacToe,
+        connect4:gameConnect4,
+        memory:gameMemory,
+        "2048":game2048,
+        snake:gameSnake,
+        pong:gamePong,
+        breakout:gameBreakout,
+        flappy:gameFlappy,
+        space:gameSpace,
+        dodger:gameDodger,
+        quicktap:gameQuickTap,
+        reaction:gameReaction,
+        math:gameMath,
+        numbermemory:gameNumberMemory,
+        simon:gameSimon,
+        colormatch:gameColorMatch,
+        cipher:gameCipher,
+        rps:gameRPS,
+        higher:gameHigher,
+        numguess:gameNumberGuess,
+        dice:gameDice,
+        penalty:gamePenalty,
+        target:gameTarget,
+        sudoku:gameSudoku,
+        wordsearch:gameWordSearch
+    };
+
+    if(engines[id]){
+        engines[id](box);
+    }else{
+
+        box.innerHTML=`
+
+            <div class="game-box">
+
+                <h2>Coming Soon</h2>
+
+                <p>This game engine is being expanded.</p>
+
+            </div>
+        `;
+    }
+}
+
+/* ============================================================
+   GLOBAL ESCAPE KEY
+============================================================ */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="Escape"){
+
+        if(document.getElementById("result")
+            .classList.contains("active")){
+
+            closeResult();
+            return;
+        }
+
+        if(document.getElementById("profileModal")
+            .classList.contains("active")){
+
+            closeProfile();
+            return;
+        }
+
+        if(document.getElementById("arena")
+            .classList.contains("active")){
+
+            exitGame();
+        }
+    }
+});
+
+/* ============================================================
+   PREVENT ENTER SUBMISSION ISSUES
+============================================================ */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+
+        const tag=e.target.tagName;
+
+        if(tag==="INPUT"&&
+           e.target.type!=="number"){
+
+            /* Allow normal input behavior. */
+        }
+    }
+});
+
+/* ============================================================
+   INITIAL ACHIEVEMENT RENDER
+============================================================ */
+
+renderAchievements();
+
+</script>
+
 </body>
 </html>
