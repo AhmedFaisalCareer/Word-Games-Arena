@@ -93,4 +93,4 @@ Players will be able to create an online room and share it with a friend.
 Example:
 
 ```text
-https://YOUR-USERNAME.github.io/word-games-arena/?room=ABC123
+[https://YOUR-USERNAME.github.io/word-games-arena/?room=ABC123](https://ahmedfaisalcareer.github.io/Word-Games-Arena/)
